@@ -1,0 +1,5 @@
+menus:
+  common:
+    topnav:
+      blogs:
+        to: blogs.index
