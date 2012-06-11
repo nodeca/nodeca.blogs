@@ -4,3 +4,7 @@ i18n:
       common:
         topnav:
           blogs: Blogs
+
+      admin:
+        topnav:
+          blogs: Blogs

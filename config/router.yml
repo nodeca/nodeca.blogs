@@ -2,3 +2,6 @@ router:
   map:
     blogs.index:
       "/blogs": ~
+
+    admin.blogs.index:
+      "/admin/blogs": ~

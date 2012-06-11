@@ -3,3 +3,8 @@ menus:
     topnav:
       blogs:
         to: blogs.index
+
+  admin:
+    topnav:
+      blogs:
+        to: admin.blogs.index
