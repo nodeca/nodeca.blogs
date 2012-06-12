@@ -4,4 +4,4 @@ router:
       "/blogs": ~
 
     admin.blogs.index:
-      "/admin/blogs": ~
+      "/blogs": ~
