@@ -2,10 +2,10 @@ i18n:
   en-US:
     common:
       menus:
-        topnav:
+        navbar:
           blogs: Blogs
 
     admin:
       menus:
-        topnav:
+        navbar:
           blogs: Blogs
