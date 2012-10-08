@@ -6,7 +6,9 @@
 // Validate input parameters
 //
 var params_schema = {
-}
+};
+
+
 nodeca.validate(params_schema);
 
 
