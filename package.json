@@ -1,13 +1,10 @@
 {
   "name"            : "nodeca.blogs",
-  "description"     : "Nodeca blogs app",
+  "description"     : "Nodeca blogs application",
   "version"         : "0.0.1",
-  "keywords"        : ["nodeca", "blogs", "app"],
+  "keywords"        : ["nodeca", "blogs"],
   "homepage"        : "https://github.com/nodeca/nodeca.blogs",
 
-  "author"          : "Aleksey V Zapparov <ixti@member.fsf.org> (http://ixti.net/)",
-
-  "bugs"            : { "url": "https://github.com/nodeca/nodeca.blogs/issues" },
   "license"         : { "type": "MIT", "url": "https://github.com/nodeca/nodeca.blogs/blob/master/LICENSE" },
   "repository"      : { "type": "git", "url": "git://github.com/nodeca/nodeca.blogs.git" },
 
@@ -15,8 +12,6 @@
 
   "devDependencies" : {
                         "chai"    : "~ 1.4.0",
-                        "mocha"   : "~ 1.7.0",
-                        "jshint"  : "*"
-                      },
-  "engines"         : { "node": ">= 0.6.0" }
+                        "mocha"   : "~ 1.7.0"
+                      }
 }

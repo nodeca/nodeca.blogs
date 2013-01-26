@@ -1,19 +1,15 @@
 'use strict';
 
-/*global nodeca*/
+/////////////////////////////////////////////////////////////////////////////////
 
 
-// Validate input parameters
-//
-var params_schema = {
-};
+module.exports = function (N, apiPath) {
+  N.validate(apiPath, {
+  });
 
-
-nodeca.validate(params_schema);
-
-
-module.exports = function (params, next) {
-  this.response.data.req_time = Date.now();
-  this.response.layout = 'default.blogs';
-  next();
+  N.wire.on(apiPath, function (env, callback) {
+    env.response.data.req_time = Date.now();
+    env.response.layout = 'default.blogs';
+    callback();
+  });
 };

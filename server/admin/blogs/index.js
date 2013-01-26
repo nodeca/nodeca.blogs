@@ -1,17 +1,11 @@
 'use strict';
 
-/*global nodeca*/
 
+module.exports = function (N, apiPath) {
+  N.validate(apiPath, {
+  });
 
-// Validate input parameters
-//
-var params_schema = {
-};
-
-
-nodeca.validate(params_schema);
-
-
-module.exports = function (params, next) {
-  next();
+  N.wire.on(apiPath, function (env, callback) {
+    callback();
+  });
 };
