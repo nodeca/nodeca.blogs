@@ -10,18 +10,27 @@ packages:
       include:    "*.js"
       exclude:    "/(^|\\/)_.*/"
 
-    views:
-      root:       "./client/admin"
-      include:    "*.jade"
-      exclude:    "/(^|\\/)_.*/"
+    #views:
+    #  root:       "./client/admin"
+    #  include:    "*.jade"
+    #  exclude:    "/(^|\\/)_.*/"
+
+    #views:
+    #  root:       "./views/desktop/admin"
+    #  include:    "*.jade"
+    #  exclude:    "/(^|\\/)_.*/"
 
     i18n_client:
       root:       "./client/admin"
       include:    "i18n/*.yml"
 
-    styles:
-      root:       "./client/admin"
-      include:    "*.styl"
+    #styles:
+    #  root:       "./client/admin"
+    #  include:    "*.styl"
+
+    #styles:
+    #  root:       "./assets"
+    #  include:    "desktop/admin/**.styl"
 
     server:
       root:       "./server/admin"
@@ -39,19 +48,29 @@ packages:
       include:    "*.js"
       exclude:    "/(^|\\/)_.*/"
 
-    views:
-      root:       "./client/blogs"
-      include:    "*.jade"
-      exclude:    "/(^|\\/)_.*/"
+    #views:
+    #  root:       "./client/blogs"
+    #  include:    "*.jade"
+    #  exclude:    "/(^|\\/)_.*/"
+
+    #views:
+    #  root:       "./views/desktop/blogs"
+    #  include:    "*.jade"
+    #  exclude:    "/(^|\\/)_.*/"
 
     i18n_client:
       root:       "./client/blogs"
       include:    "i18n/*.yml"
 
-    styles:
-      root:       "./client/blogs"
-      main:       "app.styl"
-      include:    "*.styl"
+    #styles:
+    #  root:       "./client/blogs"
+    #  main:       "app.styl"
+    #  include:    "*.styl"
+
+    #styles:
+    #  root:       "./assets"
+    #  main:       "desktop/blogs/app.styl"
+    #  include:    "desktop/blogs/**.styl"
 
     server:
       root:       "./server/blogs"
@@ -61,3 +80,11 @@ packages:
     i18n_server:
       root:       "./server/blogs"
       include:    "i18n/*.yml"
+
+
+  core:
+    #views:
+    #  root:       "./views/desktop/layouts"
+    #  include:    "*.jade"
+    #  exclude:    "/(^|\\/)_.*/"
+      apiPrefix:  "layouts"
