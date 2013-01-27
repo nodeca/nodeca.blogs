@@ -1,23 +1,59 @@
-bundles:
-  frontend:
-    - blogs
-
-
 packages:
   admin:
+    client:
+      root:       "./client/admin"
+      include:    "*.js"
+      exclude:    "/(^|\\/)_.*/"
+
+    views:
+      root:       "./client/admin"
+      include:    "*.jade"
+      exclude:    "/(^|\\/)_.*/"
+
+    i18n_client:
+      root:       "./client/admin"
+      include:    "i18n/*.yml"
+
+    styles:
+      root:       "./client/admin"
+      main:       "app.styl"
+      include:    "*.styl"
+
     server:
       root:       "./server/admin"
       include:    "*.js"
       exclude:    "/(^|\\/)_.*/"
 
+    i18n_server:
+      root:       "./server/admin"
+      include:    "i18n/*.yml"
+
+
   blogs:
+    client:
+      root:       "./client/blogs"
+      include:    "*.js"
+      exclude:    "/(^|\\/)_.*/"
+
+    views:
+      root:       "./client/blogs"
+      include:    "*.jade"
+      exclude:    "/(^|\\/)_.*/"
+
+    i18n_client:
+      root:       "./client/blogs"
+      include:    "i18n/*.yml"
+
+    styles:
+      root:       "./client/blogs"
+      main:       "app.styl"
+      include:    "*.styl"
+
     server:
       root:       "./server/blogs"
       include:    "*.js"
       exclude:    "/(^|\\/)_.*/"
 
-    views:
-      root:       "./views/desktop/layouts"
-      include:    "*.jade"
-      exclude:    "/(^|\\/)_.*/"
-      apiPrefix:  "layouts"
+    i18n_server:
+      root:       "./server/blogs"
+      include:    "i18n/*.yml"
