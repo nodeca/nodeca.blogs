@@ -82,9 +82,9 @@ packages:
       include:    "i18n/*.yml"
 
 
-  core:
-    #views:
-    #  root:       "./views/desktop/layouts"
-    #  include:    "*.jade"
-    #  exclude:    "/(^|\\/)_.*/"
-      apiPrefix:  "layouts"
+  #core:
+  #  views:
+  #    root:       "./views/desktop/layouts"
+  #    include:    "*.jade"
+  #    exclude:    "/(^|\\/)_.*/"
+  #    apiPrefix:  "layouts"
