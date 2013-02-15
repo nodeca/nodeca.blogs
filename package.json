@@ -11,7 +11,7 @@
   "main"            : "./index.js",
 
   "devDependencies" : {
-                        "chai"    : "~ 1.4.2",
+                        "chai"    : "*",
                         "mocha"   : "*",
                         "jshint"  : "*"
                       }
