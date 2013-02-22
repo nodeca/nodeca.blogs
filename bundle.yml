@@ -43,6 +43,9 @@ packages:
 
 
   blogs:
+    depends:
+      - lib
+
     client:
       root:       "./client/blogs"
       include:    "*.js"
