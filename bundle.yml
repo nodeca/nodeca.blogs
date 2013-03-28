@@ -6,31 +6,25 @@ bundles:
 packages:
   admin:
     client:
-      root:       "./client/admin"
-      include:    "*.js"
-      exclude:    "/(^|\\/|\\\\)_.*/"
+      include: client/admin/**.js
+      exclude: /(^|\/|\\)_.*/
 
     views:
-      root:       "./client/admin"
-      include:    "*.jade"
-      exclude:    "/(^|\\/|\\\\)_.*/"
+      include: client/admin/**.jade
+      exclude: /(^|\/|\\)_.*/
 
     i18n_client:
-      root:       "./client/admin"
-      include:    "i18n/*.yml"
+      include: client/admin/**i18n/*.yml
 
     styles:
-      root:       "./client/admin"
-      include:    "*.styl"
+      include: client/admin/**.styl
 
     server:
-      root:       "./server/admin"
-      include:    "*.js"
-      exclude:    "/(^|\\/|\\\\)_.*/"
+      include: server/admin/**.js
+      exclude: /(^|\/|\\)_.*/
 
     i18n_server:
-      root:       "./server/admin"
-      include:    "i18n/*.yml"
+      include: server/admin/**i18n/*.yml
 
 
   blogs:
@@ -38,28 +32,22 @@ packages:
       - common
 
     client:
-      root:       "./client/blogs"
-      include:    "*.js"
-      exclude:    "/(^|\\/|\\\\)_.*/"
+      include: client/blogs/**.js
+      exclude: /(^|\/|\\)_.*/
 
     views:
-      root:       "./client/blogs"
-      include:    "*.jade"
-      exclude:    "/(^|\\/|\\\\)_.*/"
+      include: client/blogs/**.jade
+      exclude: /(^|\/|\\)_.*/
 
     i18n_client:
-      root:       "./client/blogs"
-      include:    "i18n/*.yml"
+      include: client/blogs/**i18n/*.yml
 
     styles:
-      root:       "./client/blogs"
-      include:    "*.styl"
+      include: client/blogs/**.styl
 
     server:
-      root:       "./server/blogs"
-      include:    "*.js"
-      exclude:    "/(^|\\/|\\\\)_.*/"
+      include: server/blogs/**.js
+      exclude: /(^|\/|\\)_.*/
 
     i18n_server:
-      root:       "./server/blogs"
-      include:    "i18n/*.yml"
+      include: server/blogs/**i18n/*.yml
