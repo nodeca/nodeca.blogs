@@ -1,0 +1,6 @@
+i18n:
+  en-US:
+    admin:
+      menus:
+        navbar:
+          blogs: Blogs

@@ -4,8 +4,3 @@ i18n:
       menus:
         navbar:
           blogs: Blogs
-
-    admin:
-      menus:
-        navbar:
-          blogs: Blogs
