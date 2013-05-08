@@ -1,8 +1,7 @@
 router:
-  map:
-    http.get:
-      blogs.index:
-        "/blogs": ~
+  http.get:
+    blogs.index:
+      "/blogs": ~
 
-      admin.blogs.index:
-        "/blogs": ~
+    admin.blogs.index:
+      "/blogs": ~
