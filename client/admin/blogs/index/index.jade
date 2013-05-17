@@ -1,9 +1,14 @@
 #content
-  ul.breadcrumbs
-    li: a(href='#') Breadcrumbs
-    li: a(href='#') Should
-    li: a(href='#') Be
-    li: a(href='#') Here
+  != self.partial('@admin.core.blocks.sidebar_menu', { menu: self.menus.admin })
 
-  h1 Blog acp page
-  p Last update #{self.req_time}
+  .main
+    != self.partial('@admin.core.blocks.breadcrumbs', { menu: self.menus.admin, path: self.blocks.breadcrumbs });
+
+    ul.breadcrumbs
+      li: a(href='#') Breadcrumbs
+      li: a(href='#') Should
+      li: a(href='#') Be
+      li: a(href='#') Here
+
+    h1 Blog acp page
+    p Last update #{self.req_time}
