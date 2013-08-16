@@ -6,7 +6,7 @@ module.exports = function (N, apiPath) {
   });
 
   N.wire.on(apiPath, function (env, callback) {
-    env.response.data.req_time = Date.now();
+    env.res.req_time = Date.now();
     callback();
   });
 };
