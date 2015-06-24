@@ -5,8 +5,6 @@
   "keywords"        : ["nodeca", "blogs"],
   "homepage"        : "https://github.com/nodeca/nodeca.blogs",
 
-  "license"         : { "type": "MIT", "url": "https://github.com/nodeca/nodeca.blogs/blob/master/LICENSE" },
-  "repository"      : { "type": "git", "url": "git://github.com/nodeca/nodeca.blogs.git" },
-
-  "main"            : "./index.js"
+  "license"         : "MIT",
+  "repository"      : "nodeca/nodeca.blogs"
 }
