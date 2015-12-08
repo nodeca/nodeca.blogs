@@ -6,7 +6,6 @@ services:
   - redis
   - mongodb
 addons:
-addons:
   apt:
     sources:
       - mongodb-3.0-precise
