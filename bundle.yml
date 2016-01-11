@@ -5,49 +5,14 @@ bundles:
 
 packages:
   admin:
-    client:
-      include: client/admin/**.js
-      exclude: /(^|\/|\\)_.*/
-
-    views:
-      include: client/admin/**.jade
-      exclude: /(^|\/|\\)_.*/
-
-    i18n_client:
-      include: client/admin/**i18n/*.yml
-
-    styles:
-      include: client/admin/**.styl
-
-    server:
-      include: server/admin/**.js
-      exclude: /(^|\/|\\)_.*/
-
-    i18n_server:
-      include: server/admin/**i18n/*.yml
-
+    entries:
+      - client/admin
+      - server/admin
 
   blogs:
     depends:
       - common
 
-    client:
-      include: client/blogs/**.js
-      exclude: /(^|\/|\\)_.*/
-
-    views:
-      include: client/blogs/**.jade
-      exclude: /(^|\/|\\)_.*/
-
-    i18n_client:
-      include: client/blogs/**i18n/*.yml
-
-    styles:
-      include: client/blogs/**.styl
-
-    server:
-      include: server/blogs/**.js
-      exclude: /(^|\/|\\)_.*/
-
-    i18n_server:
-      include: server/blogs/**i18n/*.yml
+    entries:
+      - client/blogs
+      - server/blogs
