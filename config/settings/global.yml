@@ -1,0 +1,5 @@
+setting_groups:
+  blogs: ~
+
+  blogs_editor:
+    parent: blogs

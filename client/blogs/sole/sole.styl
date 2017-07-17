@@ -1,0 +1,95 @@
+// Blog entry list for a user
+//
+
+@import "nodeca.core/client/common/_variables"
+
+$aside-size = '$$ N.config.users.avatars.resize.sm.height $$'px
+
+.blogs-sole__head
+  display flex
+  padding-bottom 1rem
+  margin-bottom 1.5rem
+  border-bottom 1px solid $decorator-color
+  line-height 1.25em
+
+.blogs-sole__avatar
+  flex 0 0 $aside-size + 10px
+
+.blogs-sole__userpic
+  width $aside-size
+  height $aside-size
+  border-radius 3px
+  box-shadow 0 0 1px $body-color-secondary
+
+.blogs-sole__author-link
+  color $body-color-secondary
+  font-size $font-size-xs
+
+.blogs-sole__categories
+  color $body-color-secondary
+  font-size $font-size-xs
+
+.blogs-sole__category-list
+  margin 0
+  padding 0
+  list-style none
+  margin-left 0.5rem
+  display inline
+
+.blogs-sole__category-item
+  display inline
+
+.blogs-sole__category-item + .blogs-sole__category-item
+  &:before
+    content ', '
+
+.blogs-sole-entry
+  margin-bottom 2rem
+
+.blogs-sole-entry__meta
+  margin-bottom 1rem
+  color $body-color-secondary
+  line-height 1.25em
+
+.blogs-sole-entry__controls
+  display flex
+  align-items center
+
+.blogs-sole-entry__read-more
+  flex 1 1 0%
+  font-size $font-size-xs
+
+.blogs-sole-entry__controls-blk
+  margin 0
+  padding 0
+  list-style none
+
+.blogs-sole-entry__control-item
+  color $body-color-secondary
+  font-size $font-size-xs
+  display inline-block
+  margin-right 1.5rem
+  &:last-child
+    margin-right 0
+
+.blogs-sole-entry__tags
+  margin-top 0.5rem
+  font-size $font-size-xs
+  color $body-color-secondary
+
+.blogs-sole-entry__tag-list
+  margin 0
+  padding 0
+  list-style none
+  margin-left 0.5rem
+  display inline
+
+.blogs-sole-entry__tag-item
+  display inline
+
+.blogs-sole-entry__category
+  font-weight bold
+
+.blogs-sole-entry__tag-item + .blogs-sole-entry__tag-item
+  &:before
+    content ', '

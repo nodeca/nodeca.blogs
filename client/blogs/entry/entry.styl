@@ -1,0 +1,135 @@
+// Blog entry
+//
+
+@import "nodeca.core/client/common/_variables"
+
+$aside-size = '$$ N.config.users.avatars.resize.sm.height $$'px
+
+.blogs-entry
+  margin-bottom 2rem
+
+.blogs-entry__title
+  color $brand-primary
+
+.blogs-entry__meta
+  margin-left $aside-size + 16px
+  margin-bottom 1rem
+  color $body-color-secondary
+  line-height 1.25em
+
+.blogs-entry__author-link
+  color $body-color-secondary
+  font-size $font-size-xs
+
+.blogs-entry__aside
+  float left
+  margin-top .125rem
+
+.blogs-entry__userpic
+  display inline-block
+  width $aside-size
+  height $aside-size
+  border-radius 3px
+  box-shadow 0 0 1px $body-color-secondary
+
+.blogs-entry__content
+  margin-right 0px
+  margin-left $aside-size + 16px
+  min-height $aside-size - 40 // Dont allow post controls to be above avatar bottom
+
+.blogs-entry__controls
+  margin-left $aside-size + 16px
+
+.blogs-entry__controls-blk
+  margin 0
+  padding 0
+  list-style none
+
+.blogs-entry__control-item
+  color $body-color-secondary
+  font-size $font-size-xs
+  display inline-block
+  margin-right 1.5rem
+  &:last-child
+    margin-right 0
+
+.blogs-entry__tags
+  margin-top 0.5rem
+  margin-left $aside-size + 16px
+  font-size $font-size-xs
+  color $body-color-secondary
+
+.blogs-entry__tag-list
+  margin 0
+  padding 0
+  list-style none
+  margin-left 0.5rem
+  display inline
+
+.blogs-entry__tag-item
+  display inline
+
+.blogs-entry__category
+  font-weight bold
+
+.blogs-entry__tag-item + .blogs-entry__tag-item
+  &:before
+    content ', '
+
+//
+// Comments
+//
+.blogs-entry__comment-header
+  font-size $font-size-lg
+  margin-bottom 1rem
+
+.blogs-comment
+  margin-bottom 1rem
+
+.blogs-comment__meta
+  margin-left $aside-size + 16px
+  margin-bottom 1rem
+  color $body-color-secondary
+  line-height 1.25em
+
+.blogs-comment__author-link
+.blogs-comment__date
+  color $body-color-secondary
+  font-size $font-size-xs
+
+.blogs-comment__aside
+  float left
+  margin-top .125rem
+
+.blogs-comment__userpic
+  display inline-block
+  width $aside-size
+  height $aside-size
+  border-radius 3px
+  box-shadow 0 0 1px $body-color-secondary
+
+.blogs-comment__content
+  margin-right 0px
+  margin-left $aside-size + 16px
+  min-height $aside-size - 40 // Dont allow post controls to be above avatar bottom
+
+.blogs-comment__message
+  & > p:first-child
+    margin-top -.25rem // Compensate line-height 1.5 rem
+
+.blogs-comment__controls
+  text-align right
+  margin-left $aside-size + 16px
+
+.blogs-comment__controls-blk
+  margin 0
+  padding 0
+  list-style none
+
+.blogs-comment__control-item
+  color $body-color-secondary
+  font-size $font-size-xs
+  display inline-block
+  margin-right 1.5rem
+  &:last-child
+    margin-right 0

@@ -1,0 +1,76 @@
+- var user = self.users[self.user_id] || {};
+
+article#content.blogs-sole
+  != self.partial('@common.blocks.navbar.logo_apps')
+
+  nav.breadcrumbs-container
+    .layout__container.container-fluid
+      != self.partial('@common.blocks.breadcrumbs')
+
+  .layout__container.container-fluid
+    != self.partial('@users.blocks.announces')
+
+    header.page-head.blogs-sole__head
+      a.blogs-sole__avatar(href=self.link_to('users.member', { user_hid: user.hid }))
+        img.blogs-sole__userpic(alt=user.name)&attributes(self.avatar(user, 'sm'))
+
+      .blogs-sole__meta
+        a.blogs-sole__author-link(
+          href=self.link_to('users.member', { user_hid: user.hid })
+        )= user.name
+
+        if self.categories.length
+          .blogs-sole__categories
+            = self.t('categories')
+
+            ul.blogs-sole__category-list
+              each tag in self.categories
+                li.blogs-sole__category-item
+                  a(href=self.link_to('blogs.sole', { user_hid: user.hid, $query: { tag: tag.hid } }))= tag.name
+
+    .blogs-sole__entry-list
+      each entry in self.entries || []
+
+        .blogs-sole-entry.clearfix
+          footer.blogs-sole-entry__meta
+            .blogs-sole-entry__title
+              a(href=self.link_to('blogs.entry', { user_hid: user.hid, entry_hid: entry.hid }))
+                = entry.title
+
+          .blogs-sole-entry__content
+            .blogs-sole-entry__message.markup!= entry.html
+
+          footer.blogs-sole-entry__controls
+            .blogs-sole-entry__read-more
+              a(href=self.link_to('blogs.entry', { user_hid: user.hid, entry_hid: entry.hid }))
+                = self.t('read_more')
+
+            ul.blogs-sole-entry__controls-blk
+              li.blogs-sole-entry__control-item
+                != self.timetag(entry.ts, 'relative')
+
+              li.blogs-sole-entry__control-item
+                span.icon.icon-bookmark
+
+              li.blogs-sole-entry__control-item
+                span.icon.icon-comment.icon-space-after
+                = self.t('comments', entry.comments)
+
+          -
+            var tags = (entry.tag_hids || []).map(function (hid) {
+              return self.tags && self.tags[hid];
+            }).filter(Boolean);
+
+          if tags.length
+            footer.blogs-sole-entry__tags
+              = self.t('tags')
+
+              ul.blogs-sole-entry__tag-list
+                each tag in tags
+                  li.blogs-sole-entry__tag-item(
+                    class=tag.is_category ? 'blogs-sole-entry__category' : ''
+                  )
+                    a(href=self.link_to('blogs.sole', { user_hid: user.hid, $query: { tag: tag.hid } }))= tag.name
+
+      else
+        p!= self.t('no_entries')

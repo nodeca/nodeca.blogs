@@ -1,0 +1,4 @@
+en-US:
+  comments: "Comments (#{count}):"
+  reply: "Reply"
+  tags: "Tags:"

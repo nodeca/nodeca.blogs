@@ -1,12 +1,59 @@
-#content
-  ul.breadcrumbs
-    li
-      a(href='#') Breadcrumbs
-    li
-      a(href='#') Should
-    li
-      a(href='#') Be
-    li
-      a(href='#') Here
+- self.users = self.users || {};
 
-  h1 Hello from blogs! @#{self.req_time}
+article#content.blogs-index
+  != self.partial('@common.blocks.navbar.logo_apps')
+
+  nav.breadcrumbs-container
+    .layout__container.container-fluid
+      != self.partial('@common.blocks.breadcrumbs')
+
+  .layout__container.container-fluid
+    != self.partial('@users.blocks.announces')
+
+    header.page-head
+      h1.page-head__title(itemprop='name')= self.t('title')
+
+    .blogs-index__entry-list.clearfix
+      each entry in self.entries || []
+        - var user = self.users[entry.user] || { hid: 0 };
+
+        .blogs-index-entry.clearfix
+          .blogs-index-entry__aside
+            if user.hid
+              a(href=self.link_to('users.member', { user_hid: user.hid }))
+                img.blogs-index-entry__userpic(alt=user.name)&attributes(self.avatar(user, 'sm'))
+            else
+              .blogs-index-entry__userpic.av-anon
+
+          footer.blogs-index-entry__meta
+            .blogs-index-entry__title
+              a(href=self.link_to('blogs.entry', { user_hid: user.hid, entry_hid: entry.hid }))
+                = entry.title
+
+            if user.hid
+              .blogs-index-entry__author
+                a.blogs-index-entry__author-link(
+                  href=self.link_to('users.member', { user_hid: user.hid })
+                )= user.name
+
+          .blogs-index-entry__content
+            .blogs-index-entry__message.markup!= entry.html
+
+          footer.blogs-index-entry__controls
+            .blogs-index-entry__read-more
+              a(href=self.link_to('blogs.entry', { user_hid: user.hid, entry_hid: entry.hid }))
+                = self.t('read_more')
+
+            ul.blogs-index-entry__controls-blk
+              li.blogs-index-entry__control-item
+                != self.timetag(entry.ts, 'relative')
+
+              li.blogs-index-entry__control-item
+                span.icon.icon-bookmark
+
+              li.blogs-index-entry__control-item
+                span.icon.icon-comment.icon-space-after
+                = self.t('comments', entry.comments)
+
+      else
+        p!= self.t('no_entries')

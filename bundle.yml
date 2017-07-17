@@ -15,4 +15,9 @@ packages:
 
     entries:
       - client/blogs
+      - internal/blogs
       - server/blogs
+
+  common:
+    entries:
+      - internal/common

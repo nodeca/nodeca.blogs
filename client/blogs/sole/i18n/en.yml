@@ -1,0 +1,6 @@
+en-US:
+  no_entries: This user has no blog entries.
+  read_more: Read more
+  comments: "#{count} ((comment|comments))"
+  categories: "Categories:"
+  tags: "Tags:"

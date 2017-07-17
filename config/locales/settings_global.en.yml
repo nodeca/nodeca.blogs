@@ -1,0 +1,11 @@
+i18n:
+  en-US:
+    admin:
+      core:
+        group_names:
+          blogs: Blogs
+          blogs_editor: Editor
+
+        category_names:
+          blog_entries: Blog entries
+          blog_comments: Blog comments

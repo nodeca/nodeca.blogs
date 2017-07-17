@@ -3,5 +3,20 @@ router:
     blogs.index:
       "/blogs": ~
 
+    blogs.sole:
+      "/blogs/{user_hid}":
+        user_hid:
+          match: /\d+/
+          type: 'integer'
+
+    blogs.entry:
+      "/blogs/{user_hid}/{entry_hid}":
+        user_hid:
+          match: /\d+/
+          type: 'integer'
+        entry_hid:
+          match: /\d+/
+          type: 'integer'
+
     admin.blogs.index:
       "/blogs": ~
