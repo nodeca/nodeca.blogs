@@ -29,20 +29,6 @@ $aside-size = '$$ N.config.users.avatars.resize.sm.height $$'px
   color $body-color-secondary
   font-size $font-size-xs
 
-.blogs-sole__category-list
-  margin 0
-  padding 0
-  list-style none
-  margin-left 0.5rem
-  display inline
-
-.blogs-sole__category-item
-  display inline
-
-.blogs-sole__category-item + .blogs-sole__category-item
-  &:before
-    content ', '
-
 .blogs-sole-entry
   margin-bottom 2rem
 
@@ -77,19 +63,5 @@ $aside-size = '$$ N.config.users.avatars.resize.sm.height $$'px
   font-size $font-size-xs
   color $body-color-secondary
 
-.blogs-sole-entry__tag-list
-  margin 0
-  padding 0
-  list-style none
-  margin-left 0.5rem
-  display inline
-
-.blogs-sole-entry__tag-item
-  display inline
-
-.blogs-sole-entry__category
+.blogs-sole-entry__tags .blogs-tag-list__category
   font-weight bold
-
-.blogs-sole-entry__tag-item + .blogs-sole-entry__tag-item
-  &:before
-    content ', '

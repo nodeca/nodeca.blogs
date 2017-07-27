@@ -9,7 +9,13 @@ const _ = require('lodash');
 module.exports = function (N, apiPath) {
 
   N.validate(apiPath, {
-    user_hid: { type: 'integer', minimum: 1, required: true }
+    user_hid: { type: 'integer', minimum: 1, required: true },
+    $query: {
+      type: 'object',
+      properties: {
+        tag: { type: 'string' } // tag hid
+      }
+    }
   });
 
 
@@ -40,18 +46,28 @@ module.exports = function (N, apiPath) {
                                .lean(true);
 
     env.data.categories = categories;
+
+    // select current category if ?tag=XX is specified
+    if (env.params.$query && env.params.$query.tag) {
+      env.data.current_category = categories.filter(tag => tag.hid === Number(env.params.$query.tag))[0];
+    }
   });
 
 
   // Fetch entries and tags for this user
   //
   N.wire.before(apiPath, async function fetch_entries(env) {
-    env.data.entries = await N.models.blogs.BlogEntry.find()
-                                 .where('user').equals(env.data.user._id)
-                                 .where('st').equals(N.models.blogs.BlogEntry.statuses.VISIBLE)
-                                 .sort('-_id')
-                                 .limit(20)
-                                 .lean(true);
+    let query = N.models.blogs.BlogEntry.find()
+                    .where('user').equals(env.data.user._id)
+                    .where('st').equals(N.models.blogs.BlogEntry.statuses.VISIBLE);
+
+    if (env.data.current_category) {
+      query = query.where('tag_hids').equals(env.data.current_category.hid);
+    }
+
+    env.data.entries = await query.sort('-_id')
+                                  .limit(20)
+                                  .lean(true);
 
     let tagset = new Set();
 
@@ -78,16 +94,13 @@ module.exports = function (N, apiPath) {
     env.data.users.push(env.data.user._id);
 
     env.res.user_id = env.data.user._id;
+    env.res.category_hids = _.map(env.data.categories, 'hid');
 
-    // TODO: move it to separate sanitizer, check hellbanned for votes_hb
-    env.res.categories = env.data.categories.map(tag => _.pick(tag, [
-      '_id', 'hid', 'name'
-    ]));
     env.res.entries    = env.data.entries.map(entry => _.pick(entry, [
       '_id', 'hid', 'title', 'html', 'comments', 'user', 'ts', 'tag_hids'
     ]));
-    env.res.tags       = _.keyBy(env.data.tags.map(tag => _.pick(tag, [
-      '_id', 'hid', 'name', 'is_category'
+    env.res.tags       = _.keyBy(env.data.tags.concat(env.data.categories).map(tag => _.pick(tag, [
+      '_id', 'hid', 'user', 'name', 'is_category'
     ])), 'hid');
   });
 
@@ -110,6 +123,12 @@ module.exports = function (N, apiPath) {
       route:   'blogs.sole',
       params:  { user_hid: user.hid }
     });
+
+    if (env.data.current_category) {
+      env.data.breadcrumbs.push({
+        text: env.data.current_category.name
+      });
+    }
 
     env.res.breadcrumbs = env.data.breadcrumbs;
   });

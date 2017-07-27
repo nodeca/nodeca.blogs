@@ -19,14 +19,11 @@ article#content.blogs-sole
           href=self.link_to('users.member', { user_hid: user.hid })
         )= user.name
 
-        if self.categories.length
+        if self.category_hids && self.category_hids.length
           .blogs-sole__categories
             = self.t('categories')
 
-            ul.blogs-sole__category-list
-              each tag in self.categories
-                li.blogs-sole__category-item
-                  a(href=self.link_to('blogs.sole', { user_hid: user.hid, $query: { tag: tag.hid } }))= tag.name
+            != self.partial('@blogs.blocks.tag_list', { tag_hids: self.category_hids })
 
     .blogs-sole__entry-list
       each entry in self.entries || []
@@ -56,21 +53,11 @@ article#content.blogs-sole
                 span.icon.icon-comment.icon-space-after
                 = self.t('comments', entry.comments)
 
-          -
-            var tags = (entry.tag_hids || []).map(function (hid) {
-              return self.tags && self.tags[hid];
-            }).filter(Boolean);
-
-          if tags.length
+          if entry.tag_hids && entry.tag_hids.length
             footer.blogs-sole-entry__tags
               = self.t('tags')
 
-              ul.blogs-sole-entry__tag-list
-                each tag in tags
-                  li.blogs-sole-entry__tag-item(
-                    class=tag.is_category ? 'blogs-sole-entry__category' : ''
-                  )
-                    a(href=self.link_to('blogs.sole', { user_hid: user.hid, $query: { tag: tag.hid } }))= tag.name
+              != self.partial('@blogs.blocks.tag_list', { tag_hids: entry.tag_hids })
 
       else
         p!= self.t('no_entries')

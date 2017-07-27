@@ -75,14 +75,9 @@ module.exports = function (N, apiPath) {
       return;
     }
 
-    let tags = await N.models.blogs.BlogTag.find()
-                         .where('hid').in(env.data.entry.tag_hids)
-                         .lean(true);
-
-    let tags_by_hid = _.keyBy(tags, 'hid');
-
-    // sort tags in the order they appeared in the array
-    env.data.tags = env.data.entry.tag_hids.map(hid => tags_by_hid[hid]);
+    env.data.tags = await N.models.blogs.BlogTag.find()
+                             .where('hid').in(env.data.entry.tag_hids)
+                             .lean(true);
   });
 
 
@@ -94,10 +89,13 @@ module.exports = function (N, apiPath) {
                              .where('st').equals(N.models.blogs.BlogComment.statuses.VISIBLE)
                              .lean(true);
 
-    // TODO: sort as in DFS traversal by comment.path
-    comments = _.sortBy(comments, 'hid');
+    let comment_paths = {};
 
-    env.data.comments = comments;
+    comments.forEach(comment => {
+      comment_paths[comment._id] = comment.path.concat(comment._id).map(String).join(',');
+    });
+
+    env.data.comments = _.sortBy(comments, comment => comment_paths[comment._id]);
   });
 
 
@@ -112,9 +110,15 @@ module.exports = function (N, apiPath) {
                        .concat(_.map(env.data.comments, 'user'));
 
     // TODO: move it to separate sanitizer, check hellbanned for votes_hb
-    env.res.entry    = _.pick(env.data.entry, [ '_id', 'hid', 'title', 'html', 'comments', 'user', 'ts', 'views' ]);
-    env.res.tags     = env.data.tags.map(tag => _.pick(tag, [ '_id', 'hid', 'name', 'is_category' ]));
-    env.res.comments = env.data.comments.map(comment => _.pick(comment, [ '_id', 'hid', 'html', 'user', 'ts' ]));
+    env.res.entry    = _.pick(env.data.entry, [
+      '_id', 'hid', 'title', 'html', 'comments', 'user', 'ts', 'views', 'tag_hids'
+    ]);
+    env.res.comments = env.data.comments.map(comment => _.pick(comment, [
+      '_id', 'hid', 'html', 'user', 'ts', 'path'
+    ]));
+    env.res.tags     = _.keyBy(env.data.tags.map(tag => _.pick(tag, [
+      '_id', 'hid', 'user', 'name', 'is_category'
+    ])), 'hid');
   });
 
 

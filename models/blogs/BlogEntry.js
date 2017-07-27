@@ -65,7 +65,7 @@ module.exports = function (N, collectionName) {
   BlogEntry.index({ user: 1, _id: -1, st: 1 });
 
   // get a list of blog entries by tag
-  BlogEntry.index({ tags: 1, _id: -1, st: 1 });
+  BlogEntry.index({ tag_hids: 1, _id: -1, st: 1 });
 
   // Export statuses
   //

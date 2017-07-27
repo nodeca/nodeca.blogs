@@ -1,5 +1,54 @@
 - var user = self.users[self.user_id] || {};
 
+mixin render_comments(comments)
+  - var i = 0;
+  while i < comments.length
+    -
+      var comment  = comments[i++];
+      var children = [];
+
+      while (i < comments.length && comments[i].path.indexOf(comment._id) >= 0) {
+        children.push(comments[i++]);
+      }
+
+    - var user = self.users[comment.user] || { hid: 0 };
+
+    .blogs-comment.clearfix
+      .blogs-comment__aside
+        if user.hid
+          a(href=self.link_to('users.member', { user_hid: user.hid }))
+            img.blogs-comment__userpic(alt=user.name)&attributes(self.avatar(user, 'sm'))
+        else
+          .blogs-comment__userpic.av-anon
+
+      footer.blogs-comment__meta
+        if user.hid
+          .blogs-comment__author
+            a.blogs-comment__author-link(
+              href=self.link_to('users.member', { user_hid: user.hid })
+            )= user.name
+
+        .blogs-comment__date
+          != self.timetag(comment.ts, 'relative')
+
+      .blogs-comment__content
+        .blogs-comment__message.markup!= comment.html
+
+      footer.blogs-comment__controls
+        ul.blogs-comment__controls-blk
+          li.blogs-comment__control-item
+            span.icon.icon-vote-up
+
+          li.blogs-comment__control-item
+            span.icon.icon-vote-down
+
+          li.blogs-comment__control-item
+            != self.t('reply')
+
+      .blogs-comment__children
+        +render_comments(children)
+
+
 article#content.blogs-entry
   != self.partial('@common.blocks.navbar.logo_apps')
 
@@ -48,52 +97,14 @@ article#content.blogs-entry
           li.blogs-entry__control-item
             span.icon.icon-views.icon-space-after= self.entry.views
 
-      if (self.tags || []).length
+      if self.entry.tag_hids && self.entry.tag_hids.length
         footer.blogs-entry__tags
           = self.t('tags')
 
-          ul.blogs-entry__tag-list
-            each tag in self.tags
-              li.blogs-entry__tag-item(
-                class=tag.is_category ? 'blogs-entry__category' : ''
-              )
-                a(href=self.link_to('blogs.sole', { user_hid: user.hid, $query: { tag: tag.hid } }))= tag.name
+          != self.partial('@blogs.blocks.tag_list', { tag_hids: self.entry.tag_hids })
 
     .blogs-entry__comments
       .blogs-entry__comment-header
         = self.t('comments', (self.comments || []).length)
 
-      each comment in self.comments || []
-        - var user = self.users[comment.user] || { hid: 0 };
-
-        .blogs-comment.clearfix
-          .blogs-comment__aside
-            if user.hid
-              a(href=self.link_to('users.member', { user_hid: user.hid }))
-                img.blogs-comment__userpic(alt=user.name)&attributes(self.avatar(user, 'sm'))
-            else
-              .blogs-comment__userpic.av-anon
-
-          footer.blogs-comment__meta
-            if user.hid
-              .blogs-comment__author
-                a.blogs-comment__author-link(
-                  href=self.link_to('users.member', { user_hid: user.hid })
-                )= user.name
-
-            .blogs-comment__date
-              != self.timetag(comment.ts, 'relative')
-
-          .blogs-comment__content
-            .blogs-comment__message.markup!= comment.html
-
-          footer.blogs-comment__controls
-            ul.blogs-comment__controls-blk
-              li.blogs-comment__control-item
-                span.icon.icon-vote-up
-
-              li.blogs-comment__control-item
-                span.icon.icon-vote-down
-
-              li.blogs-comment__control-item
-                != self.t('reply')
+      +render_comments(self.comments || [])

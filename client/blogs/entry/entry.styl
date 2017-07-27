@@ -59,22 +59,8 @@ $aside-size = '$$ N.config.users.avatars.resize.sm.height $$'px
   font-size $font-size-xs
   color $body-color-secondary
 
-.blogs-entry__tag-list
-  margin 0
-  padding 0
-  list-style none
-  margin-left 0.5rem
-  display inline
-
-.blogs-entry__tag-item
-  display inline
-
-.blogs-entry__category
+.blogs-entry__tags .blogs-tag-list__category
   font-weight bold
-
-.blogs-entry__tag-item + .blogs-entry__tag-item
-  &:before
-    content ', '
 
 //
 // Comments
@@ -133,3 +119,10 @@ $aside-size = '$$ N.config.users.avatars.resize.sm.height $$'px
   margin-right 1.5rem
   &:last-child
     margin-right 0
+
+.blogs-comment__children
+  margin-left $aside-size + 16px
+
+  // stop indenting deeply nested comments
+  & & & &
+    margin-left 0
