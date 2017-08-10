@@ -1,6 +1,15 @@
 - self.users = self.users || {};
+- self.add_raw_data('pagination', self.pagination)
 
-article#content.blogs-index
+article#content.blogs-index(
+  data-keymap= {
+    'home': 'blogs.index:nav_to_start',
+    'end':  'blogs.index:nav_to_end'
+  }
+  data-last-entry-hid= self.last_entry_hid
+  data-top-marker=     self.entries && self.entries.length > 0 ? self.entries[0]._id : null
+  data-bottom-marker=  self.entries && self.entries.length > 0 ? self.entries[self.entries.length - 1]._id : null
+)
   != self.partial('@common.blocks.navbar.logo_apps')
 
   nav.breadcrumbs-container
@@ -13,47 +22,35 @@ article#content.blogs-index
     header.page-head
       h1.page-head__title(itemprop='name')= self.t('title')
 
-    .blogs-index__entry-list.clearfix
-      each entry in self.entries || []
-        - var user = self.users[entry.user] || { hid: 0 };
+    if self.entries && self.entries.length
+      .blogs-index__loading-prev.nojs-hide(
+        class=(self.pagination.chunk_offset === 0 ? 'hidden-xs-up' : '')
+      )
+        span.icon.icon-loading-placeholder
 
-        .blogs-index-entry.clearfix
-          .blogs-index-entry__aside
-            if user.hid
-              a(href=self.link_to('users.member', { user_hid: user.hid }))
-                img.blogs-index-entry__userpic(alt=user.name)&attributes(self.avatar(user, 'sm'))
-            else
-              .blogs-index-entry__userpic.av-anon
+      .blogs-index__entry-list._affix(
+        data-affix-top={
+          offset:     500,
+          wire_above: 'blogs.index:load_prev',
+          throttle:   100
+        }
+        data-affix-bottom={
+          offset:     500,
+          wire_below: 'blogs.index:load_next',
+          throttle:   100
+        }
+      )!= self.partial('@blogs.blocks.entry_list_mixed')
 
-          footer.blogs-index-entry__meta
-            .blogs-index-entry__title
-              a(href=self.link_to('blogs.entry', { user_hid: user.hid, entry_hid: entry.hid }))
-                = entry.title
+      .blogs-index__loading-next.nojs-hide(
+        class=(self.entries && self.entries.length > 0 && self.entries[self.entries.length - 1].hid === self.last_entry_hid ? 'hidden-xs-up' : '')
+      )
+        span.icon.icon-loading-placeholder
 
-            if user.hid
-              .blogs-index-entry__author
-                a.blogs-index-entry__author-link(
-                  href=self.link_to('users.member', { user_hid: user.hid })
-                )= user.name
+      nav.pager.js-hide
+        if self.head.prev
+          a.btn.btn-secondary(href=self.head.prev)= self.t('prev_page')
 
-          .blogs-index-entry__content
-            .blogs-index-entry__message.markup!= entry.html
-
-          footer.blogs-index-entry__controls
-            .blogs-index-entry__read-more
-              a(href=self.link_to('blogs.entry', { user_hid: user.hid, entry_hid: entry.hid }))
-                = self.t('read_more')
-
-            ul.blogs-index-entry__controls-blk
-              li.blogs-index-entry__control-item
-                != self.timetag(entry.ts, 'relative')
-
-              li.blogs-index-entry__control-item
-                span.icon.icon-bookmark
-
-              li.blogs-index-entry__control-item
-                span.icon.icon-comment.icon-space-after
-                = self.t('comments', entry.comments)
-
-      else
-        p!= self.t('no_entries')
+        if self.head.next
+          a.btn.btn-secondary(href=self.head.next)= self.t('next_page')
+    else
+      p!= self.t('no_entries')

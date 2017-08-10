@@ -3,3 +3,11 @@ setting_groups:
 
   blogs_editor:
     parent: blogs
+
+setting_schemas:
+  global:
+    blog_entries_per_page:
+      type: number
+      group_key: core_display
+      category_key: blogs
+      default: 25

@@ -1,0 +1,48 @@
+//- This template shows blog entries belonging to multiple users.
+//-  - shows nick+avatar for each user
+//-  - doesn't show tags
+
+each entry in self.entries
+  - var user = self.users[entry.user] || { hid: 0 };
+
+  .blogs-entry-mixed(
+    data-entry-hid=entry.hid
+    data-entry-id=entry._id
+    id='entry' + entry.hid
+  )
+    .blogs-entry-mixed__aside
+      if user.hid
+        a(href=self.link_to('users.member', { user_hid: user.hid }))
+          img.blogs-entry-mixed__userpic(alt=user.name)&attributes(self.avatar(user, 'sm'))
+      else
+        .blogs-entry-mixed__userpic.av-anon
+
+    header.blogs-entry-mixed__meta
+      .blogs-entry-mixed__title
+        a(href=self.link_to('blogs.entry', { user_hid: user.hid, entry_hid: entry.hid }))
+          = entry.title
+
+      if user.hid
+        .blogs-entry-mixed__author
+          a.blogs-entry-mixed__author-link(
+            href=self.link_to('users.member', { user_hid: user.hid })
+          )= user.name
+
+    .blogs-entry-mixed__content
+      .blogs-entry-mixed__message.markup!= entry.html
+
+    footer.blogs-entry-mixed__controls
+      .blogs-entry-mixed__read-more
+        a(href=self.link_to('blogs.entry', { user_hid: user.hid, entry_hid: entry.hid }))
+          = self.t('read_more')
+
+      ul.blogs-entry-mixed__controls-blk
+        li.blogs-entry-mixed__control-item
+          != self.timetag(entry.ts, 'relative')
+
+        li.blogs-entry-mixed__control-item
+          span.icon.icon-bookmark
+
+        li.blogs-entry-mixed__control-item
+          span.icon.icon-comment.icon-space-after
+          = self.t('comments', entry.comments)

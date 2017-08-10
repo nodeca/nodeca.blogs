@@ -7,5 +7,9 @@ i18n:
           blogs_editor: Editor
 
         category_names:
+          blogs: Blogs
           blog_entries: Blog entries
           blog_comments: Blog comments
+
+        setting_names:
+          blog_entries_per_page: Blog entries per page

@@ -1,5 +1,5 @@
 en-US:
   title: Last entries
   no_entries: No blog entries yet.
-  read_more: Read more
-  comments: "#{count} ((comment|comments))"
+  next_page: Older
+  prev_page: Newer
