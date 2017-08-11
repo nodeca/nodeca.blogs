@@ -10,7 +10,20 @@ article#content.blogs-index(
   data-top-marker=     self.entries && self.entries.length > 0 ? self.entries[0]._id : null
   data-bottom-marker=  self.entries && self.entries.length > 0 ? self.entries[self.entries.length - 1]._id : null
 )
-  != self.partial('@common.blocks.navbar.logo_apps')
+
+  -
+    var navbar_args = {
+      title: self.t('title'),
+      progress: {
+        link_top:    self.link_to('blogs.index'),
+        link_bottom: self.link_to('blogs.index', { $query: { from: self.last_entry_hid } }),
+        current:     self.pagination.chunk_offset,
+        total:       self.pagination.total
+      }
+    };
+
+  != self.partial('@common.blocks.navbar.levelup_progress_apps', navbar_args)
+  != self.partial('@common.blocks.navbar.alt_levelup_progress_title_toolbar', navbar_args)
 
   nav.breadcrumbs-container
     .layout__container.container-fluid

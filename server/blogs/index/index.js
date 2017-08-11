@@ -70,7 +70,7 @@ module.exports = function (N, apiPath) {
   //
   N.wire.after(apiPath, async function fill_pagination(env) {
     //
-    // Count total amount of visible entries in the section
+    // Count total amount of visible blog entries
     //
     let counters_by_status = await Promise.map(
       env.data.blog_entries_visible_statuses,
@@ -82,7 +82,7 @@ module.exports = function (N, apiPath) {
     let total = _.sum(counters_by_status);
 
     //
-    // Count an amount of visible topics before the first one
+    // Count an amount of visible blog entries before the first displayed
     //
     let offset = 0;
 
@@ -112,7 +112,7 @@ module.exports = function (N, apiPath) {
     env.res.head = env.res.head || {};
     env.res.head.title = env.t('title');
 
-    if (env.params.topic_hid) {
+    if (env.params.$query && env.params.$query.from) {
       env.res.head.robots = 'noindex,follow';
     }
   });

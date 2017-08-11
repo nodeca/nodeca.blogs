@@ -1,6 +1,9 @@
 'use strict';
 
 
+const _ = require('lodash');
+
+
 // Page state
 //
 // - first_offset:       offset of the first entry in the DOM
@@ -21,11 +24,16 @@ let $window = $(window);
 const CUT_ITEMS_MAX = 150;
 const CUT_ITEMS_MIN = 100;
 
+// height of a space between text content of a post and the next post header
+const TOP_OFFSET = 48;
+
+const navbarHeight = parseInt($('body').css('margin-top'), 10) + parseInt($('body').css('padding-top'), 10);
+
 
 /////////////////////////////////////////////////////////////////////
 // init on page load
 //
-N.wire.on('navigate.done:' + module.apiPath, function page_setup() {
+N.wire.on('navigate.done:' + module.apiPath, function page_setup(data) {
   let pagination     = N.runtime.page_data.pagination,
       last_entry_hid = $('.blogs-index').data('last-entry-hid');
 
@@ -38,6 +46,175 @@ N.wire.on('navigate.done:' + module.apiPath, function page_setup() {
   pageState.next_loading_start = 0;
   pageState.top_marker         = $('.blogs-index').data('top-marker');
   pageState.bottom_marker      = $('.blogs-index').data('bottom-marker');
+
+  // disable automatic scroll to an anchor in the navigator
+  data.no_scroll = true;
+
+  if (data.state && typeof data.state.hid !== 'undefined' && typeof data.state.offset !== 'undefined') {
+    let el = $('#entry' + data.state.hid);
+
+    if (el.length) {
+      $window.scrollTop(el.offset().top - navbarHeight - TOP_OFFSET + data.state.offset);
+      return;
+    }
+  } else if (data.params.$query && data.params.$query.from) {
+    let el = $('#entry' + Number(data.params.$query.from));
+
+    if (el.length) {
+      $window.scrollTop(el.offset().top - $('.navbar').height() - TOP_OFFSET);
+      return;
+    }
+  }
+
+  // If we're on the first page, scroll to the top;
+  // otherwise scroll to the first entry
+  //
+  if (pagination.chunk_offset > 1 && $('.blogs-index__entry-list').length) {
+    $window.scrollTop($('.blogs-index__entry-list').offset().top - $('.navbar').height());
+
+  } else {
+    $window.scrollTop(0);
+  }
+});
+
+
+/////////////////////////////////////////////////////////////////////
+// Change URL when user scrolls the page
+//
+// Use a separate debouncer that only fires when user stops scrolling,
+// so it's executed a lot less frequently.
+//
+// The reason is that `history.replaceState` is very slow in FF
+// on large pages: https://bugzilla.mozilla.org/show_bug.cgi?id=1250972
+//
+let locationScrollHandler = null;
+
+N.wire.on('navigate.done:' + module.apiPath, function location_updater_init() {
+  if ($('.blogs-index__entry-list').length === 0) return;
+
+  locationScrollHandler = _.debounce(function update_location_on_scroll() {
+    let entries        = document.getElementsByClassName('blogs-entry-mixed');
+    let entryThreshold = navbarHeight + TOP_OFFSET;
+    let offset;
+    let currentIdx;
+
+    // Get offset of the first entry in the viewport;
+    // "-1" means user sees navigation above all entries
+    //
+    currentIdx = _.sortedIndexBy(entries, null, entry => {
+      if (!entry) { return entryThreshold; }
+      return entry.getBoundingClientRect().top;
+    }) - 1;
+
+    let href = null;
+    let state = null;
+
+    offset = currentIdx + pageState.first_offset;
+
+    if (currentIdx >= 0 && entries.length) {
+      state = {
+        hid:    $(entries[currentIdx]).data('entry-hid'),
+        offset: entryThreshold - entries[currentIdx].getBoundingClientRect().top
+      };
+    }
+
+    // save current offset, and only update url if offset is different
+    if (pageState.current_offset !== offset) {
+      let $query = {};
+
+      if (currentIdx >= 0) {
+        $query.from = $(entries[currentIdx]).data('entry-hid');
+      }
+
+      href = N.router.linkTo('blogs.index', { $query });
+
+      if ((pageState.current_offset >= 0) !== (offset >= 0)) {
+        $('meta[name="robots"]').remove();
+
+        if (offset >= 0) {
+          $('head').append($('<meta name="robots" content="noindex,follow">'));
+        }
+      }
+
+      pageState.current_offset = offset;
+    }
+
+    N.wire.emit('navigate.replace', { href, state });
+  }, 500);
+
+  // avoid executing it on first tick because of initial scrollTop()
+  setTimeout(() => {
+    $window.on('scroll', locationScrollHandler);
+  }, 1);
+});
+
+N.wire.on('navigate.exit:' + module.apiPath, function location_updater_teardown() {
+  if (!locationScrollHandler) return;
+  locationScrollHandler.cancel();
+  $window.off('scroll', locationScrollHandler);
+  locationScrollHandler = null;
+});
+
+
+/////////////////////////////////////////////////////////////////////
+// When user scrolls the page:
+//
+//  1. update progress bar
+//  2. show/hide navbar
+//
+let progressScrollHandler = null;
+
+
+N.wire.on('navigate.done:' + module.apiPath, function progress_updater_init() {
+  if ($('.blogs-index__entry-list').length === 0) return;
+
+  progressScrollHandler = _.debounce(function update_progress_on_scroll() {
+    // If we scroll below page title, show the secondary navbar
+    //
+    let title = document.getElementsByClassName('page-head__title');
+
+    if (title.length && title[0].getBoundingClientRect().bottom > navbarHeight) {
+      $('.navbar').removeClass('navbar__m-secondary');
+    } else {
+      $('.navbar').addClass('navbar__m-secondary');
+    }
+
+    // Update progress bar
+    //
+    let entries        = document.getElementsByClassName('blogs-entry-mixed');
+    let entryThreshold = navbarHeight + TOP_OFFSET;
+    let offset;
+    let currentIdx;
+
+    // Get offset of the first blog entry in the viewport
+    //
+    currentIdx = _.sortedIndexBy(entries, null, e => {
+      if (!e) { return entryThreshold; }
+      return e.getBoundingClientRect().top;
+    }) - 1;
+
+    offset = currentIdx + pageState.first_offset;
+
+    N.wire.emit('common.blocks.navbar.blocks.page_progress:update', {
+      current:  offset + 1 // `+1` because offset is zero based
+    }).catch(err => N.wire.emit('error', err));
+  }, 100, { maxWait: 100 });
+
+  // avoid executing it on first tick because of initial scrollTop()
+  setTimeout(() => {
+    $window.on('scroll', progressScrollHandler);
+  });
+
+  // execute it once on page load
+  progressScrollHandler();
+});
+
+
+N.wire.on('navigate.exit:' + module.apiPath, function progress_updater_teardown() {
+  if (!progressScrollHandler) return;
+  progressScrollHandler.cancel();
+  $window.off('scroll', progressScrollHandler);
+  progressScrollHandler = null;
 });
 
 
@@ -126,7 +303,9 @@ N.wire.once('navigate.done:' + module.apiPath, function blogs_index_init_handler
 
       if (res.entries.length === 0) return;
 
-      pageState.top_marker = res.entries[0]._id;
+      pageState.top_marker    = res.entries[0]._id;
+      pageState.first_offset  = res.pagination.chunk_offset;
+      pageState.entry_count   = res.pagination.total;
 
       // update prev/next metadata
       $('link[rel="prev"]').remove();
@@ -140,7 +319,7 @@ N.wire.once('navigate.done:' + module.apiPath, function blogs_index_init_handler
 
       let old_height = $('.blogs-index__entry-list').height();
 
-      // render & inject topics list
+      // render & inject entry list
       let $result = $(N.runtime.render('blogs.blocks.entry_list_mixed', res));
 
       return N.wire.emit('navigate.update', {
@@ -177,6 +356,10 @@ N.wire.once('navigate.done:' + module.apiPath, function blogs_index_init_handler
 
         // reset lock
         pageState.prev_loading_start = 0;
+
+        return N.wire.emit('common.blocks.navbar.blocks.page_progress:update', {
+          max: pageState.entry_count
+        });
       });
     }).catch(err => {
       N.wire.emit('error', err);
@@ -218,6 +401,8 @@ N.wire.once('navigate.done:' + module.apiPath, function blogs_index_init_handler
       if (res.entries.length === 0) return;
 
       pageState.bottom_marker = res.entries[res.entries.length - 1]._id;
+      pageState.first_offset  = res.pagination.chunk_offset - $('.blogs-entry-mixed').length;
+      pageState.topic_count   = res.pagination.total;
 
       // update prev/next metadata
       $('link[rel="next"]').remove();
@@ -229,7 +414,7 @@ N.wire.once('navigate.done:' + module.apiPath, function blogs_index_init_handler
         $('head').append(link);
       }
 
-      // render & inject topics list
+      // render & inject entry list
       let $result = $(N.runtime.render('blogs.blocks.entry_list_mixed', res));
 
       return N.wire.emit('navigate.update', {
@@ -271,6 +456,10 @@ N.wire.once('navigate.done:' + module.apiPath, function blogs_index_init_handler
 
         // reset lock
         pageState.next_loading_start = 0;
+
+        return N.wire.emit('common.blocks.navbar.blocks.page_progress:update', {
+          max: pageState.entry_count
+        });
       });
     }).catch(err => {
       N.wire.emit('error', err);
