@@ -44,5 +44,7 @@ each entry in self.entries
           span.icon.icon-bookmark
 
         li.blogs-entry-mixed__control-item
-          span.icon.icon-comment.icon-space-after
-          = self.t('comments', entry.comments)
+          - var href = self.link_to('blogs.entry', { user_hid: user.hid, entry_hid: entry.hid, $anchor: 'comments' });
+          a.blogs-entry-mixed__control-link(href=href)
+            span.icon.icon-comment.icon-space-after
+            = self.t('comments', entry.comments)

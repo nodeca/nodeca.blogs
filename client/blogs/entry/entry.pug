@@ -103,7 +103,7 @@ article#content.blogs-entry
 
           != self.partial('@blogs.blocks.tag_list', { tag_hids: self.entry.tag_hids })
 
-    .blogs-entry__comments
+    #comments.blogs-entry__comments
       .blogs-entry__comment-header
         = self.t('comments', (self.comments || []).length)
 

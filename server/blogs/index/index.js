@@ -128,10 +128,6 @@ module.exports = function (N, apiPath) {
       route: 'blogs.index'
     });
 
-    env.data.breadcrumbs.push({
-      text: env.t('title')
-    });
-
     env.res.breadcrumbs = env.data.breadcrumbs;
   });
 
