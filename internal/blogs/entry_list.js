@@ -27,7 +27,11 @@ module.exports = function (N, apiPath) {
   // Fetch and fill permissions
   //
   N.wire.before(apiPath, async function fetch_and_fill_permissions(env) {
-    env.data.settings = await env.extras.settings.fetch([ 'can_see_hellbanned' ]);
+    env.res.settings = env.data.settings = await env.extras.settings.fetch([
+      'can_see_hellbanned',
+      'can_see_ip',
+      'can_report_abuse'
+    ]);
   });
 
 

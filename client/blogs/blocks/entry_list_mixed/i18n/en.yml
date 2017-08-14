@@ -1,3 +1,10 @@
 en-US:
   read_more: Read more
   comments: "#{count} ((comment|comments))"
+  multiselect_hint: "Click with shift to start range selection"
+
+  ip_info: IP info
+  add_infraction: Add infraction
+  delete: Delete
+  undelete: Undelete
+  edit: Edit

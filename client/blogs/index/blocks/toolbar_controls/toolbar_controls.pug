@@ -1,8 +1,78 @@
+- var menu_rnd_id = 'rnd' + String(Math.random()).slice(2, 10)
+
+- var items = []
+
+if self.runtime.is_member
+  - items.push('new_entry')
+  - items.push('mark_read')
+
+
+if self.selected_cnt
+  if items.length > 0
+    - items.push('divider')
+  - items.push('many_header')
+  - items.push('many_unselect')
+  - items.push('many_delete')
+  - items.push('many_undelete')
+
+//- If last item is header - remove it
+if items.length > 0 && items[items.length - 1] === 'header'
+  - items.pop()
+
+
 .page-actions.blogs-index__toolbar-controls
-  button.hidden-nav-alt.btn.btn-primary(
-    type='button'
-  )= self.t('new_entry')
-  button.visible-nav-alt.btn.btn-secondary.btn-square.icon.icon-plus(
-    type='button'
-    title=self.t('new_entry')
-  )
+  if self.runtime.is_member
+    button.hidden-nav-alt.hidden-xs-down.btn.btn-primary(
+      type='button'
+    )= self.t('new_entry')
+
+    button.visible-nav-alt.btn.btn-secondary.btn-square.hidden-xs-down.icon.icon-plus(
+      type='button'
+      title=self.t('new_entry')
+    )
+
+  if items.length > 0
+    .page-actions__dropdown
+      button.btn.btn-secondary.btn-square.icon.icon-dropdown.dropdown-toggle(
+        type='button'
+        id=menu_rnd_id
+        aria-haspopup='true'
+        aria-expanded='false'
+        data-toggle='dropdown'
+      )
+
+      .dropdown-menu.dropdown-menu-right(aria-labelledby=menu_rnd_id)
+
+        each item in items
+          case item
+
+            when 'new_entry'
+              button.dropdown-item.hidden-sm-up(
+                type='button'
+              )= self.t('new_entry')
+
+            when 'mark_read'
+              button.dropdown-item(
+                type='button'
+              )= self.t('mark_read')
+
+            when 'divider'
+              .dropdown-divider
+
+            when 'many_header'
+              .dropdown-header=self.t('many_header', { count: self.selected_cnt })
+
+            when 'many_unselect'
+              button.dropdown-item(
+                type='button'
+              )=self.t('many_unselect')
+
+            when 'many_delete'
+              button.dropdown-item(
+                type='button'
+              )= self.t('many_delete')
+
+            when 'many_undelete'
+              button.dropdown-item(
+                type='button'
+              )= self.t('many_undelete')

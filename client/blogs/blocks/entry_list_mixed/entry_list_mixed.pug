@@ -2,6 +2,9 @@
 //-  - shows nick+avatar for each user
 //-  - doesn't show tags
 
+//- show many operations checkbox
+- var many_ops_permitted = self.runtime.is_member;
+
 each entry in self.entries
   - var user = self.users[entry.user] || { hid: 0 };
 
@@ -16,6 +19,12 @@ each entry in self.entries
           img.blogs-entry-mixed__userpic(alt=user.name)&attributes(self.avatar(user, 'sm'))
       else
         .blogs-entry-mixed__userpic.av-anon
+
+    if many_ops_permitted
+      label.blogs-entry-mixed__select(title=self.t('multiselect_hint'))
+        input.blogs-entry-mixed__select-cb(
+          type='checkbox'
+        )
 
     header.blogs-entry-mixed__meta
       .blogs-entry-mixed__title
@@ -38,13 +47,38 @@ each entry in self.entries
 
       ul.blogs-entry-mixed__controls-blk
         li.blogs-entry-mixed__control-item
-          != self.timetag(entry.ts, 'relative')
-
-        li.blogs-entry-mixed__control-item
-          span.icon.icon-bookmark
-
-        li.blogs-entry-mixed__control-item
           - var href = self.link_to('blogs.entry', { user_hid: user.hid, entry_hid: entry.hid, $anchor: 'comments' });
           a.blogs-entry-mixed__control-link(href=href)
             span.icon.icon-comment.icon-space-after
             = self.t('comments', entry.comments)
+        if self.settings.can_report_abuse
+          li.blogs-entry-mixed__control-item
+            span.icon.icon-report
+
+        if self.runtime.is_member
+          li.blogs-entry-mixed__control-item
+            span.icon.icon-bookmark
+
+        li.blogs-entry-mixed__control-item
+          != self.timetag(entry.ts, 'relative')
+
+        - var showDropdown = false
+        - showDropdown = showDropdown || self.runtime.is_member
+        - showDropdown = showDropdown || self.settings.can_see_ip
+
+        if showDropdown
+          //- no aria parts - visible to moderators only
+          .forum-post__control-item.forum-post__mod-menu.dropdown.dropup
+            button.btn.btn-square.btn-sm.forum-post__action.dropdown-toggle(
+              data-toggle='dropdown'
+              role='button'
+            )
+            .dropdown-menu.dropdown-menu-right(role='menu')
+              button.dropdown-item= self.t('add_infraction')
+
+              if self.settings.can_see_ip
+                button.dropdown-item= self.t('ip_info')
+
+              button.dropdown-item= self.t('edit')
+              button.blogs-entry-mixed__delete.dropdown-item= self.t('delete')
+              button.blogs-entry-mixed__undelete.dropdown-item= self.t('undelete')

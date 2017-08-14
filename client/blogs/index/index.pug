@@ -20,10 +20,16 @@ article#content.blogs-index(
         link_bottom: self.link_to('blogs.index', { $query: { from: self.last_entry_hid } }),
         current:     self.pagination.chunk_offset,
         total:       self.pagination.total
-      }
+      },
+      search_areas: [
+        {
+          title: self.t('search_entries'),
+          method: 'search.blog_entries'
+        }
+      ]
     };
 
-  != self.partial('@common.blocks.navbar.logo_apps')
+  != self.partial('@common.blocks.navbar.logo_apps', navbar_args)
   != self.partial('@common.blocks.navbar.alt_progress_title_toolbar', navbar_args)
 
   nav.breadcrumbs-container
