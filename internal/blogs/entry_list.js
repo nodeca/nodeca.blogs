@@ -19,7 +19,17 @@
 'use strict';
 
 
-const _ = require('lodash');
+const _              = require('lodash');
+const sanitize_entry = require('nodeca.blogs/lib/sanitizers/blog_entry');
+
+let setting_names = [
+  'blogs_show_ignored',
+  'blogs_mod_can_delete',
+  'blogs_mod_can_see_hard_deleted',
+  'can_see_hellbanned',
+  'can_see_ip',
+  'can_report_abuse'
+];
 
 
 module.exports = function (N, apiPath) {
@@ -27,11 +37,7 @@ module.exports = function (N, apiPath) {
   // Fetch and fill permissions
   //
   N.wire.before(apiPath, async function fetch_and_fill_permissions(env) {
-    env.res.settings = env.data.settings = await env.extras.settings.fetch([
-      'can_see_hellbanned',
-      'can_see_ip',
-      'can_report_abuse'
-    ]);
+    env.res.settings = env.data.settings = await env.extras.settings.fetch(setting_names);
   });
 
 
@@ -41,6 +47,14 @@ module.exports = function (N, apiPath) {
     let statuses = N.models.blogs.BlogEntry.statuses;
 
     env.data.blog_entries_visible_statuses = [ statuses.VISIBLE ];
+
+    if (env.data.settings.blogs_mod_can_delete) {
+      env.data.blog_entries_visible_statuses.push(statuses.DELETED);
+    }
+
+    if (env.data.settings.blogs_mod_can_see_hard_deleted) {
+      env.data.blog_entries_visible_statuses.push(statuses.DELETED_HARD);
+    }
 
     if (env.data.settings.can_see_hellbanned || env.user_info.hb) {
       env.data.blog_entries_visible_statuses.push(statuses.HB);
@@ -115,13 +129,7 @@ module.exports = function (N, apiPath) {
 
   // Sanitize and fill blog entries
   //
-  N.wire.after(apiPath, function blog_entries_sanitize_and_fill(env) {
-    // Fill entries
-    env.res.entries = env.data.entries;
-
-    // TODO: move it to separate sanitizer, check hellbanned for votes_hb
-    env.res.entries = env.data.entries.map(entry => _.pick(entry, [
-      '_id', 'hid', 'title', 'html', 'comments', 'user', 'ts', 'tag_hids'
-    ]));
+  N.wire.after(apiPath, async function blog_entries_sanitize_and_fill(env) {
+    env.res.entries = await sanitize_entry(N, env.data.entries, env.user_info);
   });
 };

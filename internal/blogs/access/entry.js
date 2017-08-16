@@ -106,20 +106,34 @@ module.exports = function (N, apiPath) {
       usergroup_ids: locals.data.user_info.usergroups
     };
 
-    let can_see_hellbanned = await N.settings.get('can_see_hellbanned', params, {});
+    let setting_names = [
+      'can_see_hellbanned',
+      'blogs_mod_can_delete',
+      'blogs_mod_can_see_hard_deleted'
+    ];
+
+    let settings = await N.settings.get(setting_names, params, {});
 
     locals.data.entry_ids.forEach((id, i) => {
       if (locals.data.access_read[i] === false) return; // continue
 
       let entry = locals.cache[id];
 
-      let allow_access = (entry.st === statuses.VISIBLE || entry.ste === statuses.VISIBLE);
+      let visibleSt = [ statuses.VISIBLE ];
 
-      if (entry.st === statuses.HB) {
-        allow_access = allow_access && (locals.data.user_info.hb || can_see_hellbanned);
+      if (locals.data.user_info.hb || settings.can_see_hellbanned) {
+        visibleSt.push(statuses.HB);
       }
 
-      if (!allow_access) {
+      if (settings.blogs_mod_can_delete) {
+        visibleSt.push(statuses.DELETED);
+      }
+
+      if (settings.blogs_mod_can_see_hard_deleted) {
+        visibleSt.push(statuses.DELETED_HARD);
+      }
+
+      if (visibleSt.indexOf(entry.st) === -1) {
         locals.data.access_read[i] = false;
       }
     });

@@ -22,9 +22,10 @@ module.exports = function (N, collectionName) {
   set_content_type('BLOG_ENTRY', 5);
 
   let statuses = {
-    VISIBLE:  1,
-    HB:       2,
-    DELETED:  3
+    VISIBLE:      1,
+    HB:           2,
+    DELETED:      3,
+    DELETED_HARD: 4
   };
 
   let BlogEntry = new Schema({

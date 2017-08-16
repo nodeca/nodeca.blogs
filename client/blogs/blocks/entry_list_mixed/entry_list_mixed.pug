@@ -2,13 +2,21 @@
 //-  - shows nick+avatar for each user
 //-  - doesn't show tags
 
+- var entryStatuses = '$$ JSON.stringify(N.models.blogs.BlogEntry.statuses) $$'
+
 //- show many operations checkbox
 - var many_ops_permitted = self.runtime.is_member;
 
 each entry in self.entries
+  - if (self.ignored_users[entry.user] && !self.settings.blogs_show_ignored) { continue; }
+
   - var user = self.users[entry.user] || { hid: 0 };
 
   .blogs-entry-mixed(
+    class=(entry.st === entryStatuses.DELETED) ? 'blogs-entry-mixed__m-deleted' : ''
+    class=(entry.st === entryStatuses.DELETED_HARD) ? 'blogs-entry-mixed__m-deleted-hard' : ''
+    class=(entry.st === entryStatuses.HB) ? 'blogs-entry-mixed__m-hb' : ''
+    class=(self.ignored_users[entry.user]) ? 'blogs-entry-mixed__m-ignored' : ''
     data-entry-hid=entry.hid
     data-entry-id=entry._id
     id='entry' + entry.hid
@@ -33,6 +41,7 @@ each entry in self.entries
 
       if user.hid
         .blogs-entry-mixed__author
+          span.blogs-entry-mixed__ignored-mark.icon.icon-ignore.icon-space-after
           a.blogs-entry-mixed__author-link(
             href=self.link_to('users.member', { user_hid: user.hid })
           )= user.name

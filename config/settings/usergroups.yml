@@ -1,0 +1,50 @@
+setting_schemas:
+  usergroup:
+
+    blogs_can_create:
+      priority: 200
+      category_key: blogs
+      type: boolean
+      default: true
+
+    blogs_edit_max_time_entries:
+      priority: 210
+      category_key: blogs
+      type: number
+      default: -1
+
+    blogs_edit_max_time_comments:
+      priority: 220
+      category_key: blogs
+      type: number
+      default: 30
+
+    blogs_show_ignored:
+      priority: 230
+      category_key: blogs
+      type: boolean
+      default: false
+
+    blogs_mod_can_delete:
+      priority: 1510
+      category_key: perm_blogs_moderate
+      type: boolean
+      default: false
+
+    blogs_mod_can_hard_delete:
+      priority: 1520
+      category_key: perm_blogs_moderate
+      type: boolean
+      default: false
+
+    blogs_mod_can_see_hard_deleted:
+      priority: 1530
+      category_key: perm_blogs_moderate
+      type: boolean
+      default: false
+
+    blogs_mod_can_add_infractions:
+      priority: 2110
+      category_key: perm_infractions
+      type: boolean
+      default: false

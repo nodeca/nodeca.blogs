@@ -3,7 +3,10 @@
 
 'use strict';
 
-const _ = require('lodash');
+const _                = require('lodash');
+const sanitize_comment = require('nodeca.blogs/lib/sanitizers/blog_comment');
+const sanitize_entry   = require('nodeca.blogs/lib/sanitizers/blog_entry');
+const sanitize_tag     = require('nodeca.blogs/lib/sanitizers/blog_entry');
 
 
 module.exports = function (N, apiPath) {
@@ -18,10 +21,18 @@ module.exports = function (N, apiPath) {
   N.wire.before(apiPath, async function fetch_blog_entry(env) {
     env.data.entry = await N.models.blogs.BlogEntry.findOne()
                                .where('hid').equals(env.params.entry_hid)
-                               .where('st').equals(N.models.blogs.BlogEntry.statuses.VISIBLE)
                                .lean(true);
 
     if (!env.data.entry) throw N.io.NOT_FOUND;
+
+    let access_env = { params: {
+      entries: env.data.entry,
+      user_info: env.user_info
+    } };
+
+    await N.wire.emit('internal:blogs.access.entry', access_env);
+
+    if (!access_env.data.access_read) throw N.io.NOT_FOUND;
 
     let can_see_deleted_users = await env.extras.settings.fetch('can_see_deleted_users');
 
@@ -84,9 +95,33 @@ module.exports = function (N, apiPath) {
   // Fetch blog entry comments
   //
   N.wire.before(apiPath, async function fetch_comments(env) {
+    let statuses = N.models.blogs.BlogComment.statuses;
+
+    let setting_names = [
+      'can_see_hellbanned',
+      'blogs_mod_can_delete',
+      'blogs_mod_can_see_hard_deleted'
+    ];
+
+    let settings = await env.extras.settings.fetch(setting_names);
+
+    let visibleSt = [ statuses.VISIBLE ];
+
+    if (env.user_info.hb || settings.can_see_hellbanned) {
+      visibleSt.push(statuses.HB);
+    }
+
+    if (settings.blogs_mod_can_delete) {
+      visibleSt.push(statuses.DELETED);
+    }
+
+    if (settings.blogs_mod_can_see_hard_deleted) {
+      visibleSt.push(statuses.DELETED_HARD);
+    }
+
     let comments = await N.models.blogs.BlogComment.find()
                              .where('entry').equals(env.data.entry._id)
-                             .where('st').equals(N.models.blogs.BlogComment.statuses.VISIBLE)
+                             .where('st').in(visibleSt)
                              .lean(true);
 
     let comment_paths = {};
@@ -99,7 +134,7 @@ module.exports = function (N, apiPath) {
   });
 
 
-  N.wire.on(apiPath, function blog_entry(env) {
+  N.wire.on(apiPath, async function blog_entry(env) {
     env.res.head.title = env.data.entry.title;
     env.res.head.canonical = N.router.linkTo('blogs.entry', env.params);
 
@@ -109,16 +144,9 @@ module.exports = function (N, apiPath) {
                        .concat([ env.data.user._id ])
                        .concat(_.map(env.data.comments, 'user'));
 
-    // TODO: move it to separate sanitizer, check hellbanned for votes_hb
-    env.res.entry    = _.pick(env.data.entry, [
-      '_id', 'hid', 'title', 'html', 'comments', 'user', 'ts', 'views', 'tag_hids'
-    ]);
-    env.res.comments = env.data.comments.map(comment => _.pick(comment, [
-      '_id', 'hid', 'html', 'user', 'ts', 'path'
-    ]));
-    env.res.tags     = _.keyBy(env.data.tags.map(tag => _.pick(tag, [
-      '_id', 'hid', 'user', 'name', 'is_category'
-    ])), 'hid');
+    env.res.entry    = await sanitize_entry(N, env.data.entry, env.user_info);
+    env.res.comments = await sanitize_comment(N, env.data.comments, env.user_info);
+    env.res.tags     = _.keyBy(await sanitize_tag(N, env.data.tags, env.user_info), 'hid');
   });
 
 

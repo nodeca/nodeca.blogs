@@ -1,0 +1,17 @@
+i18n:
+  en-US:
+    admin:
+      core:
+        category_names:
+          perm_blogs: Blogs
+          perm_blogs_moderate: Blogs moderation
+
+        setting_names:
+          blogs_can_create: Create entries and comments
+          blogs_edit_max_time_entries: Max time to edit entry after create (minutes)
+          blogs_edit_max_time_comments: Max time to edit comment after create (minutes)
+          blogs_show_ignored: Show ignored entries
+          blogs_mod_can_delete: Delete entries/comments
+          blogs_mod_can_hard_delete: Hard delete entries/comments
+          blogs_mod_can_see_hard_deleted: See hard deleted entries/comments
+          blogs_mod_can_add_infractions: Can give infractions in blogs
