@@ -34,8 +34,7 @@ module.exports.up = async function (N) {
 
   await usergroupStore.set({
     blogs_can_create:             { value: false, force: true },
-    blogs_edit_max_time_entries:  { value: 0, force: true },
-    blogs_edit_max_time_comments: { value: 0, force: true }
+    blogs_edit_comments_max_time: { value: 0, force: true }
   }, { usergroup_id: violatorsGroupId });
 
   // add usergroup settings for banned
@@ -43,7 +42,6 @@ module.exports.up = async function (N) {
   let bannedGroupId = await N.models.users.UserGroup.findIdByName('banned');
 
   await usergroupStore.set({
-    blogs_edit_max_time_entries:  { value: 0 },
-    blogs_edit_max_time_comments: { value: 0 }
+    blogs_edit_comments_max_time: { value: 0 }
   }, { usergroup_id: bannedGroupId });
 };

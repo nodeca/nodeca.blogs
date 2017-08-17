@@ -8,8 +8,7 @@ i18n:
 
         setting_names:
           blogs_can_create: Create entries and comments
-          blogs_edit_max_time_entries: Max time to edit entry after create (minutes)
-          blogs_edit_max_time_comments: Max time to edit comment after create (minutes)
+          blogs_edit_comments_max_time: Max time to edit comment after create (minutes)
           blogs_show_ignored: Show ignored entries
           blogs_mod_can_delete: Delete entries/comments
           blogs_mod_can_hard_delete: Hard delete entries/comments

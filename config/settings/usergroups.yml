@@ -7,20 +7,14 @@ setting_schemas:
       type: boolean
       default: true
 
-    blogs_edit_max_time_entries:
+    blogs_edit_comments_max_time:
       priority: 210
-      category_key: blogs
-      type: number
-      default: -1
-
-    blogs_edit_max_time_comments:
-      priority: 220
       category_key: blogs
       type: number
       default: 30
 
     blogs_show_ignored:
-      priority: 230
+      priority: 220
       category_key: blogs
       type: boolean
       default: false
