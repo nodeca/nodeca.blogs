@@ -46,7 +46,7 @@ article#content.blogs-index(
 
     if self.entries && self.entries.length
       .blogs-index__loading-prev.nojs-hide(
-        class=(self.pagination.chunk_offset === 0 ? 'hidden-xs-up' : '')
+        class=(self.pagination.chunk_offset === 0 ? 'd-none' : '')
       )
         span.icon.icon-loading-placeholder
 
@@ -64,7 +64,7 @@ article#content.blogs-index(
       )!= self.partial('@blogs.blocks.entry_list_mixed')
 
       .blogs-index__loading-next.nojs-hide(
-        class=(self.entries && self.entries.length > 0 && self.entries[self.entries.length - 1].hid === self.last_entry_hid ? 'hidden-xs-up' : '')
+        class=(self.entries && self.entries.length > 0 && self.entries[self.entries.length - 1].hid === self.last_entry_hid ? 'd-none' : '')
       )
         span.icon.icon-loading-placeholder
 

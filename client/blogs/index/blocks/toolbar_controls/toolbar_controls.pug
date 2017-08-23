@@ -22,11 +22,11 @@ if items.length > 0 && items[items.length - 1] === 'header'
 
 .page-actions.blogs-index__toolbar-controls
   if self.runtime.is_member
-    button.hidden-nav-alt.hidden-xs-down.btn.btn-primary(
+    button.hidden-nav-alt.d-none.d-sm-inline-block.btn.btn-primary(
       type='button'
     )= self.t('new_entry')
 
-    button.visible-nav-alt.btn.btn-secondary.btn-square.hidden-xs-down.icon.icon-plus(
+    button.visible-nav-alt.btn.btn-secondary.btn-square.d-none.d-sm-inline-block.icon.icon-plus(
       type='button'
       title=self.t('new_entry')
     )
@@ -47,7 +47,7 @@ if items.length > 0 && items[items.length - 1] === 'header'
           case item
 
             when 'new_entry'
-              button.dropdown-item.hidden-sm-up(
+              button.dropdown-item.d-sm-none(
                 type='button'
               )= self.t('new_entry')
 

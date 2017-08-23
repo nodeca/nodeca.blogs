@@ -227,24 +227,24 @@ function reset_loading_placeholders() {
 
   // if topmost entry is loaded, hide top placeholder
   if (pageState.reached_start) {
-    if (!prev.hasClass('hidden-xs-up')) {
+    if (!prev.hasClass('d-none')) {
       $window.scrollTop($window.scrollTop() - prev.outerHeight(true));
-      prev.addClass('hidden-xs-up');
+      prev.addClass('d-none');
     }
 
   } else {
     /* eslint-disable no-lonely-if */
-    if (prev.hasClass('hidden-xs-up')) {
-      prev.removeClass('hidden-xs-up');
+    if (prev.hasClass('d-none')) {
+      prev.removeClass('d-none');
       $window.scrollTop($window.scrollTop() + prev.outerHeight(true));
     }
   }
 
   // if last entry is loaded, hide bottom placeholder
   if (pageState.reached_end) {
-    next.addClass('hidden-xs-up');
+    next.addClass('d-none');
   } else {
-    next.removeClass('hidden-xs-up');
+    next.removeClass('d-none');
   }
 }
 
