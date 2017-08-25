@@ -12,63 +12,67 @@ each entry in self.entries
 
   - var user = self.users[entry.user] || { hid: 0 };
 
-  .blogs-entry-mixed(
-    class=(entry.st === entryStatuses.DELETED) ? 'blogs-entry-mixed__m-deleted' : ''
-    class=(entry.st === entryStatuses.DELETED_HARD) ? 'blogs-entry-mixed__m-deleted-hard' : ''
-    class=(entry.st === entryStatuses.HB) ? 'blogs-entry-mixed__m-hb' : ''
-    class=(self.ignored_users[entry.user]) ? 'blogs-entry-mixed__m-ignored' : ''
+  .blog-entry(
+    class=(entry.st === entryStatuses.DELETED) ? 'blog-entry__m-deleted' : ''
+    class=(entry.st === entryStatuses.DELETED_HARD) ? 'blog-entry__m-deleted-hard' : ''
+    class=(entry.st === entryStatuses.HB) ? 'blog-entry__m-hb' : ''
+    class=(self.ignored_users[entry.user]) ? 'blog-entry__m-ignored' : ''
     data-entry-hid=entry.hid
     data-entry-id=entry._id
     id='entry' + entry.hid
   )
-    .blogs-entry-mixed__aside
-      if user.hid
-        a(href=self.link_to('users.member', { user_hid: user.hid }))
-          img.blogs-entry-mixed__userpic(alt=user.name)&attributes(self.avatar(user, 'sm'))
-      else
-        .blogs-entry-mixed__userpic.av-anon
-
     if many_ops_permitted
-      label.blogs-entry-mixed__select(title=self.t('multiselect_hint'))
-        input.blogs-entry-mixed__select-cb(
+      label.blog-entry__select(title=self.t('multiselect_hint'))
+        input.blog-entry__select-cb(
           type='checkbox'
         )
 
-    header.blogs-entry-mixed__meta
-      .blogs-entry-mixed__title
-        a(href=self.link_to('blogs.entry', { user_hid: user.hid, entry_hid: entry.hid }))
+    header.blog-entry__meta
+      .blog-entry__title
+        a.blog-entry__link(href=self.link_to('blogs.entry', { user_hid: user.hid, entry_hid: entry.hid }))
           = entry.title
 
-      if user.hid
-        .blogs-entry-mixed__author
-          span.blogs-entry-mixed__ignored-mark.icon.icon-ignore.icon-space-after
-          a.blogs-entry-mixed__author-link(
+      .blog-entry__author
+        if user.hid
+          a.blog-entry__author-link._ucard-popover(
             href=self.link_to('users.member', { user_hid: user.hid })
-          )= user.name
+            data-user-id=entry.user
+            data-user-ref='blog_entry:'+entry.hid
+          )
+            span.blog-entry__ignored-mark.icon.icon-ignore.icon-space-after
+            img.blog-entry__avatar(alt=user.name)&attributes(self.avatar(user, 'sm'))
+            = user.name
+        else
+          .blog-entry__avatar.av-anon
 
-    .blogs-entry-mixed__content
-      .blogs-entry-mixed__message.markup!= entry.html
+    .blog-entry__content
+      .blog-entry__message.markup!= entry.html
 
-    footer.blogs-entry-mixed__controls
-      .blogs-entry-mixed__read-more
+    footer.blog-entry__controls
+      .blog-entry__read-more
         a(href=self.link_to('blogs.entry', { user_hid: user.hid, entry_hid: entry.hid }))
           = self.t('read_more')
 
-      ul.blogs-entry-mixed__controls-blk
-        li.blogs-entry-mixed__control-item
+      ul.blog-entry__controls-blk
+        li.blog-entry__control-item
           - var href = self.link_to('blogs.entry', { user_hid: user.hid, entry_hid: entry.hid, $anchor: 'comments' });
-          a.blogs-entry-mixed__control-link(href=href)
+          a.blog-entry__action(href=href)
             span.icon.icon-comment.icon-space-after
             = self.t('comments', entry.comments)
+
         if self.settings.can_report_abuse
-          li.blogs-entry-mixed__control-item
-            span.icon.icon-report
+          li.blog-entry__control-item
+            button.btn.btn-sm.blog-entry__action(title=self.t('report')
+              data-entry-id=entry._id
+              data-on-click='blogs.blocks.blog_entry:report'
+            )
+              span.icon.icon-report
 
         if self.runtime.is_member
-          li.blogs-entry-mixed__control-item
+          li.blog-entry__control-item
             span.icon.icon-bookmark
 
-        li.blogs-entry-mixed__control-item
+        li.blog-entry__control-item
           != self.timetag(entry.ts, 'relative')
 
         - var showDropdown = false
@@ -77,8 +81,8 @@ each entry in self.entries
 
         if showDropdown
           //- no aria parts - visible to moderators only
-          .forum-post__control-item.forum-post__mod-menu.dropdown.dropup
-            button.btn.btn-square.btn-sm.forum-post__action.dropdown-toggle(
+          .blog-entry__control-item.blog-entry__mod-menu.dropdown.dropup
+            button.btn.btn-square.btn-sm.blog-entry__action.dropdown-toggle(
               data-toggle='dropdown'
               role='button'
             )
@@ -86,8 +90,11 @@ each entry in self.entries
               button.dropdown-item= self.t('add_infraction')
 
               if self.settings.can_see_ip
-                button.dropdown-item= self.t('ip_info')
+                button.dropdown-item(
+                  data-entry-id=entry._id
+                  data-on-click='blogs.blocks.blog_entry:show_ip'
+                )= self.t('ip_info')
 
               button.dropdown-item= self.t('edit')
-              button.blogs-entry-mixed__delete.dropdown-item= self.t('delete')
-              button.blogs-entry-mixed__undelete.dropdown-item= self.t('undelete')
+              button.blog-entry__delete.dropdown-item= self.t('delete')
+              button.blog-entry__undelete.dropdown-item= self.t('undelete')

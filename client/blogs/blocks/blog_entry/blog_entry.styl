@@ -1,0 +1,79 @@
+@import "nodeca.core/client/common/_variables"
+
+.blog-entry
+  margin-bottom 2rem
+
+.blog-entry__title
+  font-size $h4-font-size
+  color $brand-primary
+
+.blog-entry__meta
+  margin-bottom 1rem
+  color $body-color-secondary
+
+.blog-entry__author-link
+  color $body-color-secondary
+  font-size $font-size-xs
+
+.blog-entry__avatar
+  display inline-block
+  width 16px
+  height 16px
+  margin-right 3px
+  border-radius 2px
+  box-shadow 0 0 1px $body-color-secondary
+
+.blog-entry__select
+  float right
+  min-width 2rem
+  text-align center
+  margin-bottom 0
+  padding-bottom .5rem
+
+.blog-entry__select-cb
+  position relative
+  vertical-align text-bottom
+
+.blog-entry__content
+  margin-right 0px
+
+.blog-entry__read-more
+  font-size $font-size-xs
+
+.blog-entry__controls-blk
+  margin 0
+  padding 0
+  list-style none
+
+.blog-entry__control-item
+  color $body-color-secondary
+  font-size $font-size-xs
+  display inline-block
+  margin-right 1.5rem
+  &:last-child
+    margin-right 0
+
+.blog-entry__action
+  background-color transparent
+  color $body-color-secondary
+
+  &:hover
+  &:focus
+  &:active
+    color $body-color-secondary - 20%
+    background-color $body-bg-secondary
+
+.blog-entry__undelete
+  display none
+
+.blog-entry__m-deleted
+.blog-entry__m-hb
+.blog-entry__m-deleted-hard
+.blog-entry__m-ignored
+  background-color $deleted-bg
+
+.blog-entry__ignored-mark
+  display none
+.blog-entry__m-ignored
+  .blog-entry__ignored-mark
+    display inline-block

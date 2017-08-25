@@ -22,9 +22,10 @@ if items.length > 0 && items[items.length - 1] === 'header'
 
 .page-actions.blogs-index__toolbar-controls
   if self.runtime.is_member
-    button.hidden-nav-alt.d-none.d-sm-inline-block.btn.btn-primary(
+    button.hidden-nav-alt.btn.btn-primary.btn-square.d-none.d-sm-inline-block.icon.icon-plus(
       type='button'
-    )= self.t('new_entry')
+      title=self.t('new_entry')
+    )
 
     button.visible-nav-alt.btn.btn-secondary.btn-square.d-none.d-sm-inline-block.icon.icon-plus(
       type='button'

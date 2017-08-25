@@ -3,6 +3,7 @@ en-US:
   comments: "#{count} ((comment|comments))"
   multiselect_hint: "Click with shift to start range selection"
 
+  report: Report to moderator
   ip_info: IP info
   add_infraction: Add infraction
   delete: Delete

@@ -93,7 +93,7 @@ N.wire.on('navigate.done:' + module.apiPath, function location_updater_init() {
   if ($('.blogs-index__entry-list').length === 0) return;
 
   locationScrollHandler = _.debounce(function update_location_on_scroll() {
-    let entries        = document.getElementsByClassName('blogs-entry-mixed');
+    let entries        = document.getElementsByClassName('blog-entry');
     let entryThreshold = navbarHeight + TOP_OFFSET;
     let offset;
     let currentIdx;
@@ -181,7 +181,7 @@ N.wire.on('navigate.done:' + module.apiPath, function progress_updater_init() {
 
     // Update progress bar
     //
-    let entries        = document.getElementsByClassName('blogs-entry-mixed');
+    let entries        = document.getElementsByClassName('blog-entry');
     let entryThreshold = navbarHeight + TOP_OFFSET;
     let offset;
     let currentIdx;
@@ -333,7 +333,7 @@ N.wire.once('navigate.done:' + module.apiPath, function blogs_index_init_handler
         //
         // Limit total amount of posts in DOM
         //
-        let entries   = document.getElementsByClassName('blogs-entry-mixed');
+        let entries   = document.getElementsByClassName('blog-entry');
         let cut_count = entries.length - CUT_ITEMS_MIN;
 
         if (cut_count > CUT_ITEMS_MAX - CUT_ITEMS_MIN) {
@@ -347,7 +347,7 @@ N.wire.once('navigate.done:' + module.apiPath, function blogs_index_init_handler
             $(entry).nextAll().remove();
 
             // Update range for the next time we'll be doing prefetch
-            pageState.bottom_marker = $('.blogs-entry-mixed:last').data('entry-id');
+            pageState.bottom_marker = $('.blog-entry:last').data('entry-id');
 
             pageState.reached_end = false;
             reset_loading_placeholders();
@@ -401,7 +401,7 @@ N.wire.once('navigate.done:' + module.apiPath, function blogs_index_init_handler
       if (res.entries.length === 0) return;
 
       pageState.bottom_marker = res.entries[res.entries.length - 1]._id;
-      pageState.first_offset  = res.pagination.chunk_offset - $('.blogs-entry-mixed').length;
+      pageState.first_offset  = res.pagination.chunk_offset - $('.blog-entry').length;
       pageState.topic_count   = res.pagination.total;
 
       // update prev/next metadata
@@ -425,7 +425,7 @@ N.wire.once('navigate.done:' + module.apiPath, function blogs_index_init_handler
         //
         // Limit total amount of posts in DOM
         //
-        let entries   = document.getElementsByClassName('blogs-entry-mixed');
+        let entries   = document.getElementsByClassName('blog-entry');
         let cut_count = entries.length - CUT_ITEMS_MIN;
 
         if (cut_count > CUT_ITEMS_MAX - CUT_ITEMS_MIN) {
@@ -443,11 +443,11 @@ N.wire.once('navigate.done:' + module.apiPath, function blogs_index_init_handler
             $(entry).prevAll().remove();
 
             // Update range for the next time we'll be doing prefetch
-            pageState.top_marker = $('.blogs-entry-mixed:first').data('entry-id');
+            pageState.top_marker = $('.blog-entry:first').data('entry-id');
 
             // update scroll so it would point at the same spot as before
             $window.scrollTop(old_scroll + $('.blogs-index__entry-list').height() - old_height);
-            pageState.first_offset += old_length - document.getElementsByClassName('blogs-entry-mixed').length;
+            pageState.first_offset += old_length - document.getElementsByClassName('blog-entry').length;
 
             pageState.reached_start = false;
             reset_loading_placeholders();
