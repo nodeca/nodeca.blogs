@@ -77,3 +77,30 @@
 .blog-entry__m-ignored
   .blog-entry__ignored-mark
     display inline-block
+
+// override .btn+.btn margin
+.blog-entry__bookmark-remove.blog-entry__bookmark-remove
+  margin 0
+
+.blog-entry__bookmark-remove
+  display none
+
+.blog-entry__m-bookmarked
+  .blog-entry__bookmark-remove
+    display inline-block
+    opacity 1
+    .icon
+      color $brand-success
+  .blog-entry__bookmark-add
+    display none
+
+.blog-entry__bookmarks-count
+  font-size $font-size-xs
+  color $body-color-secondary
+
+.blog-entry__bookmarks-count:after
+  content attr(data-bm-count)
+  margin-left .3em
+
+.blog-entry__bookmarks-count[data-bm-count="0"]:after
+  display none

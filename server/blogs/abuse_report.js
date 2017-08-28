@@ -30,7 +30,8 @@ module.exports = function (N, apiPath) {
   // Fetch entry
   //
   N.wire.before(apiPath, async function fetch_entry(env) {
-    env.data.entry = await N.models.blogs.BlogEntry.findById(env.params.entry_id)
+    env.data.entry = await N.models.blogs.BlogEntry
+                               .findById(env.params.entry_id)
                                .lean(true);
 
     if (!env.data.entry) throw N.io.NOT_FOUND;

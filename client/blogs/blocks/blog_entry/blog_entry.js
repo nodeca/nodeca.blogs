@@ -2,7 +2,7 @@
 'use strict';
 
 
-N.wire.once([ 'navigate.done:blogs.index', 'navigate.done:blogs.sole' ], function blog_entry_setup_handlers() {
+N.wire.once(module.apiPath, function blog_entry_setup_handlers() {
 
   // Click report button
   //
@@ -21,6 +21,25 @@ N.wire.once([ 'navigate.done:blogs.index', 'navigate.done:blogs.sole' ], functio
   //
   N.wire.on(module.apiPath + ':show_ip', function blog_entry_show_ip(data) {
     return N.wire.emit('blogs.blocks.ip_info_dlg', { entry_id: data.$this.data('entry-id') });
+  });
+
+
+  // Add/remove bookmark
+  //
+  N.wire.on(module.apiPath + ':bookmark', function entry_bookmark(data) {
+    let id     = data.$this.data('entry-id');
+    let remove = data.$this.data('remove') || false;
+    let $entry = data.$this.closest('.blog-entry');
+
+    return N.io.rpc('blogs.bookmark', { entry_id: id, remove }).then(res => {
+      if (remove) {
+        $entry.removeClass('blog-entry__m-bookmarked');
+      } else {
+        $entry.addClass('blog-entry__m-bookmarked');
+      }
+
+      $entry.find('.blog-entry__bookmarks-count').attr('data-bm-count', res.count);
+    });
   });
 
 

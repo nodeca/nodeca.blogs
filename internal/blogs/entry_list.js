@@ -9,12 +9,14 @@
 //   env:
 //     res:
 //       entries: ...       # sanitized, with restricted fields
+//       own_bookmarks: ... # array of posts ids bookmarked by user
 //       ignored_users: ... # hash { ignored_user_id => true }
 //     data:
 //       blog_entries_visible_statuses: ...
 //       settings: ...
 //       entries: ...
 //       users: ...
+//       own_bookmarks: ...
 //
 'use strict';
 
@@ -88,6 +90,22 @@ module.exports = function (N, apiPath) {
         env.data.entries.push(entry);
       }
     });
+  });
+
+
+  // Fetch and fill bookmarks
+  //
+  N.wire.after(apiPath, async function fetch_and_fill_bookmarks(env) {
+    let bookmarks = await N.models.blogs.BlogEntryBookmark.find()
+                              .where('user').equals(env.user_info.user_id)
+                              .where('entry').in(env.data.entry_ids)
+                              .lean(true);
+
+    env.data.own_bookmarks = bookmarks;
+
+    if (!bookmarks.length) return;
+
+    env.res.own_bookmarks = _.map(bookmarks, 'entry');
   });
 
 

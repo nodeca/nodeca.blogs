@@ -7,6 +7,8 @@
 //- show many operations checkbox
 - var many_ops_permitted = self.runtime.is_member;
 
+- self.own_bookmarks = self.own_bookmarks || [];
+
 each entry in self.entries
   - if (self.ignored_users[entry.user] && !self.settings.blogs_show_ignored) { continue; }
 
@@ -16,6 +18,7 @@ each entry in self.entries
     class=(entry.st === entryStatuses.DELETED) ? 'blog-entry__m-deleted' : ''
     class=(entry.st === entryStatuses.DELETED_HARD) ? 'blog-entry__m-deleted-hard' : ''
     class=(entry.st === entryStatuses.HB) ? 'blog-entry__m-hb' : ''
+    class=(self.own_bookmarks.indexOf(entry._id) !== -1) ? 'blog-entry__m-bookmarked' : ''
     class=(self.ignored_users[entry.user]) ? 'blog-entry__m-ignored' : ''
     data-entry-hid=entry.hid
     data-entry-id=entry._id
@@ -56,13 +59,13 @@ each entry in self.entries
       ul.blog-entry__controls-blk
         li.blog-entry__control-item
           - var href = self.link_to('blogs.entry', { user_hid: user.hid, entry_hid: entry.hid, $anchor: 'comments' });
-          a.blog-entry__action(href=href)
+          a.blog-entry__action.blog-entry__comments(href=href)
             span.icon.icon-comment.icon-space-after
             = self.t('comments', entry.comments)
 
         if self.settings.can_report_abuse
           li.blog-entry__control-item
-            button.btn.btn-sm.blog-entry__action(title=self.t('report')
+            button.btn.btn-sm.blog-entry__action.blog-entry__report(title=self.t('report')
               data-entry-id=entry._id
               data-on-click='blogs.blocks.blog_entry:report'
             )
@@ -70,7 +73,22 @@ each entry in self.entries
 
         if self.runtime.is_member
           li.blog-entry__control-item
-            span.icon.icon-bookmark
+            button.btn.btn-sm.blog-entry__action.blog-entry__bookmark-add(
+              data-entry-id=entry._id
+              data-on-click='blogs.blocks.blog_entry:bookmark'
+              title=self.t('bookmark_add')
+            )
+              span.icon.icon-bookmark
+              span.blog-entry__bookmarks-count(data-bm-count=entry.bookmarks)
+
+            button.btn.btn-sm.blog-entry__action.blog-entry__bookmark-remove(
+              data-entry-id=entry._id
+              data-on-click='blogs.blocks.blog_entry:bookmark'
+              data-remove='true'
+              title=self.t('bookmark_remove')
+            )
+              span.icon.icon-bookmark
+              span.blog-entry__bookmarks-count(data-bm-count=entry.bookmarks)
 
         li.blog-entry__control-item
           != self.timetag(entry.ts, 'relative')
