@@ -1,0 +1,14 @@
+en-US:
+  read_more: Read more
+  comments: "#{count} ((comment|comments))"
+  tags: "Tags:"
+  multiselect_hint: "Click with shift to start range selection"
+
+  report: Report to moderator
+  bookmark_add: Add to bookmarks
+  bookmark_remove: Remove from bookmarks
+  ip_info: IP info
+  add_infraction: Add infraction
+  delete: Delete
+  undelete: Undelete
+  edit: Edit

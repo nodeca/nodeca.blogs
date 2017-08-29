@@ -1,0 +1,7 @@
+en-US:
+  new_entry: New entry
+  mark_read: Mark all read
+  many_header: "With #{count} ((entry|entries)):"
+  many_unselect: Clear selection
+  many_delete: Delete
+  many_undelete: Undelete

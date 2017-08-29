@@ -34,6 +34,11 @@ mixin render_comments(comments)
       .blogs-comment__content
         .blogs-comment__message.markup!= comment.html
 
+        - var tail = self.partial('@blogs.entry.attachments', { post: comment, user: user });
+        if tail
+          .forum-post__tail.markup-tail
+            !=tail
+
       footer.blogs-comment__controls
         ul.blogs-comment__controls-blk
           li.blogs-comment__control-item
@@ -67,7 +72,7 @@ article#content.blogs-entry
         else
           .blogs-entry__userpic.av-anon
 
-      footer.blogs-entry__meta
+      header.blogs-entry__meta
         .blogs-entry__title
           = self.entry.title
 
@@ -79,6 +84,11 @@ article#content.blogs-entry
 
       .blogs-entry__content
         .blogs-entry__message.markup!= self.entry.html
+
+        - var tail = self.partial('@blogs.entry.attachments', { post: self.entry, user: user });
+        if tail
+          .forum-post__tail.markup-tail
+            !=tail
 
       footer.blogs-entry__controls
         ul.blogs-entry__controls-blk

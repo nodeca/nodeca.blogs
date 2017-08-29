@@ -39,10 +39,10 @@ article#content.blogs-index(
   .layout__container.container-fluid
     != self.partial('@users.blocks.announces')
 
-    header.page-head
-      .float-right
-        != self.partial('@blogs.index.blocks.toolbar_controls')
-      h1.page-head__title(itemprop='name')= self.t('title')
+    header.page-head.blogs-index__head
+      h1.blogs-index__title.page-head__title(itemprop='name')= self.t('title')
+
+      != self.partial('@blogs.index.blocks.toolbar_controls')
 
     if self.entries && self.entries.length
       .blogs-index__loading-prev.nojs-hide(

@@ -1,7 +1,52 @@
+- self.users = self.users || {};
+- self.add_raw_data('pagination', self.pagination)
 - var user = self.users[self.user_id] || {};
 
-article#content.blogs-sole
-  != self.partial('@common.blocks.navbar.logo_apps')
+article#content.blogs-sole(
+  data-keymap= {
+    'home': 'blogs.sole:nav_to_start',
+    'end':  'blogs.sole:nav_to_end'
+  }
+  data-tag-hid=        self.current_tag
+  data-last-entry-hid= self.last_entry_hid
+  data-top-marker=     self.entries && self.entries.length > 0 ? self.entries[0]._id : null
+  data-bottom-marker=  self.entries && self.entries.length > 0 ? self.entries[self.entries.length - 1]._id : null
+)
+
+  -
+    var $query_top = {};
+    var $query_bottom = { from: self.last_entry_hid };
+
+    if (self.current_tag) {
+      $query_top.tag    = self.current_tag;
+      $query_bottom.tag = self.current_tag;
+    }
+
+    var navbar_args = {
+      title: user.nick,
+      toolbar: 'blogs.sole.blocks.toolbar_controls',
+      progress: {
+        link_top:    self.link_to('blogs.sole', {
+          user_hid: user.hid,
+          $query:   $query_top
+        }),
+        link_bottom: self.link_to('blogs.sole', {
+          user_hid: user.hid,
+          $query:   $query_bottom
+        }),
+        current:     self.pagination.chunk_offset,
+        total:       self.pagination.total
+      },
+      search_areas: [
+        {
+          title: self.t('search_entries'),
+          method: 'search.blog_entries'
+        }
+      ]
+    };
+
+  != self.partial('@common.blocks.navbar.logo_apps', navbar_args)
+  != self.partial('@common.blocks.navbar.alt_progress_title_toolbar', navbar_args)
 
   nav.breadcrumbs-container
     .layout__container.container-fluid
@@ -25,39 +70,37 @@ article#content.blogs-sole
 
             != self.partial('@blogs.blocks.tag_list', { tag_hids: self.category_hids })
 
-    .blogs-sole__entry-list
-      each entry in self.entries || []
+      != self.partial('@blogs.index.blocks.toolbar_controls')
 
-        .blogs-sole-entry.clearfix
-          footer.blogs-sole-entry__meta
-            .blogs-sole-entry__title
-              a(href=self.link_to('blogs.entry', { user_hid: user.hid, entry_hid: entry.hid }))
-                = entry.title
+    if self.entries && self.entries.length
+      .blogs-sole__loading-prev.nojs-hide(
+        class=(self.pagination.chunk_offset === 0 ? 'd-none' : '')
+      )
+        span.icon.icon-loading-placeholder
 
-          .blogs-sole-entry__content
-            .blogs-sole-entry__message.markup!= entry.html
+      .blogs-sole__entry-list._affix(
+        data-affix-top={
+          offset:     500,
+          wire_above: 'blogs.sole:load_prev',
+          throttle:   100
+        }
+        data-affix-bottom={
+          offset:     500,
+          wire_below: 'blogs.sole:load_next',
+          throttle:   100
+        }
+      )!= self.partial('@blogs.blocks.entry_list_sole')
 
-          footer.blogs-sole-entry__controls
-            .blogs-sole-entry__read-more
-              a(href=self.link_to('blogs.entry', { user_hid: user.hid, entry_hid: entry.hid }))
-                = self.t('read_more')
+      .blogs-sole__loading-next.nojs-hide(
+        class=(self.entries && self.entries.length > 0 && self.entries[self.entries.length - 1].hid === self.last_entry_hid ? 'd-none' : '')
+      )
+        span.icon.icon-loading-placeholder
 
-            ul.blogs-sole-entry__controls-blk
-              li.blogs-sole-entry__control-item
-                != self.timetag(entry.ts, 'relative')
+      nav.pager.js-hide
+        if self.head.prev
+          a.btn.btn-secondary(href=self.head.prev)= self.t('prev_page')
 
-              li.blogs-sole-entry__control-item
-                span.icon.icon-bookmark
-
-              li.blogs-sole-entry__control-item
-                span.icon.icon-comment.icon-space-after
-                = self.t('comments', entry.comments)
-
-          if entry.tag_hids && entry.tag_hids.length
-            footer.blogs-sole-entry__tags
-              = self.t('tags')
-
-              != self.partial('@blogs.blocks.tag_list', { tag_hids: entry.tag_hids })
-
-      else
-        p!= self.t('no_entries')
+        if self.head.next
+          a.btn.btn-secondary(href=self.head.next)= self.t('next_page')
+    else
+      p!= self.t('no_entries')
