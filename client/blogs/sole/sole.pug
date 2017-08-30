@@ -1,6 +1,7 @@
 - self.users = self.users || {};
 - self.add_raw_data('pagination', self.pagination)
 - var user = self.users[self.user_id] || {};
+- var tag = self.current_tag && self.tags[self.current_tag] || {};
 
 article#content.blogs-sole(
   data-keymap= {
@@ -24,7 +25,7 @@ article#content.blogs-sole(
 
     var navbar_args = {
       title_html: self.current_tag ?
-                  self.partial('@blogs.sole.blocks.title_tag', { user: user, tag: self.tags[self.current_tag] || {} }) :
+                  self.partial('@blogs.sole.blocks.title_tag', { user: user, tag: tag }) :
                   self.partial('@blogs.sole.blocks.title_user', { user: user }),
       level_up: self.current_tag ?
                 self.link_to('blogs.sole', { user_hid: user.hid }) :
@@ -64,8 +65,10 @@ article#content.blogs-sole(
   .layout__container.container-fluid
     != self.partial('@users.blocks.announces')
 
-    if !self.current_tag
-      header.page-head.blogs-sole__head
+    header.page-head.blogs-sole__head
+      if self.current_tag
+        h1.blogs-index__title.page-head__title(itemprop='name')= self.t('title_tag', { tag: tag.name })
+      else
         a.blogs-sole__avatar(href=self.link_to('users.member', { user_hid: user.hid }))
           img.blogs-sole__userpic(alt=user.name)&attributes(self.avatar(user, 'sm'))
 
@@ -76,7 +79,7 @@ article#content.blogs-sole(
 
           != self.partial('@blogs.blocks.tag_list', { tag_hids: self.category_hids })
 
-        != self.partial('@blogs.index.blocks.toolbar_controls')
+      != self.partial('@blogs.sole.blocks.toolbar_controls')
 
     if self.entries && self.entries.length
       .blogs-sole__loading-prev.nojs-hide(

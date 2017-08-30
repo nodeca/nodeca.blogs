@@ -169,10 +169,6 @@ module.exports = function (N, apiPath) {
       params:  { user_hid: user.hid }
     });
 
-    env.data.breadcrumbs.push({
-      text:    env.data.entry.title
-    });
-
     env.res.breadcrumbs = env.data.breadcrumbs;
   });
 };

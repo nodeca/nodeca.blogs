@@ -1,4 +1,5 @@
 en-US:
+  title_tag: 'Tag: #{tag}'
   no_entries: This user has no blog entries.
   next_page: Older
   prev_page: Newer

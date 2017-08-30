@@ -185,11 +185,11 @@ N.wire.on('navigate.done:' + module.apiPath, function progress_updater_init() {
   if ($('.blogs-sole__entry-list').length === 0) return;
 
   progressScrollHandler = _.debounce(function update_progress_on_scroll() {
-    // If we scroll below page title, show the secondary navbar
+    // If we scroll below page head, show the secondary navbar
     //
-    let title = document.getElementsByClassName('page-head');
+    let head = document.getElementsByClassName('page-head');
 
-    if (title.length && title[0].getBoundingClientRect().bottom > navbarHeight) {
+    if (head.length && head[0].getBoundingClientRect().bottom > navbarHeight) {
       $('.navbar').removeClass('navbar__m-secondary');
     } else {
       $('.navbar').addClass('navbar__m-secondary');
