@@ -166,8 +166,10 @@ N.wire.on('navigate.exit:' + module.apiPath, function location_updater_teardown(
 /////////////////////////////////////////////////////////////////////
 // When user scrolls the page:
 //
-//  1. update progress bar
-//  2. show/hide navbar
+//  1. show/hide navbar
+//
+// Unlike on the other pages, this handler does not update progress bar
+// (because there isn't one).
 //
 let progressScrollHandler = null;
 
@@ -185,26 +187,6 @@ N.wire.on('navigate.done:' + module.apiPath, function progress_updater_init() {
     } else {
       $('.navbar').addClass('navbar__m-secondary');
     }
-
-    // Update progress bar
-    //
-    let entries        = document.getElementsByClassName('blog-entry');
-    let entryThreshold = navbarHeight + TOP_OFFSET;
-    let offset;
-    let currentIdx;
-
-    // Get offset of the first blog entry in the viewport
-    //
-    currentIdx = _.sortedIndexBy(entries, null, e => {
-      if (!e) { return entryThreshold; }
-      return e.getBoundingClientRect().top;
-    }) - 1;
-
-    offset = currentIdx + pageState.first_offset;
-
-    N.wire.emit('common.blocks.navbar.blocks.page_progress:update', {
-      current:  offset + 1 // `+1` because offset is zero based
-    }).catch(err => N.wire.emit('error', err));
   }, 100, { maxWait: 100 });
 
   // avoid executing it on first tick because of initial scrollTop()
@@ -363,10 +345,6 @@ N.wire.once('navigate.done:' + module.apiPath, function blogs_index_init_handler
 
         // reset lock
         pageState.prev_loading_start = 0;
-
-        return N.wire.emit('common.blocks.navbar.blocks.page_progress:update', {
-          max: pageState.entry_count
-        });
       });
     }).catch(err => {
       N.wire.emit('error', err);
@@ -463,10 +441,6 @@ N.wire.once('navigate.done:' + module.apiPath, function blogs_index_init_handler
 
         // reset lock
         pageState.next_loading_start = 0;
-
-        return N.wire.emit('common.blocks.navbar.blocks.page_progress:update', {
-          max: pageState.entry_count
-        });
       });
     }).catch(err => {
       N.wire.emit('error', err);

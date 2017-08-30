@@ -23,7 +23,12 @@ article#content.blogs-sole(
     }
 
     var navbar_args = {
-      title: user.nick,
+      title_html: self.current_tag ?
+                  self.partial('@blogs.sole.blocks.title_tag', { user: user, tag: self.tags[self.current_tag] || {} }) :
+                  self.partial('@blogs.sole.blocks.title_user', { user: user }),
+      level_up: self.current_tag ?
+                self.link_to('blogs.sole', { user_hid: user.hid }) :
+                self.link_to('blogs.index'),
       toolbar: 'blogs.sole.blocks.toolbar_controls',
       progress: {
         link_top:    self.link_to('blogs.sole', {
@@ -45,8 +50,12 @@ article#content.blogs-sole(
       ]
     };
 
-  != self.partial('@common.blocks.navbar.logo_apps', navbar_args)
-  != self.partial('@common.blocks.navbar.alt_progress_title_toolbar', navbar_args)
+  != self.partial('@common.blocks.navbar.levelup_apps', navbar_args)
+
+  if self.current_tag
+    != self.partial('@common.blocks.navbar.alt_levelup_title_toolbar', navbar_args)
+  else
+    != self.partial('@common.blocks.navbar.alt_levelup_progress_title_toolbar', navbar_args)
 
   nav.breadcrumbs-container
     .layout__container.container-fluid
@@ -55,22 +64,19 @@ article#content.blogs-sole(
   .layout__container.container-fluid
     != self.partial('@users.blocks.announces')
 
-    header.page-head.blogs-sole__head
-      a.blogs-sole__avatar(href=self.link_to('users.member', { user_hid: user.hid }))
-        img.blogs-sole__userpic(alt=user.name)&attributes(self.avatar(user, 'sm'))
+    if !self.current_tag
+      header.page-head.blogs-sole__head
+        a.blogs-sole__avatar(href=self.link_to('users.member', { user_hid: user.hid }))
+          img.blogs-sole__userpic(alt=user.name)&attributes(self.avatar(user, 'sm'))
 
-      .blogs-sole__meta
-        a.blogs-sole__author-link(
-          href=self.link_to('users.member', { user_hid: user.hid })
-        )= user.name
+        .blogs-sole__meta
+          a.blogs-sole__author-link(
+            href=self.link_to('users.member', { user_hid: user.hid })
+          )= user.name
 
-        if self.category_hids && self.category_hids.length
-          .blogs-sole__categories
-            = self.t('categories')
+          != self.partial('@blogs.blocks.tag_list', { tag_hids: self.category_hids })
 
-            != self.partial('@blogs.blocks.tag_list', { tag_hids: self.category_hids })
-
-      != self.partial('@blogs.index.blocks.toolbar_controls')
+        != self.partial('@blogs.index.blocks.toolbar_controls')
 
     if self.entries && self.entries.length
       .blogs-sole__loading-prev.nojs-hide(

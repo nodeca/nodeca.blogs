@@ -43,10 +43,7 @@ each entry in self.entries
 
       ul.blog-entry__controls-blk
         li.blog-entry__control-item
-          - var href = self.link_to('blogs.entry', { user_hid: user.hid, entry_hid: entry.hid, $anchor: 'comments' });
-          a.blog-entry__action.blog-entry__comments(href=href)
-            span.icon.icon-comment.icon-space-after
-            = self.t('comments', entry.comments)
+          != self.timetag(entry.ts, 'relative')
 
         if self.settings.can_report_abuse
           li.blog-entry__control-item
@@ -76,7 +73,10 @@ each entry in self.entries
               span.blog-entry__bookmarks-count(data-bm-count=entry.bookmarks)
 
         li.blog-entry__control-item
-          != self.timetag(entry.ts, 'relative')
+          - var href = self.link_to('blogs.entry', { user_hid: user.hid, entry_hid: entry.hid, $anchor: 'comments' });
+          a.blog-entry__action.blog-entry__comments(href=href)
+            span.icon.icon-comment.icon-space-after
+            = self.t('comments', entry.comments)
 
         - var showDropdown = false
         - showDropdown = showDropdown || self.runtime.is_member
@@ -102,8 +102,4 @@ each entry in self.entries
               button.blog-entry__delete.dropdown-item= self.t('delete')
               button.blog-entry__undelete.dropdown-item= self.t('undelete')
 
-    if entry.tag_hids && entry.tag_hids.length
-      footer.blog-entry__tags
-        = self.t('tags')
-
-        != self.partial('@blogs.blocks.tag_list', { tag_hids: entry.tag_hids })
+    != self.partial('@blogs.blocks.tag_list', { tag_hids: entry.tag_hids })

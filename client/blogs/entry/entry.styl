@@ -12,33 +12,23 @@ $aside-size = '$$ N.config.users.avatars.resize.sm.height $$'px
   color $brand-primary
 
 .blogs-entry__meta
-  margin-left $aside-size + 16px
   margin-bottom 1rem
-  color $body-color-secondary
-  line-height 1.25em
-
-.blogs-entry__author-link
   color $body-color-secondary
   font-size $font-size-xs
 
-.blogs-entry__aside
-  float left
-  margin-top .125rem
+.blogs-entry__author:after
+  content ', '
 
-.blogs-entry__userpic
+.blogs-entry__author-link
+  color $body-color-secondary
+
+.blogs-entry__avatar
   display inline-block
-  width $aside-size
-  height $aside-size
-  border-radius 3px
+  width 20px
+  height 20px
+  margin-right 5px
+  border-radius 2px
   box-shadow 0 0 1px $body-color-secondary
-
-.blogs-entry__content
-  margin-right 0px
-  margin-left $aside-size + 16px
-  min-height $aside-size - 40 // Dont allow post controls to be above avatar bottom
-
-.blogs-entry__controls
-  margin-left $aside-size + 16px
 
 .blogs-entry__controls-blk
   margin 0
@@ -47,80 +37,79 @@ $aside-size = '$$ N.config.users.avatars.resize.sm.height $$'px
 
 .blogs-entry__control-item
   color $body-color-secondary
-  font-size $font-size-xs
   display inline-block
+  font-size $font-size-sm
   margin-right 1.5rem
   &:last-child
     margin-right 0
 
-.blogs-entry__tags
-  margin-top 0.5rem
-  margin-left $aside-size + 16px
-  font-size $font-size-xs
-  color $body-color-secondary
-
-.blogs-entry__tags .blogs-tag-list__category
-  font-weight bold
+.blogs-entry__body
+  padding-bottom 1.5rem
+  margin-bottom 1.5rem
+  border-bottom 1px solid $decorator-color
 
 //
 // Comments
 //
-.blogs-entry__comment-header
+.blog-entry__comment-header
   font-size $font-size-lg
   margin-bottom 1rem
 
-.blogs-comment
+.blog-comment
   margin-bottom 1rem
 
-.blogs-comment__meta
+.blog-comment__meta
   margin-left $aside-size + 16px
   margin-bottom 1rem
   color $body-color-secondary
   line-height 1.25em
 
-.blogs-comment__author-link
-.blogs-comment__date
+.blog-comment__author-link
+  color $body-color-secondary
+  font-size $font-size-sm
+
+.blog-comment__date
   color $body-color-secondary
   font-size $font-size-xs
 
-.blogs-comment__aside
+.blog-comment__aside
   float left
   margin-top .125rem
 
-.blogs-comment__userpic
+.blog-comment__avatar
   display inline-block
   width $aside-size
   height $aside-size
   border-radius 3px
   box-shadow 0 0 1px $body-color-secondary
 
-.blogs-comment__content
+.blog-comment__content
   margin-right 0px
   margin-left $aside-size + 16px
   min-height $aside-size - 40 // Dont allow post controls to be above avatar bottom
 
-.blogs-comment__message
+.blog-comment__message
   & > p:first-child
     margin-top -.25rem // Compensate line-height 1.5 rem
 
-.blogs-comment__controls
+.blog-comment__controls
   text-align right
   margin-left $aside-size + 16px
 
-.blogs-comment__controls-blk
+.blog-comment__controls-blk
   margin 0
   padding 0
   list-style none
 
-.blogs-comment__control-item
+.blog-comment__control-item
   color $body-color-secondary
-  font-size $font-size-xs
+  font-size $font-size-sm
   display inline-block
   margin-right 1.5rem
   &:last-child
     margin-right 0
 
-.blogs-comment__children
+.blog-comment__children
   margin-left $aside-size + 16px
 
   // stop indenting deeply nested comments

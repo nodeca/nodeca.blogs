@@ -187,7 +187,7 @@ N.wire.on('navigate.done:' + module.apiPath, function progress_updater_init() {
   progressScrollHandler = _.debounce(function update_progress_on_scroll() {
     // If we scroll below page title, show the secondary navbar
     //
-    let title = document.getElementsByClassName('page-head__title');
+    let title = document.getElementsByClassName('page-head');
 
     if (title.length && title[0].getBoundingClientRect().bottom > navbarHeight) {
       $('.navbar').removeClass('navbar__m-secondary');
@@ -527,7 +527,6 @@ N.wire.once('navigate.done:' + module.apiPath, function blogs_sole_init_handlers
       apiPath: 'blogs.sole',
       params: {
         user_hid: pageState.user_hid,
-        tag_hid:  pageState.tag_hid,
         $query
       }
     });

@@ -13,44 +13,44 @@ mixin render_comments(comments)
 
     - var user = self.users[comment.user] || { hid: 0 };
 
-    .blogs-comment.clearfix
-      .blogs-comment__aside
+    .blog-comment.clearfix
+      .blog-comment__aside
         if user.hid
           a(href=self.link_to('users.member', { user_hid: user.hid }))
-            img.blogs-comment__userpic(alt=user.name)&attributes(self.avatar(user, 'sm'))
+            img.blog-comment__avatar(alt=user.name)&attributes(self.avatar(user, 'sm'))
         else
-          .blogs-comment__userpic.av-anon
+          .blog-comment__avatar.av-anon
 
-      footer.blogs-comment__meta
+      footer.blog-comment__meta
         if user.hid
-          .blogs-comment__author
-            a.blogs-comment__author-link(
+          .blog-comment__author
+            a.blog-comment__author-link(
               href=self.link_to('users.member', { user_hid: user.hid })
             )= user.name
 
-        .blogs-comment__date
+        .blog-comment__date
           != self.timetag(comment.ts, 'relative')
 
-      .blogs-comment__content
-        .blogs-comment__message.markup!= comment.html
+      .blog-comment__content
+        .blog-comment__message.markup!= comment.html
 
         - var tail = self.partial('@blogs.entry.attachments', { post: comment, user: user });
         if tail
           .forum-post__tail.markup-tail
             !=tail
 
-      footer.blogs-comment__controls
-        ul.blogs-comment__controls-blk
-          li.blogs-comment__control-item
+      footer.blog-comment__controls
+        ul.blog-comment__controls-blk
+          li.blog-comment__control-item
             span.icon.icon-vote-up
 
-          li.blogs-comment__control-item
+          li.blog-comment__control-item
             span.icon.icon-vote-down
 
-          li.blogs-comment__control-item
+          li.blog-comment__control-item
             != self.t('reply')
 
-      .blogs-comment__children
+      .blog-comment__children
         +render_comments(children)
 
 
@@ -64,24 +64,21 @@ article#content.blogs-entry
   .layout__container.container-fluid
     != self.partial('@users.blocks.announces')
 
-    .blogs-entry.clearfix
-      .blogs-entry__aside
-        if user.hid
-          a(href=self.link_to('users.member', { user_hid: user.hid }))
-            img.blogs-entry__userpic(alt=user.name)&attributes(self.avatar(user, 'sm'))
-        else
-          .blogs-entry__userpic.av-anon
+    header.page-head
+      h1.blogs-entry__title.page-head__title(itemprop='name')= self.entry.title
 
-      header.blogs-entry__meta
-        .blogs-entry__title
-          = self.entry.title
+      .blogs-entry__meta
+        span.blogs-entry__author
+          if user.hid
+            a.blogs-entry__author-link(href=self.link_to('users.member', { user_hid: user.hid }))
+              img.blogs-entry__avatar(alt=user.name)&attributes(self.avatar(user, 'sm'))
+              = user.name
+          else
+            .blogs-entry__avatar.av-anon
 
-        if user.hid
-          .blogs-entry__author
-            a.blogs-entry__author-link(
-              href=self.link_to('users.member', { user_hid: user.hid })
-            )= user.name
+        span.blogs-entry__ts!= self.timetag(self.entry.ts, 'relative')
 
+    .blogs-entry__body
       .blogs-entry__content
         .blogs-entry__message.markup!= self.entry.html
 
@@ -99,22 +96,16 @@ article#content.blogs-entry
             span.icon.icon-vote-down
 
           li.blogs-entry__control-item
-            != self.timetag(self.entry.ts, 'relative')
-
-          li.blogs-entry__control-item
             span.icon.icon-bookmark
 
           li.blogs-entry__control-item
             span.icon.icon-views.icon-space-after= self.entry.views
 
-      if self.entry.tag_hids && self.entry.tag_hids.length
-        footer.blogs-entry__tags
-          = self.t('tags')
+      != self.partial('@blogs.blocks.tag_list', { tag_hids: self.entry.tag_hids })
 
-          != self.partial('@blogs.blocks.tag_list', { tag_hids: self.entry.tag_hids })
+    if self.comments && self.comments.length
+      #comments.blogs-entry__comments
+        .blogs-entry__comment-header
+          = self.t('comments', self.comments.length)
 
-    #comments.blogs-entry__comments
-      .blogs-entry__comment-header
-        = self.t('comments', (self.comments || []).length)
-
-      +render_comments(self.comments || [])
+        +render_comments(self.comments)

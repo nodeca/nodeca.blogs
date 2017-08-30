@@ -1,4 +1,10 @@
+@import "nodeca.core/client/common/_variables"
+
 .blogs-tag-list
+  color $body-color-secondary
+  font-size $font-size-xs
+
+.blogs-tag-list__list
   margin 0
   padding 0
   list-style none
@@ -11,3 +17,9 @@
 .blogs-tag-list__item + .blogs-tag-list__item
   &:before
     content ', '
+
+.blogs-tag-list__link
+  color $body-color-secondary
+
+.blogs-tag-list__category
+  font-weight bold

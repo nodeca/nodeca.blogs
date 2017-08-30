@@ -6,7 +6,7 @@
 const _                = require('lodash');
 const sanitize_comment = require('nodeca.blogs/lib/sanitizers/blog_comment');
 const sanitize_entry   = require('nodeca.blogs/lib/sanitizers/blog_entry');
-const sanitize_tag     = require('nodeca.blogs/lib/sanitizers/blog_entry');
+const sanitize_tag     = require('nodeca.blogs/lib/sanitizers/blog_tag');
 
 
 module.exports = function (N, apiPath) {
