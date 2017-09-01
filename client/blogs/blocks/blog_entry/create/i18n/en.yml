@@ -1,0 +1,8 @@
+en-US:
+  create_blog_entry: "New blog entry"
+
+  options_btn:
+    options: Options
+
+  title_input:
+    blog_entry_title: Title
