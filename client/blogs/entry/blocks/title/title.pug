@@ -1,0 +1,10 @@
+ul.blogs-entry-title
+  li.blogs-entry-title__item
+    if self.user.hid
+      a(href=self.link_to('users.member', { user_hid: self.user.hid }))
+        img.blogs-entry-title__avatar(alt=self.user.name)&attributes(self.avatar(self.user, 'sm'))
+    else
+      .av-anon
+
+  li.blogs-entry-title__item
+    = self.entry.title

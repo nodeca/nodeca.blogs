@@ -55,7 +55,29 @@ mixin render_comments(comments)
 
 
 article#content.blogs-entry
-  != self.partial('@common.blocks.navbar.logo_apps')
+  -
+    var $query_top = {};
+    var $query_bottom = { from: self.last_entry_hid };
+
+    if (self.current_tag) {
+      $query_top.tag    = self.current_tag;
+      $query_bottom.tag = self.current_tag;
+    }
+
+    var navbar_args = {
+      title_html: self.partial('@blogs.entry.blocks.title', { user: user, entry: self.entry }),
+      level_up: self.link_to('blogs.sole', { user_hid: user.hid }),
+      toolbar: 'blogs.entry.blocks.toolbar_controls',
+      search_areas: [
+        {
+          title: self.t('search_entries'),
+          method: 'search.blog_entries'
+        }
+      ]
+    };
+
+  != self.partial('@common.blocks.navbar.levelup_apps', navbar_args)
+  != self.partial('@common.blocks.navbar.alt_levelup_title_toolbar', navbar_args)
 
   nav.breadcrumbs-container
     .layout__container.container-fluid
@@ -64,7 +86,10 @@ article#content.blogs-entry
   .layout__container.container-fluid
     != self.partial('@users.blocks.announces')
 
-    header.page-head
+    header.page-head.blogs-entry__head
+      .float-right
+        != self.partial('@blogs.entry.blocks.toolbar_controls')
+
       h1.blogs-entry__title.page-head__title(itemprop='name')= self.entry.title
 
       .blogs-entry__meta

@@ -1,10 +1,10 @@
 ul.blogs-sole-title-tag
   li.blogs-sole-title-tag__item
     if self.user.hid
-      a.blogs-sole-title-tag(href=self.link_to('users.member', { user_hid: self.user.hid }))
+      a(href=self.link_to('users.member', { user_hid: self.user.hid }))
         img.blogs-sole-title-tag__avatar(alt=self.user.name)&attributes(self.avatar(self.user, 'sm'))
     else
-      .blogs-sole-title-tag.av-anon
+      .av-anon
 
   li.blogs-sole-title-tag__item
     = self.tag.name

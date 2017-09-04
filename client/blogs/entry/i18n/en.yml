@@ -1,3 +1,5 @@
 en-US:
   comments: "Comments (#{count}):"
   reply: "Reply"
+
+  search_entries: in blogs

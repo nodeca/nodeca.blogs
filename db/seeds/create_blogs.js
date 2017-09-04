@@ -8,7 +8,7 @@ const ObjectId  = require('mongoose').Types.ObjectId;
 
 
 const USER_COUNT        = 10;
-const ENTRY_COUNT       = 200;
+const ENTRY_COUNT       = 100;
 const MAX_TAG_COUNT     = 20;
 const MAX_COMMENT_COUNT = 20;
 
@@ -149,7 +149,7 @@ async function createEntries() {
     // so we need to assign it separately)
     entry.params = options;
 
-    createComments(await entry.save());
+    await createComments(await entry.save());
   }
 }
 
