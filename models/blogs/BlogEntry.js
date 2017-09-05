@@ -87,6 +87,35 @@ module.exports = function (N, collectionName) {
   BlogEntry.statics.statuses = statuses;
 
 
+  // Remove empty "imports" and "import_users" fields
+  //
+  BlogEntry.pre('save', function (callback) {
+    if (this.imports && this.imports.length === 0) {
+      /*eslint-disable no-undefined*/
+      this.imports = undefined;
+    }
+
+    if (this.import_users && this.import_users.length === 0) {
+      /*eslint-disable no-undefined*/
+      this.import_users = undefined;
+    }
+
+    callback();
+  });
+
+
+  // Store parser options separately and save reference to them
+  //
+  BlogEntry.pre('save', function (callback) {
+    N.models.core.MessageParams.setParams(this.params)
+      .then(id => {
+        this.params = undefined;
+        this.params_ref = id;
+      })
+      .asCallback(callback);
+  });
+
+
   // Set 'hid' for the new blog entry.
   // This hook should always be the last one to avoid counter increment on error
   BlogEntry.pre('save', function (callback) {

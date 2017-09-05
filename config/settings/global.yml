@@ -11,3 +11,51 @@ setting_schemas:
       group_key: core_display
       category_key: blogs
       default: 25
+
+    blog_entry_title_min_length:
+      type: number
+      group_key: blogs_editor
+      category_key: entry
+      default: 2
+
+    blog_entry_min_length:
+      type: number
+      group_key: blogs_editor
+      category_key: entry
+      default: 2
+
+    blog_entry_max_images:
+      type: number
+      group_key: blogs_editor
+      category_key: entry
+      default: 100
+
+    blog_entry_max_emojis:
+      type: number
+      group_key: blogs_editor
+      category_key: entry
+      default: 20
+
+    blog_comment_min_length:
+      type: number
+      group_key: blogs_editor
+      category_key: comment
+      default: 2
+
+    blog_comment_max_images:
+      type: number
+      group_key: blogs_editor
+      category_key: comment
+      default: 100
+
+    blog_comment_max_emojis:
+      type: number
+      group_key: blogs_editor
+      category_key: comment
+      default: 20
+
+    blogs_edit_comments_max_time:
+      type: number
+      group_key: blogs_editor
+      category_key: comment
+      default: 30

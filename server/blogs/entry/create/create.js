@@ -3,6 +3,10 @@
 'use strict';
 
 
+const $         = require('nodeca.core/lib/parser/cheequery');
+const charcount = require('charcount');
+
+
 module.exports = function (N, apiPath) {
 
   N.validate(apiPath, {
@@ -27,7 +31,18 @@ module.exports = function (N, apiPath) {
   });
 
 
-  // TODO: check title length
+  // Check title length
+  //
+  N.wire.before(apiPath, async function check_title_length(env) {
+    let min_length = await env.extras.settings.fetch('blog_entry_title_min_length');
+
+    if (charcount(env.params.title.trim()) < min_length) {
+      throw {
+        code: N.io.CLIENT_ERROR,
+        message: env.t('err_title_too_short', min_length)
+      };
+    }
+  });
 
 
   // Check permissions
@@ -50,7 +65,7 @@ module.exports = function (N, apiPath) {
   //
   N.wire.before(apiPath, async function prepare_options(env) {
     let settings = await N.settings.getByCategory(
-      'blog_entries',
+      'blog_entries_markup',
       { usergroup_ids: env.user_info.usergroups },
       { alias: true });
 
@@ -83,9 +98,56 @@ module.exports = function (N, apiPath) {
   });
 
 
-  // TODO: check entry length
-  // TODO: check image count
-  // TODO: check emoticons count
+  // Check post length
+  //
+  N.wire.after(apiPath, async function check_post_length(env) {
+    let min_length = await env.extras.settings.fetch('blog_entry_min_length');
+
+    if (env.data.parse_result.text_length < min_length) {
+      throw {
+        code: N.io.CLIENT_ERROR,
+        message: env.t('err_text_too_short', min_length)
+      };
+    }
+  });
+
+
+  // Limit an amount of images in the post
+  //
+  N.wire.after(apiPath, async function check_images_count(env) {
+    let max_images = await env.extras.settings.fetch('blog_entry_max_images');
+
+    if (max_images <= 0) return;
+
+    let ast         = $.parse(env.data.parse_result.html);
+    let images      = ast.find('.image').length;
+    let attachments = ast.find('.attach').length;
+    let tail        = env.data.parse_result.tail.length;
+
+    if (images + attachments + tail > max_images) {
+      throw {
+        code: N.io.CLIENT_ERROR,
+        message: env.t('err_too_many_images', max_images)
+      };
+    }
+  });
+
+
+  // Limit an amount of emoticons in the post
+  //
+  N.wire.after(apiPath, async function check_emoji_count(env) {
+    let max_emojis = await env.extras.settings.fetch('blog_entry_max_emojis');
+
+    if (max_emojis < 0) return;
+
+    if ($.parse(env.data.parse_result.html).find('.emoji').length > max_emojis) {
+      throw {
+        code: N.io.CLIENT_ERROR,
+        message: env.t('err_too_many_emojis', max_emojis)
+      };
+    }
+  });
+
 
   // Create new entry
   //
@@ -122,7 +184,13 @@ module.exports = function (N, apiPath) {
   });
 
 
-  // TODO: schedule image size fetch
+  // Schedule image size fetch
+  //
+  N.wire.after(apiPath, function fill_image_info(env) {
+    return N.queue.blog_entry_images_fetch(env.data.new_entry._id).postpone();
+  });
+
+
   // TODO: schedule search index update
   // TODO: add notification for subscribers
 

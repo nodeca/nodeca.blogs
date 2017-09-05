@@ -21,7 +21,7 @@ module.exports = function (N, apiPath) {
   //
   N.wire.on(apiPath, async function fill_parse_options(env) {
     env.res.parse_options = await N.settings.getByCategory(
-      'blog_entries',
+      'blog_entries_markup',
       { usergroup_ids: env.user_info.usergroups },
       { alias: true }
     );

@@ -8,8 +8,17 @@ i18n:
 
         category_names:
           blogs: Blogs
-          blog_entries: Blog entries
-          blog_comments: Blog comments
+          entry: Blog entry
+          comment: Blog comment
+          blog_entries_markup: Blog entries markup
+          blog_comments_markup: Blog comments markup
 
         setting_names:
           blog_entries_per_page: Blog entries per page
+          blog_entry_title_min_length: Min title length
+          blog_entry_min_length: Min text length
+          blog_entry_max_images: Max number of images
+          blog_entry_max_emojis: Max number of emoticons
+          blog_comment_min_length: Min text length
+          blog_comment_max_images: Max number of images
+          blog_comment_max_emojis: Max number of emoticons

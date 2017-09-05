@@ -65,7 +65,7 @@ async function createComments(entry) {
     let user = users[charlatan.Helpers.rand(USER_COUNT)];
 
     let options = await settings.getByCategory(
-      'blog_comments',
+      'blog_comments_markup',
       { usergroup_ids: user.usergroups },
       { alias: true }
     );
@@ -112,7 +112,7 @@ async function createEntries() {
     let user = users[charlatan.Helpers.rand(USER_COUNT)];
 
     let options = await settings.getByCategory(
-      'blog_entries',
+      'blog_entries_markup',
       { usergroup_ids: user.usergroups },
       { alias: true }
     );
