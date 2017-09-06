@@ -171,4 +171,12 @@ module.exports = function (N, apiPath) {
 
     env.res.breadcrumbs = env.data.breadcrumbs;
   });
+
+
+  // Fetch settings
+  //
+  N.wire.after(apiPath, async function fetch_settings(env) {
+    env.res.settings = env.res.settings || {};
+    env.res.settings.blogs_can_create = await env.extras.settings.fetch('blogs_can_create');
+  });
 };

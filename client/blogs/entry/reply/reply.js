@@ -1,7 +1,15 @@
-// Create new blog entry
+// Reply to entry or comment
 //
-
+// data:
+//
+// - user_hid - blog owner
+// - entry_hid
+// - entry_title
+// - comment_id - optional, parent comment id
+// - comment_hid - optional, parent comment hid
+//
 'use strict';
+
 
 const _ = require('lodash');
 
@@ -29,7 +37,7 @@ N.wire.before(module.apiPath + ':begin', function load_mdedit() {
 // Fetch options
 //
 N.wire.before(module.apiPath + ':begin', function fetch_options() {
-  return N.io.rpc('blogs.entry.create.options').then(opt => {
+  return N.io.rpc('blogs.entry.comment.reply.options').then(opt => {
     options = {
       parse_options: opt.parse_options,
       user_settings: {
@@ -44,29 +52,37 @@ N.wire.before(module.apiPath + ':begin', function fetch_options() {
 
 // Show editor and add handlers for editor events
 //
-N.wire.on(module.apiPath + ':begin', function show_editor() {
+N.wire.on(module.apiPath + ':begin', function show_editor(data) {
   let $editor = N.MDEdit.show({
-    draftKey: [ 'blog_entry_create', N.runtime.user_hid ].join('_'),
-    draftCustomFields: {
-      '.blog-entry-create__title': 'input'
-    }
+    draftKey: [ 'blog_entry_reply', N.runtime.user_hid, data.entry_hid, data.comment_id || '' ].join('_')
   });
 
   updateOptions();
 
   $editor
     .on('show.nd.mdedit', () => {
-      let title = t('create_blog_entry');
+      let title = t(data.comment_hid ? 'reply_comment' : 'reply_entry', {
+        entry_url: N.router.linkTo('blogs.entry', {
+          user_hid:  data.user_hid,
+          entry_hid: data.entry_hid
+        }),
+        entry_title: _.escape(data.entry_title),
+        comment_url: N.router.linkTo('blogs.entry', {
+          user_hid:  data.user_hid,
+          entry_hid: data.entry_hid,
+          $anchor:   'comment' + data.comment_hid
+        }),
+        comment_hid: data.comment_hid
+      });
 
       $editor.find('.mdedit-header__caption').html(title);
-      $editor.find('.mdedit-header').append(N.runtime.render(module.apiPath + '.title_input'));
       $editor.find('.mdedit-footer').append(N.runtime.render(module.apiPath + '.options_btn'));
     })
     .on('submit.nd.mdedit', () => {
       $editor.find('.mdedit-btn__submit').addClass('disabled');
 
       let params = {
-        title:                    $('.blog-entry-create__title').val(),
+        entry_hid:                data.entry_hid,
         txt:                      N.MDEdit.text(),
         attach:                   _.map(N.MDEdit.attachments(), 'media_id'),
         option_no_mlinks:         options.user_settings.no_mlinks,
@@ -74,15 +90,24 @@ N.wire.on(module.apiPath + ':begin', function show_editor() {
         option_no_quote_collapse: options.user_settings.no_quote_collapse
       };
 
-      N.io.rpc('blogs.entry.create', params).then(response => {
+      if (data.comment_id) {
+        params.parent_comment_id = data.comment_id;
+      }
+
+      N.io.rpc('blogs.entry.comment.reply', params).then(() => {
         N.MDEdit.hide({ removeDraft: true });
-        N.wire.emit('navigate.to', {
+
+        // TODO: focus on the new comment
+        return N.wire.emit('navigate.reload');
+
+        /*return N.wire.emit('navigate.to', {
           apiPath: 'blogs.entry',
           params: {
-            user_hid:  N.runtime.user_hid,
-            entry_hid: response.entry_hid
+            user_hid:  data.user_hid,
+            entry_hid: data.entry_hid
+            //$anchor:   'comment' + response.comment_hid
           }
-        });
+        });*/
       }).catch(err => {
         $editor.find('.mdedit-btn__submit').removeClass('disabled');
         N.wire.emit('error', err);

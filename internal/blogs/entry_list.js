@@ -25,6 +25,7 @@ const _              = require('lodash');
 const sanitize_entry = require('nodeca.blogs/lib/sanitizers/blog_entry');
 
 let setting_names = [
+  'blogs_can_create',
   'blogs_show_ignored',
   'blogs_mod_can_delete',
   'blogs_mod_can_see_hard_deleted',

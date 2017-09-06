@@ -24,7 +24,7 @@ N.wire.once(module.apiPath, function init_handlers() {
 // Init dialog
 //
 N.wire.on(module.apiPath, function show_ip_info_dlg(options) {
-  return N.io.rpc('blogs.ip_info', { entry_id: options.entry_id }).then(res => {
+  return N.io.rpc('blogs.entry.ip_info', { entry_id: options.entry_id }).then(res => {
     $dialog = $(N.runtime.render(module.apiPath, res));
 
     $('body').append($dialog);

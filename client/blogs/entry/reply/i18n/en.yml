@@ -1,0 +1,6 @@
+en-US:
+  reply_entry: "Reply to entry &quot;<a href='#{entry_url}'>#{entry_title}</a>&quot;"
+  reply_comment: "Reply to <a href='#{comment_url}'>##{comment_hid}</a> in &quot;#{entry_title}&quot;"
+
+  options_btn:
+    options: Options

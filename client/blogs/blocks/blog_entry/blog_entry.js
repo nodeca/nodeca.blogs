@@ -12,7 +12,7 @@ N.wire.once(module.apiPath, function blog_entry_setup_handlers() {
 
     return Promise.resolve()
       .then(() => N.wire.emit('common.blocks.abuse_report_dlg', params))
-      .then(() => N.io.rpc('blogs.abuse_report', { entry_id: id, message: params.message }))
+      .then(() => N.io.rpc('blogs.entry.abuse_report', { entry_id: id, message: params.message }))
       .then(() => N.wire.emit('notify.info', t('abuse_reported')));
   });
 
@@ -31,7 +31,7 @@ N.wire.once(module.apiPath, function blog_entry_setup_handlers() {
     let remove = data.$this.data('remove') || false;
     let $entry = data.$this.closest('.blog-entry');
 
-    return N.io.rpc('blogs.bookmark', { entry_id: id, remove }).then(res => {
+    return N.io.rpc('blogs.entry.bookmark', { entry_id: id, remove }).then(res => {
       if (remove) {
         $entry.removeClass('blog-entry__m-bookmarked');
       } else {

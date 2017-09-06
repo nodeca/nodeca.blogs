@@ -1,0 +1,5 @@
+en-US:
+  error_invalid_parent_post: "You are trying to reply to a non-existing comment."
+  err_text_too_short: "Comment should have at least #{count} ((character|characters))"
+  err_too_many_images: "Comment can't have more than #{count} ((image|images))"
+  err_too_many_emojis: "Comment can't have more than #{count} ((emoticon|emoticons))"

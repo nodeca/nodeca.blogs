@@ -1,3 +1,5 @@
+- self.add_raw_data('entry', self.entry)
+
 - var user = self.users[self.user_id] || {};
 
 mixin render_comments(comments)
@@ -47,8 +49,14 @@ mixin render_comments(comments)
           li.blog-comment__control-item
             span.icon.icon-vote-down
 
-          li.blog-comment__control-item
-            != self.t('reply')
+          if self.settings.blogs_can_create
+            li.blog-comment__control-item
+              a(
+                href='#'
+                data-on-click='blogs.entry:reply'
+                data-comment-id=comment._id
+                data-comment-hid=comment.hid
+              )=self.t('reply')
 
       .blog-comment__children
         +render_comments(children)
@@ -134,3 +142,9 @@ article#content.blogs-entry
           = self.t('comments', self.comments.length)
 
         +render_comments(self.comments)
+
+    if self.settings.blogs_can_create
+      .blogs-entry__reply
+        button.btn.btn-block.btn-link.icon.icon-plus.icon-space-after(
+          data-on-click='blogs.entry:reply'
+        )=self.t('add_comment')

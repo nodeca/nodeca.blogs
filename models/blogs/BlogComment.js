@@ -70,6 +70,61 @@ module.exports = function (N, collectionName) {
   BlogComment.statics.statuses = statuses;
 
 
+  // Remove empty "imports" and "import_users" fields
+  //
+  BlogComment.pre('save', function (callback) {
+    if (this.imports && this.imports.length === 0) {
+      /*eslint-disable no-undefined*/
+      this.imports = undefined;
+    }
+
+    if (this.import_users && this.import_users.length === 0) {
+      /*eslint-disable no-undefined*/
+      this.import_users = undefined;
+    }
+
+    callback();
+  });
+
+
+  // Store parser options separately and save reference to them
+  //
+  BlogComment.pre('save', function (callback) {
+    N.models.core.MessageParams.setParams(this.params)
+      .then(id => {
+        this.params = undefined;
+        this.params_ref = id;
+      })
+      .asCallback(callback);
+  });
+
+
+  // Set 'hid' for the new comment.
+  // This hook should always be the last one to avoid counter increment on error
+  BlogComment.pre('save', function (callback) {
+    if (!this.isNew) {
+      callback();
+      return;
+    }
+
+    N.models.blogs.BlogEntry.findByIdAndUpdate(
+      this.entry,
+      { $inc: { last_comment_counter: 1 } },
+      { 'new': true },
+      (err, entry) => {
+        if (err) {
+          callback(err);
+          return;
+        }
+
+        this.hid = entry.last_comment_counter;
+
+        callback();
+      }
+    );
+  });
+
+
   N.wire.on('init:models', function emit_init_BlogComment() {
     return N.wire.emit('init:models.' + collectionName, BlogComment);
   });
