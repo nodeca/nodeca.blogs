@@ -22,3 +22,4 @@ i18n:
           blog_comment_min_length: Min text length
           blog_comment_max_images: Max number of images
           blog_comment_max_emojis: Max number of emoticons
+          blogs_reply_old_comment_threshold: Ask reply confirmation when entry or comment are older than XX days

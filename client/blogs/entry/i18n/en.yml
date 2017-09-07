@@ -1,6 +1,18 @@
 en-US:
   comments: "Comments (#{count}):"
+  vote_up: Vote up
+  vote_down: Vote down
   reply: Reply
   add_comment: Add comment
+
+  old_entry_reply_confirm: |
+    md:**This blog entry is very old!** It was created #{count} days ago, and is probably outdated.
+
+    Are you sure you wish to reply?
+
+  old_comment_reply_confirm: |
+    md:**This comment is very old!** It was created #{count} days ago, and is probably outdated.
+
+    Are you sure you wish to reply?
 
   search_entries: in blogs

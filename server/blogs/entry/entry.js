@@ -173,10 +173,12 @@ module.exports = function (N, apiPath) {
   });
 
 
-  // Fetch settings
+  // Fetch settings needed on the client-side
   //
   N.wire.after(apiPath, async function fetch_settings(env) {
-    env.res.settings = env.res.settings || {};
-    env.res.settings.blogs_can_create = await env.extras.settings.fetch('blogs_can_create');
+    env.res.settings = Object.assign({}, env.res.settings, await env.extras.settings.fetch([
+      'blogs_can_create',
+      'blogs_reply_old_comment_threshold'
+    ]));
   });
 };

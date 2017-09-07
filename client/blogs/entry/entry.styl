@@ -102,12 +102,38 @@ $aside-size = '$$ N.config.users.avatars.resize.sm.height $$'px
   list-style none
 
 .blog-comment__control-item
-  color $body-color-secondary
-  font-size $font-size-sm
   display inline-block
-  margin-right 1.5rem
-  &:last-child
-    margin-right 0
+
+.blog-comment__body
+  .blog-comment__action
+    transition opacity .3s ease
+    opacity .3
+  &:hover
+    .blog-comment__action
+      opacity 1
+
+.blog-comment__action
+  background-color transparent
+  color $body-color-secondary - 20%
+
+  &:hover
+  &:focus
+  &:active
+    background-color $body-bg-secondary
+
+.blog-comment__reply
+  .blog-comment__action
+    color $brand-primary
+
+  .short
+    display none
+
+@media (max-width: $grid-breakpoints.md - 1)
+  .blog-comment__reply
+    .full
+      display none
+    .short
+      display inline-block
 
 .blog-comment__children
   margin-left $aside-size + 16px
@@ -115,3 +141,11 @@ $aside-size = '$$ N.config.users.avatars.resize.sm.height $$'px
   // stop indenting deeply nested comments
   & & & &
     margin-left 0
+
+@keyframes blog-comment-flash-animation {
+  from  { background: $decorator-color;  }
+  to    { background: none; }
+}
+
+.blog-comment__m-flash
+  animation blog-comment-flash-animation 1.5s ease-in

@@ -80,7 +80,25 @@ module.exports = function (N, apiPath) {
   });
 
 
-  // TODO: check ignores
+  // Check if blog owner is ignoring this user
+  //
+  N.wire.before(apiPath, async function check_ignore(env) {
+    let ignore_data = await N.models.users.Ignore.findOne()
+                                .where('from').equals(env.data.user._id)
+                                .where('to').equals(env.user_info.user_id)
+                                .lean(true);
+
+    if (ignore_data) {
+      let cannot_be_ignored = await env.extras.settings.fetch('cannot_be_ignored');
+
+      if (!cannot_be_ignored) {
+        throw {
+          code: N.io.CLIENT_ERROR,
+          message: env.t('err_sender_is_ignored')
+        };
+      }
+    }
+  });
 
 
   // Fetch parent comment (if any)
@@ -241,7 +259,20 @@ module.exports = function (N, apiPath) {
   });
 
 
-  // TODO: schedule image size fetch
+  // Schedule image size fetch
+  //
+  N.wire.after(apiPath, function fill_image_info(env) {
+    return N.queue.blog_comment_images_fetch(env.data.new_comment._id).postpone();
+  });
+
+
+  // Update comment counters
+  //
+  N.wire.after(apiPath, function update_counters(env) {
+    return N.models.blogs.BlogEntry.updateCounters(env.data.entry._id);
+  });
+
+
   // TODO: schedule search index update
   // TODO: set marker position (read/unread flag)
   // TODO: add notification for user whose post was replied to

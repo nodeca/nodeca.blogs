@@ -1,4 +1,5 @@
 - self.add_raw_data('entry', self.entry)
+- self.add_raw_data('settings', self.settings)
 
 - var user = self.users[self.user_id] || {};
 
@@ -15,48 +16,66 @@ mixin render_comments(comments)
 
     - var user = self.users[comment.user] || { hid: 0 };
 
-    .blog-comment.clearfix
-      .blog-comment__aside
-        if user.hid
-          a(href=self.link_to('users.member', { user_hid: user.hid }))
-            img.blog-comment__avatar(alt=user.name)&attributes(self.avatar(user, 'sm'))
-        else
-          .blog-comment__avatar.av-anon
+    .blog-comment(id='comment' + comment.hid)
+      .blog-comment__body
+        .blog-comment__aside
+          if user.hid
+            a(href=self.link_to('users.member', { user_hid: user.hid }))
+              img.blog-comment__avatar(alt=user.name)&attributes(self.avatar(user, 'sm'))
+          else
+            .blog-comment__avatar.av-anon
 
-      footer.blog-comment__meta
-        if user.hid
-          .blog-comment__author
-            a.blog-comment__author-link(
-              href=self.link_to('users.member', { user_hid: user.hid })
-            )= user.name
+        footer.blog-comment__meta
+          if user.hid
+            .blog-comment__author
+              a.blog-comment__author-link(
+                href=self.link_to('users.member', { user_hid: user.hid })
+              )= user.name
 
-        .blog-comment__date
-          != self.timetag(comment.ts, 'relative')
+          .blog-comment__date
+            != self.timetag(comment.ts, 'relative')
 
-      .blog-comment__content
-        .blog-comment__message.markup!= comment.html
+        .blog-comment__content
+          .blog-comment__message.markup!= comment.html
 
-        - var tail = self.partial('@blogs.entry.attachments', { post: comment, user: user });
-        if tail
-          .forum-post__tail.markup-tail
-            !=tail
+          - var tail = self.partial('@blogs.entry.attachments', { post: comment, user: user });
+          if tail
+            .forum-post__tail.markup-tail
+              !=tail
 
-      footer.blog-comment__controls
-        ul.blog-comment__controls-blk
-          li.blog-comment__control-item
-            span.icon.icon-vote-up
+        footer.blog-comment__controls
+          ul.blog-comment__controls-blk
+            li.blog-comment__control-item.blog-comment__vote-up
+              button.btn.blog-comment__action(
+                title=self.t('vote_up')
+              )
+                span.icon.icon-vote-up
 
-          li.blog-comment__control-item
-            span.icon.icon-vote-down
+            li.blog-comment__control-item.blog-comment__vote-down
+              button.btn.blog-comment__action(
+                title=self.t('vote_down')
+              )
+                span.icon.icon-vote-down
 
-          if self.settings.blogs_can_create
-            li.blog-comment__control-item
-              a(
-                href='#'
-                data-on-click='blogs.entry:reply'
-                data-comment-id=comment._id
-                data-comment-hid=comment.hid
-              )=self.t('reply')
+            if self.settings.blogs_can_create
+              li.blog-comment__control-item.blog-comment__reply
+                //- for wide screen
+                button.full.btn.blog-comment__action(
+                  data-on-click='blogs.entry:reply'
+                  data-comment-id=comment._id
+                  data-comment-hid=comment.hid
+                  data-comment-ts=comment.ts
+                )
+                  span.icon.icon-reply.icon-space-after= self.t('reply')
+                //- for narrow screen
+                button.short.btn.blog-comment__action(
+                  data-on-click='blogs.entry:reply'
+                  data-comment-id=comment._id
+                  data-comment-hid=comment.hid
+                  data-comment-ts=comment.ts
+                  title=self.t('reply')
+                )
+                  span.icon.icon-reply
 
       .blog-comment__children
         +render_comments(children)

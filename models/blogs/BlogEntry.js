@@ -2,6 +2,7 @@
 
 
 const _        = require('lodash');
+const Promise  = require('bluebird');
 const Mongoose = require('mongoose');
 const Schema   = Mongoose.Schema;
 
@@ -41,6 +42,7 @@ module.exports = function (N, collectionName) {
     tag_source:   String,
     ts:           { type: Date, 'default': Date.now },
     comments:     { type: Number, 'default': 0 },
+    comments_hb:  { type: Number, 'default': 0 },
 
     views:        { type: Number, 'default': 0 },
     votes:        { type: Number, 'default': 0 },
@@ -141,6 +143,30 @@ module.exports = function (N, collectionName) {
       callback();
     });
   });
+
+
+  // Update comment counters
+  //
+  BlogEntry.statics.updateCounters = async function (entry_id) {
+    let statuses = N.models.blogs.BlogEntry.statuses;
+    let updateData = {};
+
+    let count = await Promise.map(
+                        [ statuses.VISIBLE, statuses.HB ],
+                        st => N.models.blogs.BlogComment
+                                  .where('entry').equals(entry_id)
+                                  .where('st').equals(st)
+                                  .count()
+                      );
+
+    // Visible comment count
+    updateData.comments = count[0];
+
+    // Hellbanned comment count
+    updateData.comments_hb = count[0] + count[1];
+
+    await N.models.blogs.BlogEntry.update({ _id: entry_id }, { $set: updateData });
+  };
 
 
   N.wire.on('init:models', function emit_init_BlogEntry() {

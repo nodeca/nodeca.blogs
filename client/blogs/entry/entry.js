@@ -15,6 +15,9 @@ let $window = $(window);
 
 const navbarHeight = parseInt($('body').css('margin-top'), 10) + parseInt($('body').css('padding-top'), 10);
 
+// height of a space between text content of a post and the next post header
+const TOP_OFFSET = 50;
+
 
 /////////////////////////////////////////////////////////////////////
 // init on page load
@@ -22,6 +25,22 @@ const navbarHeight = parseInt($('body').css('margin-top'), 10) + parseInt($('bod
 N.wire.on('navigate.done:' + module.apiPath, function page_setup(data) {
   pageState.user_hid  = data.params.user_hid;
   pageState.entry_hid = data.params.entry_hid;
+
+  let anchor = data.anchor || '';
+
+  if (anchor.match(/^#comment\d+$/)) {
+    let el = $('.blog-comment' + anchor);
+
+    if (el.length) {
+      // override automatic scroll to an anchor in the navigator
+      data.no_scroll = true;
+
+      $window.scrollTop(el.offset().top - navbarHeight - TOP_OFFSET);
+      el.addClass('blog-comment__m-flash');
+
+      return;
+    }
+  }
 });
 
 
@@ -68,6 +87,32 @@ N.wire.on('navigate.exit:' + module.apiPath, function progress_updater_teardown(
 
 
 N.wire.once('navigate.done:' + module.apiPath, function page_once() {
+
+  // Display confirmation when answering to an old comment
+  //
+  N.wire.before(module.apiPath + ':reply', function old_reply_confirm(data) {
+    if (data.$this.data('comment-id')) {
+      let comment_time = new Date(data.$this.data('comment-ts')).getTime();
+      let comment_older_than_days = Math.floor((Date.now() - comment_time) / (24 * 60 * 60 * 1000));
+
+      if (comment_older_than_days >= N.runtime.page_data.settings.blogs_reply_old_comment_threshold) {
+        return N.wire.emit('common.blocks.confirm', {
+          html: t('old_comment_reply_confirm', { count: comment_older_than_days })
+        });
+      }
+    } else {
+      let entry_older_than_days = Math.floor(
+        (Date.now() - new Date(N.runtime.page_data.entry.ts)) / (24 * 60 * 60 * 1000)
+      );
+
+      if (entry_older_than_days >= N.runtime.page_data.settings.blogs_reply_old_comment_threshold) {
+        return N.wire.emit('common.blocks.confirm', {
+          html: t('old_entry_reply_confirm', { count: entry_older_than_days })
+        });
+      }
+    }
+  });
+
 
   // Click on post reply link or toolbar reply button
   //

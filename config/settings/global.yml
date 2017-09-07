@@ -59,3 +59,9 @@ setting_schemas:
       group_key: blogs_editor
       category_key: comment
       default: 30
+
+    blogs_reply_old_comment_threshold:
+      type: number
+      group_key: blogs_editor
+      category_key: comment
+      default: 30

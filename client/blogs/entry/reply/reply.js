@@ -94,20 +94,18 @@ N.wire.on(module.apiPath + ':begin', function show_editor(data) {
         params.parent_comment_id = data.comment_id;
       }
 
-      N.io.rpc('blogs.entry.comment.reply', params).then(() => {
+      N.io.rpc('blogs.entry.comment.reply', params).then(response => {
         N.MDEdit.hide({ removeDraft: true });
 
-        // TODO: focus on the new comment
-        return N.wire.emit('navigate.reload');
-
-        /*return N.wire.emit('navigate.to', {
+        return N.wire.emit('navigate.to', {
           apiPath: 'blogs.entry',
           params: {
             user_hid:  data.user_hid,
             entry_hid: data.entry_hid
-            //$anchor:   'comment' + response.comment_hid
-          }
-        });*/
+          },
+          anchor: 'comment' + response.comment_hid,
+          force: true
+        });
       }).catch(err => {
         $editor.find('.mdedit-btn__submit').removeClass('disabled');
         N.wire.emit('error', err);
