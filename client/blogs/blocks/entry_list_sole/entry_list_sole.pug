@@ -28,7 +28,7 @@ each entry in self.entries
           type='checkbox'
         )
 
-    header.blog-entry__meta
+    header.blog-entry__head
       .blog-entry__title
         a.blog-entry__link(href=self.link_to('blogs.entry', { user_hid: user.hid, entry_hid: entry.hid }))
           = entry.title

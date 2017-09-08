@@ -49,11 +49,13 @@ N.wire.once(module.apiPath, function blog_entry_setup_handlers() {
     if (!params.ref) return; // no data to extend
     if (!/^blog_entry:/.test(params.ref)) return; // not our data
 
-    let hid   = params.ref.split(':')[1];
-    let title = $(`#entry${hid} .blog-entry__link`).text();
-    let href  = $(`#entry${hid} .blog-entry__link`).attr('href');
+    let [ , user_hid, entry_hid ] = params.ref.split(':');
+    let title = $(`#entry${entry_hid} .blog-entry__title`).text();
+    let href  = N.router.linkTo('blogs.entry', { user_hid, entry_hid });
 
-    if (title && hid) params.title = `Re: ${title}`;
-    if (href) params.text = `${href}\n\n`;
+    if (title && href) {
+      params.title = `Re: ${title}`;
+      params.text = `${href}\n\n`;
+    }
   });
 });

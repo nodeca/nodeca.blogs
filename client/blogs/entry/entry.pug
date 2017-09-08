@@ -1,8 +1,6 @@
 - self.add_raw_data('entry', self.entry)
 - self.add_raw_data('settings', self.settings)
 
-- var user = self.users[self.user_id] || {};
-
 mixin render_comments(comments)
   - var i = 0;
   while i < comments.length
@@ -81,8 +79,9 @@ mixin render_comments(comments)
         +render_comments(children)
 
 
-article#content.blogs-entry
+article#content.blogs-entry-page
   -
+    var user = self.users[self.user_id] || {};
     var $query_top = {};
     var $query_bottom = { from: self.last_entry_hid };
 
@@ -113,44 +112,78 @@ article#content.blogs-entry
   .layout__container.container-fluid
     != self.partial('@users.blocks.announces')
 
-    header.page-head.blogs-entry__head
-      .float-right
-        != self.partial('@blogs.entry.blocks.toolbar_controls')
+    .blog-entry.blog-entry-page__entry(id='entry' + self.entry.hid)
+      header.page-head.blog-entry__head
+        .float-right
+          != self.partial('@blogs.entry.blocks.toolbar_controls')
 
-      h1.blogs-entry__title.page-head__title(itemprop='name')= self.entry.title
+        h1.blog-entry__title.page-head__title(itemprop='name')= self.entry.title
 
-      .blogs-entry__meta
-        span.blogs-entry__author
-          if user.hid
-            a.blogs-entry__author-link(href=self.link_to('users.member', { user_hid: user.hid }))
-              img.blogs-entry__avatar(alt=user.name)&attributes(self.avatar(user, 'sm'))
-              = user.name
-          else
-            .blogs-entry__avatar.av-anon
+        .blog-entry__meta
+          span.blog-entry__meta-item.blog-entry__author
+            if user.hid
+              a.blog-entry__author-link._ucard-popover(
+                href=self.link_to('users.member', { user_hid: user.hid })
+                data-user-id=self.entry.user
+                data-user-ref='blog_entry:'+user.hid+':'+self.entry.hid
+              )
+                img.blog-entry__avatar(alt=user.name)&attributes(self.avatar(user, 'sm'))
+                = user.name
+            else
+              .blog-entry__avatar.av-anon
 
-        span.blogs-entry__ts!= self.timetag(self.entry.ts, 'relative')
+          span.blog-entry__meta-item.blog-entry__ts!= self.timetag(self.entry.ts, 'relative')
 
-    .blogs-entry__body
-      .blogs-entry__content
-        .blogs-entry__message.markup!= self.entry.html
+      .blog-entry__content
+        .blog-entry__message.markup!= self.entry.html
 
         - var tail = self.partial('@blogs.entry.attachments', { post: self.entry, user: user });
         if tail
-          .forum-post__tail.markup-tail
+          .blog-entry__tail.markup-tail
             !=tail
 
-      footer.blogs-entry__controls
-        ul.blogs-entry__controls-blk
-          li.blogs-entry__control-item
-            span.icon.icon-vote-up
+      footer.blog-entry__controls
+        ul.blog-entry__controls-blk
+          if self.settings.can_report_abuse
+            li.blog-entry__control-item
+              button.btn.btn-sm.blog-entry__action.blog-entry__report(title=self.t('report')
+                data-entry-id=self.entry._id
+                data-on-click='blogs.blocks.blog_entry:report'
+              )
+                span.icon.icon-report
 
-          li.blogs-entry__control-item
-            span.icon.icon-vote-down
+          li.blog-entry__control-item.blog-entry__vote-up
+            button.btn.btn-sm.blog-entry__action(
+              title=self.t('vote_up')
+            )
+              span.icon.icon-vote-up
 
-          li.blogs-entry__control-item
-            span.icon.icon-bookmark
+          li.blog-entry__control-item.blog-entry__vote-down
+            button.btn.btn-sm.blog-entry__action(
+              title=self.t('vote_down')
+            )
+              span.icon.icon-vote-down
 
-          li.blogs-entry__control-item
+          if self.runtime.is_member
+            li.blog-entry__control-item
+              button.btn.btn-sm.blog-entry__action.blog-entry__bookmark-add(
+                data-entry-id=self.entry._id
+                data-on-click='blogs.blocks.blog_entry:bookmark'
+                title=self.t('bookmark_add')
+              )
+                span.icon.icon-bookmark
+                span.blog-entry__bookmarks-count(data-bm-count=self.entry.bookmarks)
+
+              button.btn.btn-sm.blog-entry__action.blog-entry__bookmark-remove(
+                data-entry-id=self.entry._id
+                data-on-click='blogs.blocks.blog_entry:bookmark'
+                data-remove='true'
+                title=self.t('bookmark_remove')
+              )
+                span.icon.icon-bookmark
+                span.blog-entry__bookmarks-count(data-bm-count=self.entry.bookmarks)
+
+          li.blog-entry__control-item
             span.icon.icon-views.icon-space-after= self.entry.views
 
       != self.partial('@blogs.blocks.tag_list', { tag_hids: self.entry.tag_hids })

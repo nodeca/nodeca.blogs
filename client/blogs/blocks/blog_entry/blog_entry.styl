@@ -5,11 +5,22 @@
 
 .blog-entry__title
   font-size $h4-font-size
+  line-height 1.5
   color $brand-primary
 
-.blog-entry__meta
+.blog-entry__head
   margin-bottom 1rem
+
+.blog-entry__meta
   color $body-color-secondary
+  font-size $font-size-xs
+
+.blog-entry__meta-item
+  &:after
+    content ', '
+
+  &:last-child:after
+    content none
 
 .blog-entry__author-link
   color $body-color-secondary
