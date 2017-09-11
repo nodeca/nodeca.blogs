@@ -5,7 +5,7 @@ setting_schemas:
       priority: 200
       category_key: blogs
       type: boolean
-      default: true
+      default: false
 
     blogs_edit_comments_max_time:
       priority: 210

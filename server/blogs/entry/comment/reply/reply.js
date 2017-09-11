@@ -80,27 +80,6 @@ module.exports = function (N, apiPath) {
   });
 
 
-  // Check if blog owner is ignoring this user
-  //
-  N.wire.before(apiPath, async function check_ignore(env) {
-    let ignore_data = await N.models.users.Ignore.findOne()
-                                .where('from').equals(env.data.user._id)
-                                .where('to').equals(env.user_info.user_id)
-                                .lean(true);
-
-    if (ignore_data) {
-      let cannot_be_ignored = await env.extras.settings.fetch('cannot_be_ignored');
-
-      if (!cannot_be_ignored) {
-        throw {
-          code: N.io.CLIENT_ERROR,
-          message: env.t('err_sender_is_ignored')
-        };
-      }
-    }
-  });
-
-
   // Fetch parent comment (if any)
   //
   N.wire.before(apiPath, async function fetch_parent_comment(env) {
@@ -130,6 +109,85 @@ module.exports = function (N, apiPath) {
         code: N.io.CLIENT_ERROR,
         message: env.t('error_invalid_parent_post')
       };
+    }
+  });
+
+
+  // Check ignores, forbid posting if:
+  //  - blog owner is ignoring you
+  //  - you're ignoring blog owner
+  //  - replying to comment, its author is ignoring you
+  //  - replying to comment, you're ignoring its author
+  //
+  N.wire.before(apiPath, async function check_ignores(env) {
+    let ignore_data;
+
+    // Blog owner is ignoring us (except for moderators)
+    //
+    ignore_data = await N.models.users.Ignore.findOne()
+                            .where('from').equals(env.data.user._id)
+                            .where('to').equals(env.user_info.user_id)
+                            .lean(true);
+
+    if (ignore_data) {
+      let cannot_be_ignored = await env.extras.settings.fetch('cannot_be_ignored');
+
+      if (!cannot_be_ignored) {
+        throw {
+          code: N.io.CLIENT_ERROR,
+          message: env.t('err_blog_sender_is_ignored')
+        };
+      }
+    }
+
+    // We're ignoring blog owner
+    //
+    ignore_data = await N.models.users.Ignore.findOne()
+                            .where('to').equals(env.data.user._id)
+                            .where('from').equals(env.user_info.user_id)
+                            .lean(true);
+
+    if (ignore_data) {
+      throw {
+        code: N.io.CLIENT_ERROR,
+        message: env.t('err_blog_recipient_is_ignored')
+      };
+    }
+
+    // Replying to a comment, its author is ignoring us (except for moderators)
+    //
+    if (env.data.parent_comment && env.data.parent_comment.user) {
+      ignore_data = await N.models.users.Ignore.findOne()
+                              .where('from').equals(env.data.parent_comment.user)
+                              .where('to').equals(env.user_info.user_id)
+                              .lean(true);
+
+      if (ignore_data) {
+        let cannot_be_ignored = await env.extras.settings.fetch('cannot_be_ignored');
+
+        if (!cannot_be_ignored) {
+          throw {
+            code: N.io.CLIENT_ERROR,
+            message: env.t('err_comment_sender_is_ignored')
+          };
+        }
+      }
+    }
+
+    // Replying to a comment, we're ignoring its author
+    //
+    if (env.data.parent_comment) {
+      ignore_data = await N.models.users.Ignore.findOne()
+                              .where('to').equals(env.data.parent_comment.user)
+                              .where('from').equals(env.user_info.user_id)
+                              .lean(true);
+
+      if (ignore_data) {
+        throw {
+          code: N.io.CLIENT_ERROR,
+          message: env.t('err_comment_recipient_is_ignored')
+        };
+      }
     }
   });
 

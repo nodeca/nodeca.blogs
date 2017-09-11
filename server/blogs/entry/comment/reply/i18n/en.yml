@@ -3,4 +3,7 @@ en-US:
   err_text_too_short: "Comment should have at least #{count} ((character|characters))"
   err_too_many_images: "Comment can't have more than #{count} ((image|images))"
   err_too_many_emojis: "Comment can't have more than #{count} ((emoticon|emoticons))"
-  err_sender_is_ignored: You cannot create comments in this blog because blog owner is ignoring you
+  err_blog_sender_is_ignored: You cannot create comments in this blog because blog owner is ignoring you
+  err_blog_recipient_is_ignored: You cannot create comments in this blog because you're ignoring blog owner
+  err_comment_sender_is_ignored: You cannot reply to this comment because its author is ignoring you
+  err_comment_recipient_is_ignored: You cannot reply to this comment because you're ignoring its author
