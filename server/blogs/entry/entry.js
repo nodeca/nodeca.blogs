@@ -173,6 +173,40 @@ module.exports = function (N, apiPath) {
   });
 
 
+  // Update view counter
+  //
+  // The handler is deliberately synchronous with all updates happening in the
+  // background, so it won't affect response time
+  //
+  N.wire.after(apiPath, function update_view_counter(env) {
+    // First-time visitor or a bot, don't count those
+    if (!env.session_id) return;
+
+    N.redis.time(function (err, time) {
+      if (err) return;
+
+      let score = Math.floor(time[0] * 1000 + time[1] / 1000);
+      let key   = env.data.entry._id + '-' + env.session_id;
+
+      N.redis.zscore('views:blog_entry:track_last', key, function (err, old_score) {
+        if (err) return;
+
+        // Check if user has loaded the same page in the last 10 minutes,
+        // it prevents refreshes and inside-the-topic navigation from being
+        // counted.
+        //
+        if (Math.abs(score - old_score) < 10 * 60 * 1000) { return; }
+
+        N.redis.zadd('views:blog_entry:track_last', score, key, function (err) {
+          if (err) return;
+
+          N.redis.hincrby('views:blog_entry:count', String(env.data.entry._id), 1, function () {});
+        });
+      });
+    });
+  });
+
+
   // Fetch settings needed on the client-side
   //
   N.wire.after(apiPath, async function fetch_settings(env) {

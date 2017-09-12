@@ -43,9 +43,10 @@ N.wire.once(module.apiPath, function blog_entry_setup_handlers() {
   });
 
 
-  // Extend dialogs create (add title & link when available)
+  // When user clicks "create dialog" button in usercard popup,
+  // add title & link to editor.
   //
-  N.wire.before('users.dialog.create:begin', function dialog_create_extend(params) {
+  N.wire.before('users.dialog.create:begin', function dialog_create_extend_blog_entries(params) {
     if (!params.ref) return; // no data to extend
     if (!/^blog_entry:/.test(params.ref)) return; // not our data
 

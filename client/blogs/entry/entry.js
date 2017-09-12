@@ -132,4 +132,81 @@ N.wire.once('navigate.done:' + module.apiPath, function page_once() {
       comment_hid: data.$this.data('comment-hid')
     });
   });
+
+
+  // When user clicks "create dialog" button in usercard popup,
+  // add title & link to editor.
+  //
+  N.wire.before('users.dialog.create:begin', function dialog_create_extend_blog_comments(params) {
+    if (!params.ref) return; // no data to extend
+    if (!/^blog_comment:/.test(params.ref)) return; // not our data
+
+    let [ , user_hid, entry_hid, comment_hid ] = params.ref.split(':');
+    let title = $(`#entry${entry_hid} .blog-entry__title`).text();
+    let href  = N.router.linkTo('blogs.entry', { user_hid, entry_hid, $anchor: `comment${comment_hid}` });
+
+    if (title && href) {
+      params.title = `Re: ${title}`;
+      params.text = `${href}\n\n`;
+    }
+  });
+});
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Set a "same page" modifier to all block quotes which point to the same entry
+//
+
+// current entry params if we're on an entry page, null otherwise;
+let entryParams;
+
+
+// Set `quote__m-local` or `quote__m-outer` class on every quote
+// depending on whether its origin is in the same entry or not.
+//
+function set_quote_modifiers(selector) {
+  // if entryParams is not set, it means we aren't on an entry page
+  if (!entryParams) return;
+
+  selector.find('.quote').each(function () {
+    let $tag = $(this);
+
+    if ($tag.hasClass('quote__m-local') || $tag.hasClass('quote__m-outer')) {
+      return;
+    }
+
+    let cite = $tag.attr('cite');
+
+    if (!cite) return;
+
+    let match = N.router.match(cite);
+
+    if (!match) return;
+
+    if (match &&
+        match.meta.methods.get === 'blogs.entry' &&
+        match.params.entry_hid === entryParams.entry_hid) {
+
+      $tag.addClass('quote__m-local');
+    } else {
+      $tag.addClass('quote__m-outer');
+    }
+  });
+}
+
+
+N.wire.on('navigate.done:' + module.apiPath, function set_quote_modifiers_on_init(data) {
+  entryParams = data.params;
+
+  set_quote_modifiers($(document));
+});
+
+
+N.wire.on('navigate.update', function set_quote_modifiers_on_update(data) {
+  set_quote_modifiers(data.$);
+});
+
+
+N.wire.on('navigate.exit:' + module.apiPath, function set_quote_modifiers_teardown() {
+  entryParams = null;
 });

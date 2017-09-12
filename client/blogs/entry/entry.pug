@@ -18,7 +18,11 @@ mixin render_comments(comments)
       .blog-comment__body
         .blog-comment__aside
           if user.hid
-            a(href=self.link_to('users.member', { user_hid: user.hid }))
+            a.blog-comment__author-link._ucard-popover(
+              href=self.link_to('users.member', { user_hid: user.hid })
+              data-user-id=self.entry.user
+              data-user-ref='blog_comment:'+user.hid+':'+self.entry.hid+':'+comment.hid
+            )
               img.blog-comment__avatar(alt=user.name)&attributes(self.avatar(user, 'sm'))
           else
             .blog-comment__avatar.av-anon
@@ -26,9 +30,12 @@ mixin render_comments(comments)
         footer.blog-comment__meta
           if user.hid
             .blog-comment__author
-              a.blog-comment__author-link(
+              a.blog-comment__author-link._ucard-popover(
                 href=self.link_to('users.member', { user_hid: user.hid })
-              )= user.name
+                data-user-id=self.entry.user
+                data-user-ref='blog_comment:'+user.hid+':'+self.entry.hid+':'+comment.hid
+              )
+                = user.name
 
           .blog-comment__date
             != self.timetag(comment.ts, 'relative')

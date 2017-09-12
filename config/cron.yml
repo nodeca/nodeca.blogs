@@ -1,0 +1,2 @@
+cron:
+  blog_entry_views_update: 0 */10 * * * * # every 10 minutes
