@@ -1,7 +1,11 @@
 en-US:
   comments: "Comments (#{count}):"
+  report: Report to moderator
+  bookmark_add: Add to bookmarks
+  bookmark_remove: Remove from bookmarks
   vote_up: Vote up
   vote_down: Vote down
+  vote_details: Click to see details
   reply: Reply
   add_comment: Add comment
 

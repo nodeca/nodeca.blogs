@@ -1,0 +1,5 @@
+en-US:
+  vote:
+    err_perm_expired: You cannot vote for this entry anymore
+  ip_info:
+    err_no_ip: IP address for this entry is not specified

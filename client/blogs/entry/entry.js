@@ -134,6 +134,28 @@ N.wire.once('navigate.done:' + module.apiPath, function page_once() {
   });
 
 
+  // Vote on blog entry
+  //
+  N.wire.on(module.apiPath + ':entry_vote', function entry_vote(data) {
+    let entry_id = data.$this.data('entry-id');
+    let value    = +data.$this.data('value');
+
+    return N.io.rpc('blogs.entry.vote', { entry_id, value })
+      .then(() => N.wire.emit('navigate.reload'));
+  });
+
+
+  // Vote on blog comment
+  //
+  N.wire.on(module.apiPath + ':comment_vote', function comment_vote(data) {
+    let comment_id = data.$this.data('comment-id');
+    let value      = +data.$this.data('value');
+
+    return N.io.rpc('blogs.entry.comment.vote', { comment_id, value })
+      .then(() => N.wire.emit('navigate.reload'));
+  });
+
+
   // When user clicks "create dialog" button in usercard popup,
   // add title & link to editor.
   //

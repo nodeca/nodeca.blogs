@@ -47,7 +47,7 @@ each entry in self.entries
 
         if self.settings.can_report_abuse
           li.blog-entry__control-item
-            button.btn.btn-sm.blog-entry__action.blog-entry__report(title=self.t('report')
+            button.btn.blog-entry__action.blog-entry__report(title=self.t('report')
               data-entry-id=entry._id
               data-on-click='blogs.blocks.blog_entry:report'
             )
@@ -55,7 +55,7 @@ each entry in self.entries
 
         if self.runtime.is_member
           li.blog-entry__control-item
-            button.btn.btn-sm.blog-entry__action.blog-entry__bookmark-add(
+            button.btn.blog-entry__action.blog-entry__bookmark-add(
               data-entry-id=entry._id
               data-on-click='blogs.blocks.blog_entry:bookmark'
               title=self.t('bookmark_add')
@@ -63,7 +63,7 @@ each entry in self.entries
               span.icon.icon-bookmark
               span.blog-entry__bookmarks-count(data-bm-count=entry.bookmarks)
 
-            button.btn.btn-sm.blog-entry__action.blog-entry__bookmark-remove(
+            button.btn.blog-entry__action.blog-entry__bookmark-remove(
               data-entry-id=entry._id
               data-on-click='blogs.blocks.blog_entry:bookmark'
               data-remove='true'
@@ -85,7 +85,7 @@ each entry in self.entries
         if showDropdown
           //- no aria parts - visible to moderators only
           .blog-entry__control-item.blog-entry__mod-menu.dropdown.dropup
-            button.btn.btn-square.btn-sm.blog-entry__action.dropdown-toggle(
+            button.btn.btn-square.blog-entry__action.dropdown-toggle(
               data-toggle='dropdown'
               role='button'
             )

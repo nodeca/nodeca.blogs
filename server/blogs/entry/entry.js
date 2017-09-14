@@ -207,12 +207,52 @@ module.exports = function (N, apiPath) {
   });
 
 
+  // Fetch and fill bookmarks
+  //
+  N.wire.after(apiPath, async function fetch_and_fill_bookmarks(env) {
+    let bookmarks = await N.models.blogs.BlogEntryBookmark.find()
+                              .where('user').equals(env.user_info.user_id)
+                              .where('entry').equals(env.data.entry._id)
+                              .lean(true);
+
+    env.data.own_bookmarks = bookmarks;
+
+    if (!bookmarks.length) return;
+
+    env.res.own_bookmarks = _.map(bookmarks, 'entry');
+  });
+
+
+  // Fetch and fill own votes
+  //
+  N.wire.after(apiPath, async function fetch_votes(env) {
+    let votes = await N.models.users.Vote.find()
+                          .where('from').equals(env.user_info.user_id)
+                          .where('for').in(_.map(env.data.comments, '_id').concat([ env.data.entry._id ]))
+                          .where('value').in([ 1, -1 ])
+                          .lean(true);
+
+    env.data.own_votes = votes;
+
+    if (!votes.length) return;
+
+    // [ { _id: ..., for: '562f3569c5b8d831367b0585', value: -1 } ] -> { 562f3569c5b8d831367b0585: -1 }
+    env.res.own_votes = votes.reduce((acc, vote) => {
+      acc[vote.for] = vote.value;
+      return acc;
+    }, {});
+  });
+
+
   // Fetch settings needed on the client-side
   //
   N.wire.after(apiPath, async function fetch_settings(env) {
     env.res.settings = Object.assign({}, env.res.settings, await env.extras.settings.fetch([
       'blogs_can_create',
-      'blogs_reply_old_comment_threshold'
+      'blogs_reply_old_comment_threshold',
+      'can_report_abuse',
+      'can_vote',
+      'votes_add_max_time'
     ]));
   });
 };

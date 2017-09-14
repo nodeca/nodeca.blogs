@@ -11,11 +11,13 @@ const USER_COUNT        = 10;
 const ENTRY_COUNT       = 100;
 const MAX_TAG_COUNT     = 20;
 const MAX_COMMENT_COUNT = 20;
+const MAX_VOTES         = 10;
 
 
 let models;
 let settings;
 let parser;
+let shared;
 
 
 let users        = [];
@@ -53,6 +55,31 @@ async function createTags() {
       tags_by_user[user._id].push(tag);
     }
   }
+}
+
+
+async function addVotes(post, content_type) {
+  let count = 0;
+
+  let votes = charlatan.Helpers.shuffle(users)
+                  .slice(0, charlatan.Helpers.rand(MAX_VOTES))
+                  .map(user => ({ user, value: Math.random() > 0.5 ? 1 : -1 }));
+
+  for (let { user, value } of votes) {
+    let vote = new models.users.Vote({
+      to:     post.user,
+      from:   user._id,
+      'for':  post._id,
+      type:   content_type,
+      value
+    });
+
+    count += value;
+
+    await vote.save();
+  }
+
+  post.votes = post.votes_hb = count;
 }
 
 
@@ -99,6 +126,8 @@ async function createComments(entry) {
     // set parser params (`params` is not included in the model,
     // so we need to assign it separately)
     entry.params = options;
+
+    await addVotes(comment, shared.content_type.BLOG_COMMENT);
 
     previous_comments.push(await comment.save());
   }
@@ -149,6 +178,8 @@ async function createEntries() {
     // so we need to assign it separately)
     entry.params = options;
 
+    await addVotes(entry, shared.content_type.BLOG_ENTRY);
+
     await createComments(await entry.save());
   }
 }
@@ -158,6 +189,7 @@ module.exports = async function (N) {
   models   = N.models;
   settings = N.settings;
   parser   = N.parser;
+  shared   = N.shared;
 
   await createDemoUsers();
   await createTags();

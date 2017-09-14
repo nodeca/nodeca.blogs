@@ -5,7 +5,7 @@
 
 $aside-size = '$$ N.config.users.avatars.resize.sm.height $$'px
 
-.blog-entry-page__entry
+.blogs-entry-page__entry
   padding-bottom 1.5rem
   margin-bottom 1.5rem
   border-bottom 1px solid $decorator-color
@@ -13,9 +13,16 @@ $aside-size = '$$ N.config.users.avatars.resize.sm.height $$'px
 //
 // Comments
 //
-.blog-entry__comment-header
+.blogs-entry-page__comment-header
   font-size $font-size-lg
   margin-bottom 1rem
+
+.blogs-entry-page__comment-replies
+  margin-left $aside-size + 16px
+
+  // stop indenting deeply nested comments
+  & & & &
+    margin-left 0
 
 .blog-comment
   margin-bottom 1rem
@@ -66,11 +73,16 @@ $aside-size = '$$ N.config.users.avatars.resize.sm.height $$'px
 .blog-comment__control-item
   display inline-block
 
-.blog-comment__body
+.blog-comment
   .blog-comment__action
     transition opacity .3s ease
     opacity .3
   &:hover
+    .blog-comment__action
+      opacity 1
+
+  .blog-comment__votes
+  .blog-comment__infraction
     .blog-comment__action
       opacity 1
 
@@ -83,6 +95,20 @@ $aside-size = '$$ N.config.users.avatars.resize.sm.height $$'px
   &:active
     background-color $body-bg-secondary
 
+.blog-comment__m-voted-up
+  .blog-comment__vote-up
+    .blog-comment__action
+      opacity 1
+    .icon
+      color $brand-success
+
+.blog-comment__m-voted-down
+  .blog-comment__vote-down
+    .blog-comment__action
+      opacity 1
+    .icon
+      color $brand-danger
+
 .blog-comment__reply
   .blog-comment__action
     color $brand-primary
@@ -90,19 +116,21 @@ $aside-size = '$$ N.config.users.avatars.resize.sm.height $$'px
   .short
     display none
 
+.blog-comment__votes
+  .blog-comment__action:after
+    content attr(data-votes-count)
+  .blog-comment__action[data-votes-count="0"]
+    display none
+  .blog-comment__action[data-votes-count^="+"]
+    color $brand-success
+    font-weight bold
+
 @media (max-width: $grid-breakpoints.md - 1)
   .blog-comment__reply
     .full
       display none
     .short
       display inline-block
-
-.blog-comment__children
-  margin-left $aside-size + 16px
-
-  // stop indenting deeply nested comments
-  & & & &
-    margin-left 0
 
 @keyframes blog-comment-flash-animation {
   from  { background: $decorator-color;  }

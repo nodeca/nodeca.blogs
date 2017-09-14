@@ -1,0 +1,3 @@
+en-US:
+  vote:
+    err_perm_expired: You cannot vote for this comment anymore

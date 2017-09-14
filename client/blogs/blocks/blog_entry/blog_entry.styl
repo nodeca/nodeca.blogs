@@ -58,11 +58,7 @@
 
 .blog-entry__control-item
   color $body-color-secondary
-  font-size $font-size-sm
   display inline-block
-  margin-right 1.5rem
-  &:last-child
-    margin-right 0
 
 .blog-entry__action
   background-color transparent
@@ -88,6 +84,20 @@
 .blog-entry__m-ignored
   .blog-entry__ignored-mark
     display inline-block
+
+.blog-entry__m-voted-up
+  .blog-entry__vote-up
+    .blog-entry__action
+      opacity 1
+    .icon
+      color $brand-success
+
+.blog-entry__m-voted-down
+  .blog-entry__vote-down
+    .blog-entry__action
+      opacity 1
+    .icon
+      color $brand-danger
 
 // override .btn+.btn margin
 .blog-entry__bookmark-remove.blog-entry__bookmark-remove
@@ -115,6 +125,15 @@
 
 .blog-entry__bookmarks-count[data-bm-count="0"]:after
   display none
+
+.blog-entry__votes
+  .blog-entry__action:after
+    content attr(data-votes-count)
+  .blog-entry__action[data-votes-count="0"]
+    display none
+  .blog-entry__action[data-votes-count^="+"]
+    color $brand-success
+    font-weight bold
 
 .blog-entry__tags
   margin-top 0.5rem
