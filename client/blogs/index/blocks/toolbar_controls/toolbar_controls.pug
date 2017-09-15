@@ -6,7 +6,7 @@ if self.settings.blogs_can_create
   - items.push('new_entry')
 
 if self.runtime.is_member
-  - items.push('mark_read')
+  - items.push('my_blog')
 
 
 - self.selected_cnt = 0
@@ -58,10 +58,10 @@ if items.length > 0 && items[items.length - 1] === 'header'
                 type='button'
               )= self.t('new_entry')
 
-            when 'mark_read'
-              button.dropdown-item(
-                type='button'
-              )= self.t('mark_read')
+            when 'my_blog'
+              a.dropdown-item(
+                href=self.link_to('blogs.sole', { user_hid: N.runtime.user_hid })
+              )= self.t('my_blog')
 
             when 'divider'
               .dropdown-divider

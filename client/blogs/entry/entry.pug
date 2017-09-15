@@ -143,12 +143,13 @@ mixin render_comments(comments)
                   span.icon.icon-reply
 
             li.blog-comment__control-item.blog-comment__votes
+              - var votes = comment.votes || 0;
               button.btn.blog-comment__action(
                 data-on-click='common.votes_popover'
                 data-votes-popover-placement='left'
                 data-votes-popover-for=comment._id
                 title=self.t('vote_details')
-                data-votes-count=(comment.votes > 0 ? '+' : '') + comment.votes
+                data-votes-count=(votes > 0 ? '+' : '') + votes
               )
 
             - var showDropdown = false
@@ -255,12 +256,13 @@ article#content.blogs-entry-page
       footer.blog-entry__controls
         ul.blog-entry__controls-blk
           li.blog-entry__control-item.blog-entry__votes
+            - var votes = entry.votes || 0;
             button.btn.blog-entry__action(
               data-on-click='common.votes_popover'
               data-votes-popover-placement='right'
               data-votes-popover-for=entry._id
               title=self.t('vote_details')
-              data-votes-count=(entry.votes > 0 ? '+' : '') + entry.votes
+              data-votes-count=(votes > 0 ? '+' : '') + votes
             )
 
           if self.runtime.is_member && self.runtime.user_id !== entry.user
