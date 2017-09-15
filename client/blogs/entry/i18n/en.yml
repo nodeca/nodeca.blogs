@@ -8,6 +8,12 @@ en-US:
   vote_details: Click to see details
   reply: Reply
   add_comment: Add comment
+  edit: Edit
+
+  ip_info: IP info
+  add_infraction: Add infraction
+  delete: Delete
+  undelete: Undelete
 
   old_entry_reply_confirm: |
     md:**This blog entry is very old!** It was created #{count} days ago, and is probably outdated.

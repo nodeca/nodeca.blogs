@@ -1,6 +1,7 @@
 en-US:
   new_entry: New entry
   mark_read: Mark all read
+  subscription: Subscription
   many_header: "With #{count} ((entry|entries)):"
   many_unselect: Clear selection
   many_delete: Delete

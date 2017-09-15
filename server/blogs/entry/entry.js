@@ -250,8 +250,11 @@ module.exports = function (N, apiPath) {
     env.res.settings = Object.assign({}, env.res.settings, await env.extras.settings.fetch([
       'blogs_can_create',
       'blogs_reply_old_comment_threshold',
+      'blogs_mod_can_delete',
+      'blogs_mod_can_add_infractions',
       'can_report_abuse',
       'can_vote',
+      'can_see_ip',
       'votes_add_max_time'
     ]));
   });

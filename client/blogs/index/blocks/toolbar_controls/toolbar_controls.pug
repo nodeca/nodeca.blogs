@@ -9,7 +9,9 @@ if self.runtime.is_member
   - items.push('mark_read')
 
 
-if self.selected_cnt
+- self.selected_cnt = 0
+//- TODO: if self.selected_cnt
+if self.settings.blogs_mod_can_delete
   if items.length > 0
     - items.push('divider')
   - items.push('many_header')

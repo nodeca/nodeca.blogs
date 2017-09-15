@@ -1,2 +1,99 @@
+- var menu_rnd_id = 'rnd' + String(Math.random()).slice(2, 10)
+
+- var items = []
+
+if self.settings.blogs_can_create
+  - items.push('add_comment')
+
+if self.runtime.is_member
+  - items.push('subscription')
+
+if self.entry.user === self.runtime.user_id
+  - items.push('delete')
+
+if items.length > 0
+  - items.push('divider')
+
+- items.push('header')
+
+if self.settings.blogs_mod_can_delete
+  - items.push('mod_delete')
+
+//- If last item is header - remove it
+if items.length > 0 && items[items.length - 1] === 'header'
+  - items.pop()
+
+//- If last item is divider - remove it
+if items.length > 0 && items[items.length - 1] === 'divider'
+  - items.pop()
+
+if items.length > 0 && items[items.length - 1].indexOf('mod_') === 0
+  - items.push('mod_history')
+
+
 .page-actions.blogs-entry__toolbar-controls
-  //- TODO
+  if self.settings.blogs_can_create
+    button.hidden-nav-alt.btn.btn-primary.btn-square.d-none.d-sm-inline-block.icon.icon-plus(
+      type='button'
+      data-on-click='blogs.entry:reply'
+      title=self.t('add_comment')
+    )
+
+    button.visible-nav-alt.btn.btn-secondary.btn-square.d-none.d-sm-inline-block.icon.icon-plus(
+      type='button'
+      data-on-click='blogs.entry:reply'
+      title=self.t('add_comment')
+    )
+
+  if items.length > 0
+    .page-actions__dropdown
+      button.btn.btn-secondary.btn-square.icon.icon-dropdown.dropdown-toggle(
+        type='button'
+        id=menu_rnd_id
+        aria-haspopup='true'
+        aria-expanded='false'
+        data-toggle='dropdown'
+      )
+
+      .dropdown-menu.dropdown-menu-right(aria-labelledby=menu_rnd_id)
+
+        each item in items
+          case item
+
+            when 'divider'
+              .dropdown-divider
+
+            when 'header'
+              .dropdown-header= self.t('mod_actions')
+
+            when 'mod_history'
+              //- TODO
+              button.dropdown-item.disabled(
+                type='button'
+              )= self.t('history')
+
+            when 'add_comment'
+              button.dropdown-item.d-sm-none(
+                type='button'
+                data-on-click='blogs.entry:reply'
+              )= self.t('add_comment')
+
+            when 'subscription'
+              button.dropdown-item(
+                type='button'
+              )= self.t('subscription')
+
+            when 'delete'
+              button.dropdown-item(
+                type='button'
+              )= self.t('delete')
+
+            when 'mod_delete'
+              button.dropdown-item(
+                type='button'
+              )= self.t('delete')
+
+            when 'mod_undelete'
+              button.dropdown-item(
+                type='button'
+              )= self.t('undelete')

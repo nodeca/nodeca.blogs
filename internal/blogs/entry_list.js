@@ -29,6 +29,7 @@ let setting_names = [
   'blogs_show_ignored',
   'blogs_mod_can_delete',
   'blogs_mod_can_see_hard_deleted',
+  'blogs_mod_can_add_infractions',
   'can_see_hellbanned',
   'can_see_ip',
   'can_report_abuse'

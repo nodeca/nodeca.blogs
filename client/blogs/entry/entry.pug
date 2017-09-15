@@ -35,7 +35,7 @@ mixin render_comments(comments)
           else
             .blog-comment__avatar.av-anon
 
-        footer.blog-comment__meta
+        footer.blog-comment__head
           if user.hid
             .blog-comment__author
               a.blog-comment__author-link._ucard-popover(
@@ -45,8 +45,11 @@ mixin render_comments(comments)
               )
                 = user.name
 
-          .blog-comment__date
-            != self.timetag(comment.ts, 'relative')
+          .blog-comment__meta
+            span.blog-comment__meta-item.blog-comment__ts!= self.timetag(comment.ts, 'relative')
+
+            //- TODO: edit history
+            span.blog-comment__meta-item.blog-entry__history.icon.icon-history.icon-space-after= '0'
 
         .blog-comment__content
           .blog-comment__message.markup!= comment.html
@@ -79,6 +82,46 @@ mixin render_comments(comments)
                   )
                     span.icon.icon-vote-down
 
+            if self.settings.can_report_abuse
+              li.blog-comment__control-item
+                button.btn.blog-comment__action.blog-comment__report(title=self.t('report')
+                  data-comment-id=comment._id
+                  data-on-click='blogs.entry:comment_report'
+                )
+                  span.icon.icon-report
+
+            if self.runtime.is_member
+              li.blog-comment__control-item
+                button.btn.blog-comment__action.blog-comment__bookmark-add(
+                  data-comment-id=comment._id
+                  data-on-click='blogs.entry:comment_bookmark'
+                  title=self.t('bookmark_add')
+                )
+                  span.icon.icon-bookmark
+                  span.blog-comment__bookmarks-count(data-bm-count=comment.bookmarks)
+
+                button.btn.blog-comment__action.blog-comment__bookmark-remove(
+                  data-comment-id=comment._id
+                  data-on-click='blogs.entry:comment_bookmark'
+                  data-remove='true'
+                  title=self.t('bookmark_remove')
+                )
+                  span.icon.icon-bookmark
+                  span.blog-comment__bookmarks-count(data-bm-count=comment.bookmarks)
+
+            if comment.user === self.runtime.user_id
+              li.blog-comment__control-item.blog-comment__edit
+                button.btn.blog-comment__action(
+                  title=self.t('edit')
+                )
+                  span.icon.icon-edit
+
+              li.blog-comment__control-item.blog-comment__delete
+                button.btn.blog-comment__action(
+                  title=self.t('delete')
+                )
+                  span.icon.icon-x
+
             if self.settings.blogs_can_create
               li.blog-comment__control-item.blog-comment__reply
                 //- for wide screen
@@ -107,6 +150,32 @@ mixin render_comments(comments)
                 title=self.t('vote_details')
                 data-votes-count=(comment.votes > 0 ? '+' : '') + comment.votes
               )
+
+            - var showDropdown = false
+            - showDropdown = showDropdown || self.settings.blogs_mod_can_delete
+            - showDropdown = showDropdown || self.settings.blogs_mod_can_add_infractions
+            - showDropdown = showDropdown || self.settings.can_see_ip
+
+            if showDropdown
+              //- no aria parts - visible to moderators only
+              .blog-comment__control-item.blog-comment__mod-menu.dropdown.dropup
+                button.btn.btn-square.blog-comment__action.dropdown-toggle(
+                  data-toggle='dropdown'
+                  role='button'
+                )
+                .dropdown-menu.dropdown-menu-right(role='menu')
+                  if self.settings.blogs_mod_can_add_infractions
+                    button.dropdown-item= self.t('add_infraction')
+
+                  if self.settings.can_see_ip
+                    button.dropdown-item(
+                      data-comment-id=comment._id
+                      data-on-click='blogs.entry:comment_show_ip'
+                    )= self.t('ip_info')
+
+                  if self.settings.blogs_mod_can_delete
+                    button.blog-comment__delete.dropdown-item= self.t('delete')
+                    button.blog-comment__undelete.dropdown-item= self.t('undelete')
 
       .blogs-entry-page__comment-replies
         +render_comments(children)
@@ -172,6 +241,9 @@ article#content.blogs-entry-page
 
           span.blog-entry__meta-item.blog-entry__ts!= self.timetag(entry.ts, 'relative')
 
+          //- TODO: edit history
+          span.blog-entry__meta-item.blog-entry__history.icon.icon-history.icon-space-after= '0'
+
       .blog-entry__content
         .blog-entry__message.markup!= entry.html
 
@@ -190,14 +262,6 @@ article#content.blogs-entry-page
               title=self.t('vote_details')
               data-votes-count=(entry.votes > 0 ? '+' : '') + entry.votes
             )
-
-          if self.settings.can_report_abuse
-            li.blog-entry__control-item
-              button.btn.blog-entry__action.blog-entry__report(title=self.t('report')
-                data-entry-id=entry._id
-                data-on-click='blogs.blocks.blog_entry:report'
-              )
-                span.icon.icon-report
 
           if self.runtime.is_member && self.runtime.user_id !== entry.user
 
@@ -220,6 +284,14 @@ article#content.blogs-entry-page
                 )
                   span.icon.icon-vote-down
 
+          if self.settings.can_report_abuse
+            li.blog-entry__control-item
+              button.btn.blog-entry__action.blog-entry__report(title=self.t('report')
+                data-entry-id=entry._id
+                data-on-click='blogs.blocks.blog_entry:report'
+              )
+                span.icon.icon-report
+
           if self.runtime.is_member
             li.blog-entry__control-item
               button.btn.blog-entry__action.blog-entry__bookmark-add(
@@ -239,8 +311,47 @@ article#content.blogs-entry-page
                 span.icon.icon-bookmark
                 span.blog-entry__bookmarks-count(data-bm-count=entry.bookmarks)
 
+          if entry.user === self.runtime.user_id
+            li.blog-entry__control-item.blog-entry__edit
+              button.btn.blog-entry__action(
+                title=self.t('edit')
+              )
+                span.icon.icon-edit
+
+            li.blog-entry__control-item.blog-entry__delete
+              button.btn.blog-entry__action(
+                title=self.t('delete')
+              )
+                span.icon.icon-x
+
           li.blog-entry__control-item
             span.icon.icon-views.icon-space-after= entry.views
+
+          - var showDropdown = false
+          - showDropdown = showDropdown || self.settings.blogs_mod_can_delete
+          - showDropdown = showDropdown || self.settings.blogs_mod_can_add_infractions
+          - showDropdown = showDropdown || self.settings.can_see_ip
+
+          if showDropdown
+            //- no aria parts - visible to moderators only
+            .blog-entry__control-item.blog-entry__mod-menu.dropdown.dropup
+              button.btn.btn-square.blog-entry__action.dropdown-toggle(
+                data-toggle='dropdown'
+                role='button'
+              )
+              .dropdown-menu.dropdown-menu-right(role='menu')
+                if self.settings.blogs_mod_can_add_infractions
+                  button.dropdown-item= self.t('add_infraction')
+
+                if self.settings.can_see_ip
+                  button.dropdown-item(
+                    data-entry-id=entry._id
+                    data-on-click='blogs.blocks.blog_entry:show_ip'
+                  )= self.t('ip_info')
+
+                if self.settings.blogs_mod_can_delete
+                  button.blog-entry__delete.dropdown-item= self.t('delete')
+                  button.blog-entry__undelete.dropdown-item= self.t('undelete')
 
       != self.partial('@blogs.blocks.tag_list', { tag_hids: entry.tag_hids })
 

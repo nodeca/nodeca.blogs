@@ -5,7 +5,7 @@
 - var entryStatuses = '$$ JSON.stringify(N.models.blogs.BlogEntry.statuses) $$'
 
 //- show many operations checkbox
-- var many_ops_permitted = self.runtime.is_member;
+- var many_ops_permitted = self.settings.blogs_mod_can_delete;
 
 - self.own_bookmarks = self.own_bookmarks || [];
 
@@ -74,12 +74,13 @@ each entry in self.entries
 
         li.blog-entry__control-item
           - var href = self.link_to('blogs.entry', { user_hid: user.hid, entry_hid: entry.hid, $anchor: 'comments' });
-          a.blog-entry__action.blog-entry__comments(href=href)
+          a.btn.blog-entry__action.blog-entry__comments(href=href)
             span.icon.icon-comment.icon-space-after
             = self.t('comments', entry.comments)
 
         - var showDropdown = false
-        - showDropdown = showDropdown || self.runtime.is_member
+        - showDropdown = showDropdown || self.settings.blogs_mod_can_delete
+        - showDropdown = showDropdown || self.settings.blogs_mod_can_add_infractions
         - showDropdown = showDropdown || self.settings.can_see_ip
 
         if showDropdown
@@ -90,7 +91,8 @@ each entry in self.entries
               role='button'
             )
             .dropdown-menu.dropdown-menu-right(role='menu')
-              button.dropdown-item= self.t('add_infraction')
+              if self.settings.blogs_mod_can_add_infractions
+                button.dropdown-item= self.t('add_infraction')
 
               if self.settings.can_see_ip
                 button.dropdown-item(
@@ -98,8 +100,8 @@ each entry in self.entries
                   data-on-click='blogs.blocks.blog_entry:show_ip'
                 )= self.t('ip_info')
 
-              button.dropdown-item= self.t('edit')
-              button.blog-entry__delete.dropdown-item= self.t('delete')
-              button.blog-entry__undelete.dropdown-item= self.t('undelete')
+              if self.settings.blogs_mod_can_delete
+                button.blog-entry__delete.dropdown-item= self.t('delete')
+                button.blog-entry__undelete.dropdown-item= self.t('undelete')
 
     != self.partial('@blogs.blocks.tag_list', { tag_hids: entry.tag_hids })
