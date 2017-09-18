@@ -16,6 +16,12 @@ if items.length > 0
 
 - items.push('header')
 
+if self.settings.blogs_mod_can_add_infractions
+  - items.push('mod_add_infraction')
+
+if self.settings.can_see_ip
+  - items.push('mod_ip_info')
+
 if self.settings.blogs_mod_can_delete
   - items.push('mod_delete')
 
@@ -87,6 +93,18 @@ if items.length > 0 && items[items.length - 1].indexOf('mod_') === 0
               button.dropdown-item(
                 type='button'
               )= self.t('delete')
+
+            when 'mod_add_infraction'
+              button.dropdown-item(
+                type='button'
+              )= self.t('add_infraction')
+
+            when 'mod_ip_info'
+              button.dropdown-item(
+                type='button'
+                data-on-click='blogs.blocks.blog_entry:show_ip'
+                data-entry-id=self.entry._id
+              )= self.t('ip_info')
 
             when 'mod_delete'
               button.dropdown-item(

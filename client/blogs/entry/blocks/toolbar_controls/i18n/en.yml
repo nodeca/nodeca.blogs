@@ -1,6 +1,8 @@
 en-US:
   mod_actions: Moderation
   history: History
+  ip_info: IP info
+  add_infraction: Add infraction
   delete: Delete
   undelete: Undelete
   add_comment: Add comment

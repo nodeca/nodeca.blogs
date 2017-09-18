@@ -8,7 +8,10 @@ en-US:
   vote_details: Click to see details
   reply: Reply
   add_comment: Add comment
-  edit: Edit
+  edit_entry: Edit blog entry
+  edit_comment: Edit
+  delete_comment: Delete
+  last_edited: "Last edited on #{date}"
 
   ip_info: IP info
   add_infraction: Add infraction
