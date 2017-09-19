@@ -11,97 +11,156 @@
 
 each entry in self.entries
   - var user = self.users[entry.user] || { hid: 0 };
+  - var visible = [ entryStatuses.DELETED, entryStatuses.DELETED_HARD, entryStatuses.HB ].indexOf(entry.st) === -1;
+  - var collapsed = !self.expand && !visible;
 
-  .blog-entry(
-    class=(entry.st === entryStatuses.DELETED) ? 'blog-entry__m-deleted' : ''
-    class=(entry.st === entryStatuses.DELETED_HARD) ? 'blog-entry__m-deleted-hard' : ''
-    class=(entry.st === entryStatuses.HB) ? 'blog-entry__m-hb' : ''
-    class=(self.own_bookmarks.indexOf(entry._id) !== -1) ? 'blog-entry__m-bookmarked' : ''
-    class=(self.ignored_users[entry.user]) ? 'blog-entry__m-ignored' : ''
-    data-entry-hid=entry.hid
-    data-entry-id=entry._id
-    id='entry' + entry.hid
-  )
-    if many_ops_permitted
-      label.blog-entry__select(title=self.t('multiselect_hint'))
-        input.blog-entry__select-cb(
-          type='checkbox'
-        )
+  if !collapsed
 
-    header.blog-entry__head
-      .blog-entry__title
-        a.blog-entry__link(href=self.link_to('blogs.entry', { user_hid: user.hid, entry_hid: entry.hid }))
-          = entry.title
+    .blog-entry(
+      id='entry' + entry.hid
+      class=(entry.st === entryStatuses.DELETED) ? 'blog-entry__m-deleted' : ''
+      class=(entry.st === entryStatuses.DELETED_HARD) ? 'blog-entry__m-deleted-hard' : ''
+      class=(entry.st === entryStatuses.HB) ? 'blog-entry__m-hb' : ''
+      class=(self.own_bookmarks.indexOf(entry._id) !== -1) ? 'blog-entry__m-bookmarked' : ''
+      class=(self.ignored_users[entry.user]) ? 'blog-entry__m-ignored' : ''
+      data-entry-hid=entry.hid
+      data-entry-id=entry._id
+    )
+      if many_ops_permitted
+        label.blog-entry__select(title=self.t('multiselect_hint'))
+          input.blog-entry__select-cb(
+            type='checkbox'
+          )
 
-    .blog-entry__content
-      .blog-entry__message.markup!= entry.html
+      header.blog-entry__head
+        .blog-entry__title
+          a.blog-entry__link(href=self.link_to('blogs.entry', { user_hid: user.hid, entry_hid: entry.hid }))
+            = entry.title
 
-    footer.blog-entry__controls
-      .blog-entry__read-more
-        a(href=self.link_to('blogs.entry', { user_hid: user.hid, entry_hid: entry.hid }))
-          = self.t('read_more')
+      .blog-entry__content
+        .blog-entry__message.markup!= entry.html
 
-      ul.blog-entry__controls-blk
-        li.blog-entry__control-item
-          != self.timetag(entry.ts, 'relative')
+      footer.blog-entry__controls
+        .blog-entry__read-more
+          a(href=self.link_to('blogs.entry', { user_hid: user.hid, entry_hid: entry.hid }))
+            = self.t('read_more')
 
-        if self.settings.can_report_abuse
+        ul.blog-entry__controls-blk
           li.blog-entry__control-item
-            button.btn.blog-entry__action.blog-entry__report(title=self.t('report')
-              data-entry-id=entry._id
-              data-on-click='blogs.blocks.blog_entry:report'
-            )
-              span.icon.icon-report
+            != self.timetag(entry.ts, 'relative')
 
-        if self.runtime.is_member
+          if self.settings.can_report_abuse
+            li.blog-entry__control-item
+              button.btn.blog-entry__action.blog-entry__report(title=self.t('report')
+                data-entry-id=entry._id
+                data-on-click='blogs.blocks.blog_entry:report'
+              )
+                span.icon.icon-report
+
+          if self.runtime.is_member
+            li.blog-entry__control-item
+              button.btn.blog-entry__action.blog-entry__bookmark-add(
+                data-entry-id=entry._id
+                data-on-click='blogs.blocks.blog_entry:bookmark'
+                title=self.t('bookmark_add')
+              )
+                span.icon.icon-bookmark
+                span.blog-entry__bookmarks-count(data-bm-count=entry.bookmarks)
+
+              button.btn.blog-entry__action.blog-entry__bookmark-remove(
+                data-entry-id=entry._id
+                data-on-click='blogs.blocks.blog_entry:bookmark'
+                data-remove='true'
+                title=self.t('bookmark_remove')
+              )
+                span.icon.icon-bookmark
+                span.blog-entry__bookmarks-count(data-bm-count=entry.bookmarks)
+
           li.blog-entry__control-item
-            button.btn.blog-entry__action.blog-entry__bookmark-add(
+            - var href = self.link_to('blogs.entry', { user_hid: user.hid, entry_hid: entry.hid, $anchor: 'comments' });
+            a.btn.blog-entry__action.blog-entry__comments(href=href)
+              span.icon.icon-comment.icon-space-after
+              = self.t('comments', entry.comments)
+
+          - var showDropdown = false
+          - showDropdown = showDropdown || self.settings.blogs_mod_can_delete
+          - showDropdown = showDropdown || self.settings.blogs_mod_can_add_infractions
+          - showDropdown = showDropdown || self.settings.can_see_ip
+
+          if showDropdown
+            //- no aria parts - visible to moderators only
+            .blog-entry__control-item.blog-entry__mod-menu.dropdown.dropup
+              button.btn.btn-square.blog-entry__action.dropdown-toggle(
+                data-toggle='dropdown'
+                role='button'
+              )
+              .dropdown-menu.dropdown-menu-right(role='menu')
+                if self.settings.blogs_mod_can_add_infractions
+                  button.dropdown-item= self.t('add_infraction')
+
+                if self.settings.can_see_ip
+                  button.dropdown-item(
+                    data-entry-id=entry._id
+                    data-on-click='blogs.blocks.blog_entry:show_ip'
+                  )= self.t('ip_info')
+
+                if self.settings.blogs_mod_can_delete
+                  button.blog-entry__delete.dropdown-item= self.t('delete')
+                  button.blog-entry__undelete.dropdown-item= self.t('undelete')
+
+      != self.partial('@blogs.blocks.tag_list', { tag_hids: entry.tag_hids })
+
+  else
+
+    .blog-entry.blog-entry__m-collapsed(
+      id='entry' + entry.hid
+      class=(entry.st === entryStatuses.DELETED) ? 'blog-entry__m-deleted' : ''
+      class=(entry.st === entryStatuses.DELETED_HARD) ? 'blog-entry__m-deleted-hard' : ''
+      class=(entry.st === entryStatuses.HB) ? 'blog-entry__m-hb' : ''
+      class=(self.own_bookmarks.indexOf(entry._id) !== -1) ? 'blog-entry__m-bookmarked' : ''
+      class=(self.ignored_users[entry.user]) ? 'blog-entry__m-ignored' : ''
+      data-entry-hid=entry.hid
+      data-entry-id=entry._id
+    )
+      if many_ops_permitted
+        label.blog-entry__select(title=self.t('multiselect_hint'))
+          input.blog-entry__select-cb(
+            type='checkbox'
+          )
+
+      header.blog-entry__head
+        .blog-entry__title
+          a.blog-entry__link(href=self.link_to('blogs.entry', { user_hid: user.hid, entry_hid: entry.hid }))
+            = entry.title
+
+      .blog-entry__content-collapsed
+        case entry.st
+          when entryStatuses.DELETED
+            = self.t('del_entry_text')
+          when entryStatuses.DELETED_HARD
+            = self.t('del_hard_entry_text')
+          when entryStatuses.HB
+            = self.t('hb_entry_text')
+
+        if entry.del_reason
+          .blog-entry__del-reason=self.t('del_reason', { text: entry.del_reason })
+        if entry.del_by && self.users[entry.del_by]
+          .blog-entry__del-by
+            =self.t('del_by')
+            |
+            - var delUser = self.users[entry.del_by]
+            a._ucard-popover(
+              href=self.link_to('users.member', { user_hid: delUser.hid })
+              data-user-id=entry.del_by
+              data-user-ref='blog_entry:'+user.hid+':'+entry.hid
+            )= delUser.name
+
+      footer.blog-entry__controls
+        ul.blog-entry__controls-blk
+          li.blog-entry__control-item
+            button.btn.blog-entry__action(
+              data-on-click='blogs.blocks.entry_list_sole:entry_expand'
+              title=self.t('expand')
               data-entry-id=entry._id
-              data-on-click='blogs.blocks.blog_entry:bookmark'
-              title=self.t('bookmark_add')
             )
-              span.icon.icon-bookmark
-              span.blog-entry__bookmarks-count(data-bm-count=entry.bookmarks)
-
-            button.btn.blog-entry__action.blog-entry__bookmark-remove(
-              data-entry-id=entry._id
-              data-on-click='blogs.blocks.blog_entry:bookmark'
-              data-remove='true'
-              title=self.t('bookmark_remove')
-            )
-              span.icon.icon-bookmark
-              span.blog-entry__bookmarks-count(data-bm-count=entry.bookmarks)
-
-        li.blog-entry__control-item
-          - var href = self.link_to('blogs.entry', { user_hid: user.hid, entry_hid: entry.hid, $anchor: 'comments' });
-          a.btn.blog-entry__action.blog-entry__comments(href=href)
-            span.icon.icon-comment.icon-space-after
-            = self.t('comments', entry.comments)
-
-        - var showDropdown = false
-        - showDropdown = showDropdown || self.settings.blogs_mod_can_delete
-        - showDropdown = showDropdown || self.settings.blogs_mod_can_add_infractions
-        - showDropdown = showDropdown || self.settings.can_see_ip
-
-        if showDropdown
-          //- no aria parts - visible to moderators only
-          .blog-entry__control-item.blog-entry__mod-menu.dropdown.dropup
-            button.btn.btn-square.blog-entry__action.dropdown-toggle(
-              data-toggle='dropdown'
-              role='button'
-            )
-            .dropdown-menu.dropdown-menu-right(role='menu')
-              if self.settings.blogs_mod_can_add_infractions
-                button.dropdown-item= self.t('add_infraction')
-
-              if self.settings.can_see_ip
-                button.dropdown-item(
-                  data-entry-id=entry._id
-                  data-on-click='blogs.blocks.blog_entry:show_ip'
-                )= self.t('ip_info')
-
-              if self.settings.blogs_mod_can_delete
-                button.blog-entry__delete.dropdown-item= self.t('delete')
-                button.blog-entry__undelete.dropdown-item= self.t('undelete')
-
-    != self.partial('@blogs.blocks.tag_list', { tag_hids: entry.tag_hids })
+              span.icon.icon-expand

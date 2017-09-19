@@ -85,7 +85,9 @@ N.wire.on('navigate.done:' + module.apiPath, function page_setup(data) {
 // Set up handlers for buttons in entry-list
 //
 N.wire.on('navigate.done:' + module.apiPath, function setup_blog_entry_handlers() {
-  return N.wire.emit('blogs.blocks.blog_entry');
+  return Promise.resolve()
+             .then(() => N.wire.emit('blogs.blocks.blog_entry'))
+             .then(() => N.wire.emit('blogs.blocks.entry_list_sole'));
 });
 
 
