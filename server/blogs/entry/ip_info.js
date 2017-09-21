@@ -4,9 +4,9 @@
 'use strict';
 
 
-const dns     = require('mz/dns');
-const whois   = require('whois').lookup;
-const Promise = require('bluebird');
+const promisify = require('util').promisify;
+const reverse = promisify(require('dns').reverse);
+const whois   = promisify(require('whois').lookup);
 
 
 module.exports = function (N, apiPath) {
@@ -48,7 +48,7 @@ module.exports = function (N, apiPath) {
   // Fetch whois info
   //
   N.wire.after(apiPath, async function fetch_whois(env) {
-    let data = await Promise.fromCallback(cb => whois(env.data.ip, cb));
+    let data = await whois(env.data.ip);
 
     env.res.whois = data.replace(/\r?\n/g, '\n')
                         .replace(/^[#%].*/mg, '')     // comments
@@ -65,7 +65,7 @@ module.exports = function (N, apiPath) {
 
     try {
       // this error is not fatal
-      let hosts = await dns.reverse(env.data.ip);
+      let hosts = await reverse(env.data.ip);
 
       if (hosts.length) {
         env.res.hostname = hosts[0];
