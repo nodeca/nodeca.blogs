@@ -12,6 +12,8 @@ en-US:
   edit_comment: Edit
   delete_comment: Delete
   last_edited: "Last edited on #{date}"
+  del_reason: "(#{text})"
+  del_by: "Deleted by:"
 
   ip_info: IP info
   add_infraction: Add infraction

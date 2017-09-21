@@ -3,7 +3,9 @@
 
 - self.own_votes = self.own_votes || {};
 - self.own_bookmarks = self.own_bookmarks || [];
+
 - var entry = self.entry;
+- var entryStatuses = '$$ JSON.stringify(N.models.blogs.BlogEntry.statuses) $$'
 
 mixin render_comments(comments)
   - var i = 0;
@@ -93,7 +95,7 @@ mixin render_comments(comments)
                   span.icon.icon-report
 
             if self.runtime.is_member
-              li.blog-comment__control-item
+              li.blog-comment__control-item.blog-comment__bookmark
                 button.btn.blog-comment__action.blog-comment__bookmark-add(
                   data-comment-id=comment._id
                   data-on-click='blogs.entry:comment_bookmark'
@@ -184,7 +186,10 @@ mixin render_comments(comments)
         +render_comments(children)
 
 
-article#content.blogs-entry-page
+article#content.blogs-entry-page(
+  class=(entry.st === entryStatuses.DELETED) ? 'blogs-entry-page__m-deleted' : ''
+  class=(entry.st === entryStatuses.DELETED_HARD) ? 'blog-entry-page__m-deleted-hard' : ''
+)
   -
     var user = self.users[self.user_id] || {};
     var $query_top = {};
@@ -218,6 +223,8 @@ article#content.blogs-entry-page
     != self.partial('@users.blocks.announces')
 
     .blog-entry.blogs-entry-page__entry(
+      class=(entry.st === entryStatuses.DELETED) ? 'blog-entry__m-deleted' : ''
+      class=(entry.st === entryStatuses.DELETED_HARD) ? 'blog-entry__m-deleted-hard' : ''
       class=(self.own_bookmarks.indexOf(entry._id) !== -1) ? 'blog-entry__m-bookmarked' : ''
       class=(self.own_votes[entry._id] === -1) ? 'blog-entry__m-voted-down' : ''
       class=(self.own_votes[entry._id] === +1) ? 'blog-entry__m-voted-up' : ''
@@ -250,6 +257,22 @@ article#content.blogs-entry-page
               .blog-entry__avatar.av-anon
 
           span.blog-entry__meta-item.blog-entry__ts!= self.timetag(entry.ts, 'relative')
+
+          if entry.del_by
+            span.blog-entry__meta-item.blog-entry__del-by
+              = self.t('del_by')
+              = ' '
+              - var delUser = self.users[entry.del_by] || {}
+
+              a.blog-entry__del-by-user._ucard-popover(
+                href=self.link_to('users.member', { user_hid: delUser.hid })
+                data-user-id=entry.del_by
+                data-user-ref='blog_entry:'+user.hid+':'+entry.hid
+              )= delUser.name
+
+              if entry.del_reason
+                = ' '
+                = self.t('del_reason', { text: entry.del_reason })
 
       .blog-entry__content
         .blog-entry__message.markup!= entry.html
@@ -308,7 +331,7 @@ article#content.blogs-entry-page
                 span.icon.icon-report
 
           if self.runtime.is_member
-            li.blog-entry__control-item
+            li.blog-entry__control-item.blog-entry__bookmark
               button.btn.blog-entry__action.blog-entry__bookmark-add(
                 data-entry-id=entry._id
                 data-on-click='blogs.blocks.blog_entry:bookmark'

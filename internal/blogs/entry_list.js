@@ -28,6 +28,7 @@ let setting_names = [
   'blogs_can_create',
   'blogs_show_ignored',
   'blogs_mod_can_delete',
+  'blogs_mod_can_hard_delete',
   'blogs_mod_can_see_hard_deleted',
   'blogs_mod_can_add_infractions',
   'can_see_hellbanned',

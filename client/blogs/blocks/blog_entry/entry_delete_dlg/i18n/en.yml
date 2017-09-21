@@ -1,0 +1,9 @@
+en-US:
+  title: Delete blog entry
+  title_moderator: 'Moderation: delete blog entry'
+  confirmation_text: Are you sure you want to delete this entry?
+  reason_input_help: Deletion reason
+  ok: OK
+  cancel: Cancel
+  delete_soft: Soft delete
+  delete_hard: Hard delete

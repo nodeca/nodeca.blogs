@@ -6,7 +6,7 @@ N.wire.once(module.apiPath, function blog_entry_setup_handlers() {
 
   // Click report button
   //
-  N.wire.on(module.apiPath + ':report', function report(data) {
+  N.wire.on(module.apiPath + ':report', function entry_report(data) {
     let params = { messages: t('@blogs.abuse_report.messages') };
     let id = data.$this.data('entry-id');
 
@@ -19,8 +19,50 @@ N.wire.once(module.apiPath, function blog_entry_setup_handlers() {
 
   // Show blog entry IP
   //
-  N.wire.on(module.apiPath + ':show_ip', function blog_entry_show_ip(data) {
+  N.wire.on(module.apiPath + ':show_ip', function entry_show_ip(data) {
     return N.wire.emit('blogs.blocks.ip_info_dlg', { entry_id: data.$this.data('entry-id') });
+  });
+
+
+  // Delete entry handler
+  //
+  N.wire.on(module.apiPath + ':delete', function entry_delete(data) {
+    let entry_id = data.$this.data('entry-id');
+
+    let request = {
+      entry_id,
+      as_moderator: data.$this.data('as-moderator') || false
+    };
+    let params = {
+      canDeleteHard: N.runtime.page_data.settings.blogs_mod_can_hard_delete,
+      asModerator: request.as_moderator
+    };
+
+    return Promise.resolve()
+      .then(() => N.wire.emit('blogs.blocks.blog_entry.entry_delete_dlg', params))
+      .then(() => {
+        request.method = params.method;
+        if (params.reason) request.reason = params.reason;
+        return N.io.rpc('blogs.entry.destroy', request);
+      })
+      .then(() =>
+        // TODO: move to user blog if we're on the blog page, fade otherwise
+        N.wire.emit('navigate.reload')
+      );
+  });
+
+
+  // Undelete entry handler
+  //
+  N.wire.on(module.apiPath + ':undelete', function entry_undelete(data) {
+    let entry_id = data.$this.data('entry-id');
+
+    return Promise.resolve()
+      .then(() => N.io.rpc('blogs.entry.undelete', { entry_id }))
+      .then(() =>
+        // TODO: toggle deletion status better
+        N.wire.emit('navigate.reload')
+      );
   });
 
 

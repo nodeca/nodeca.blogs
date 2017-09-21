@@ -2,6 +2,8 @@
 //-  - shows nick+avatar for each user
 //-  - doesn't show tags
 
+- self.add_raw_data('settings', self.settings)
+
 - var entryStatuses = '$$ JSON.stringify(N.models.blogs.BlogEntry.statuses) $$'
 
 //- show many operations checkbox
@@ -74,7 +76,7 @@ each entry in self.entries
                 span.icon.icon-report
 
           if self.runtime.is_member
-            li.blog-entry__control-item
+            li.blog-entry__control-item.blog-entry__bookmark
               button.btn.blog-entry__action.blog-entry__bookmark-add(
                 data-entry-id=entry._id
                 data-on-click='blogs.blocks.blog_entry:bookmark'
@@ -121,8 +123,16 @@ each entry in self.entries
                   )= self.t('ip_info')
 
                 if self.settings.blogs_mod_can_delete
-                  button.blog-entry__delete.dropdown-item= self.t('delete')
-                  button.blog-entry__undelete.dropdown-item= self.t('undelete')
+                  button.dropdown-item.blog-entry__delete(
+                    data-on-click='blogs.blocks.blog_entry:delete'
+                    data-entry-id=entry._id
+                    data-as-moderator='true'
+                  )= self.t('delete')
+
+                  button.dropdown-item.blog-entry__undelete(
+                    data-on-click='blogs.blocks.blog_entry:undelete'
+                    data-entry-id=entry._id
+                  )= self.t('undelete')
 
   else
 
@@ -171,12 +181,12 @@ each entry in self.entries
 
         if entry.del_reason
           .blog-entry__del-reason=self.t('del_reason', { text: entry.del_reason })
-        if entry.del_by && self.users[entry.del_by]
+        if entry.del_by
           .blog-entry__del-by
-            =self.t('del_by')
-            |
-            - var delUser = self.users[entry.del_by]
-            a._ucard-popover(
+            = self.t('del_by')
+            = ' '
+            - var delUser = self.users[entry.del_by] || {}
+            a.blog-entry__del-by-user._ucard-popover(
               href=self.link_to('users.member', { user_hid: delUser.hid })
               data-user-id=entry.del_by
               data-user-ref='blog_entry:'+user.hid+':'+entry.hid

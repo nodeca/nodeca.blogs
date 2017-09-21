@@ -62,6 +62,24 @@
   font-size $font-size-sm
   color $body-color-secondary
 
+.blog-entry__del-by-user
+  color $body-color-secondary
+
+.blog-entry__undelete
+  display none
+
+.blog-entry__m-deleted
+.blog-entry__m-deleted-hard
+  .blog-entry__undelete
+    display block
+
+  .blog-entry__delete
+  .blog-entry__votes
+  .blog-entry__vote-up
+  .blog-entry__vote-down
+  .blog-entry__bookmark
+    display none
+
 .blog-entry__read-more
   font-size $font-size-sm
 
@@ -83,15 +101,6 @@
   &:active
     color $body-color-secondary - 20%
     background-color $body-bg-secondary
-
-.blog-entry__undelete
-  display none
-
-.blog-entry__m-deleted
-.blog-entry__m-hb
-.blog-entry__m-deleted-hard
-.blog-entry__m-ignored
-  background-color $deleted-bg
 
 .blog-entry__ignored-mark
   display none

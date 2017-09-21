@@ -251,6 +251,7 @@ module.exports = function (N, apiPath) {
       'blogs_can_create',
       'blogs_reply_old_comment_threshold',
       'blogs_mod_can_delete',
+      'blogs_mod_can_hard_delete',
       'blogs_mod_can_add_infractions',
       'can_report_abuse',
       'can_vote',
