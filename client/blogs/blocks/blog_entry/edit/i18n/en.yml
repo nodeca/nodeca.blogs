@@ -1,0 +1,8 @@
+en-US:
+  edit_entry: "Edit &quot;<a href='#{entry_url}'>#{entry_title}</a>&quot;"
+
+  options_btn:
+    options: Options
+
+  title_input:
+    blog_entry_title: Title

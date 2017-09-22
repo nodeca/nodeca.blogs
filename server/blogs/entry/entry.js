@@ -140,9 +140,23 @@ module.exports = function (N, apiPath) {
 
     env.res.user_id = env.data.user._id;
 
-    env.data.users = (env.data.users || [])
-                       .concat([ env.data.user._id ])
-                       .concat(_.map(env.data.comments, 'user'));
+    env.data.users = env.data.users || [];
+
+    if (env.data.entry.user)   env.data.users.push(env.data.entry.user);
+    if (env.data.entry.del_by) env.data.users.push(env.data.entry.del_by);
+
+    if (env.data.entry.import_users) {
+      env.data.users = env.data.users.concat(env.data.entry.import_users);
+    }
+
+    env.data.comments.forEach(comment => {
+      if (comment.user)   env.data.users.push(comment.user);
+      if (comment.del_by) env.data.users.push(comment.del_by);
+
+      if (comment.import_users) {
+        env.data.users = env.data.users.concat(comment.import_users);
+      }
+    });
 
     env.res.entry    = await sanitize_entry(N, env.data.entry, env.user_info);
     env.res.comments = await sanitize_comment(N, env.data.comments, env.user_info);

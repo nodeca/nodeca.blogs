@@ -121,7 +121,7 @@ N.wire.once('navigate.done:' + module.apiPath, function page_once() {
   });
 
 
-  // Click on post reply link or toolbar reply button
+  // Click on reply link or toolbar reply button
   //
   N.wire.on(module.apiPath + ':reply', function reply(data) {
     return N.wire.emit('blogs.entry.reply:begin', {
@@ -130,6 +130,15 @@ N.wire.once('navigate.done:' + module.apiPath, function page_once() {
       entry_title: N.runtime.page_data.entry.title,
       comment_id:  data.$this.data('comment-id'),
       comment_hid: data.$this.data('comment-hid')
+    });
+  });
+
+
+  // Click on entry edit button
+  //
+  N.wire.on(module.apiPath + ':edit', function edit() {
+    return N.wire.emit('blogs.blocks.blog_entry.edit:begin', {
+      entry_hid: pageState.entry_hid
     });
   });
 

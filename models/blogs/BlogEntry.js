@@ -1,10 +1,11 @@
 'use strict';
 
 
-const _        = require('lodash');
-const Promise  = require('bluebird');
-const Mongoose = require('mongoose');
-const Schema   = Mongoose.Schema;
+const _              = require('lodash');
+const Promise        = require('bluebird');
+const Mongoose       = require('mongoose');
+const AttachmentInfo = require('./_AttachmentInfo');
+const Schema         = Mongoose.Schema;
 
 
 module.exports = function (N, collectionName) {
@@ -51,6 +52,8 @@ module.exports = function (N, collectionName) {
     del_reason:   String,
     del_by:       Schema.ObjectId,
     prev_st:      { st: Number, ste: Number },
+    edit_count:   Number,
+    last_edit_ts: Date,
 
     // Last assigned hid to the comments to this entry,
     // used to determine hid of a new comment
@@ -60,11 +63,7 @@ module.exports = function (N, collectionName) {
     params_ref:   Schema.ObjectId,
     imports:      [ String ],
     import_users: [ Schema.ObjectId ],
-    tail:         [ new Schema({ // explicit definition to remove `_id` field
-      media_id: Schema.ObjectId,
-      file_name: String,
-      type: { type: Number }
-    }, { _id: false }) ]
+    tail:         [ AttachmentInfo ]
   }, {
     versionKey : false
   });

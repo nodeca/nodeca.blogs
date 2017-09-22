@@ -241,6 +241,7 @@ article#content.blogs-entry-page(
             a.blog-entry__edit.icon.icon-edit(
               href='#'
               title=self.t('edit_entry')
+              data-on-click='blogs.entry:edit'
             )
 
         .blog-entry__meta
@@ -294,12 +295,14 @@ article#content.blogs-entry-page(
               data-votes-count=(votes > 0 ? '+' : '') + votes
             )
 
-          //- TODO: edit history
-          li.blog-entry__control-item.blog-entry__history
-            button.btn.blog-entry__action(
-              title=self.t('last_edited', { date: self.date(new Date(), 'datetime') })
-            )
-              span.icon.icon-history.icon-space-after= '0'
+          if entry.edit_count
+            li.blog-entry__control-item.blog-entry__history
+              button.btn.blog-entry__action(
+                title=self.t('last_edited', { date: self.date(entry.last_edit_ts, 'datetime') })
+                data-on-click='blogs.blocks.blog_entry:history'
+                data-entry-id=entry._id
+              )
+                span.icon.icon-history.icon-space-after= entry.edit_count
 
           if self.runtime.is_member && self.runtime.user_id !== entry.user
 

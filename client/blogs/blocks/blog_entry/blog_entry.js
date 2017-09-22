@@ -85,6 +85,17 @@ N.wire.once(module.apiPath, function blog_entry_setup_handlers() {
   });
 
 
+  // Show history popup
+  //
+  N.wire.on(module.apiPath + ':history', function entry_history(data) {
+    let entry_id = data.$this.data('entry-id');
+
+    return Promise.resolve()
+      .then(() => N.io.rpc('blogs.entry.show_history', { entry_id }))
+      .then(res => N.wire.emit('blogs.blocks.blog_entry.entry_history_dlg', res));
+  });
+
+
   // When user clicks "create dialog" button in usercard popup,
   // add title & link to editor.
   //

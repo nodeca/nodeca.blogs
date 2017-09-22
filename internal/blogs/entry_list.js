@@ -118,9 +118,9 @@ module.exports = function (N, apiPath) {
     env.data.users = env.data.users || [];
 
     env.data.entries.forEach(entry => {
-      if (entry.user) {
-        env.data.users.push(entry.user);
-      }
+      if (entry.user)   env.data.users.push(entry.user);
+      if (entry.del_by) env.data.users.push(entry.del_by);
+
       if (entry.import_users) {
         env.data.users = env.data.users.concat(entry.import_users);
       }
