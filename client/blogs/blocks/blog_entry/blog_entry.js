@@ -100,7 +100,7 @@ N.wire.once(module.apiPath, function blog_entry_setup_handlers() {
   // add title & link to editor.
   //
   N.wire.before('users.dialog.create:begin', function dialog_create_extend_blog_entries(params) {
-    if (!params.ref) return; // no data to extend
+    if (!params || !params.ref) return; // no data to extend
     if (!/^blog_entry:/.test(params.ref)) return; // not our data
 
     let [ , user_hid, entry_hid ] = params.ref.split(':');
@@ -108,8 +108,7 @@ N.wire.once(module.apiPath, function blog_entry_setup_handlers() {
     let href  = N.router.linkTo('blogs.entry', { user_hid, entry_hid });
 
     if (title && href) {
-      params.title = `Re: ${title}`;
-      params.text = `${href}\n\n`;
+      params.text = `Re: [${title}](${href})\n\n`;
     }
   });
 });
