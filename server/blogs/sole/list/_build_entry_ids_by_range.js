@@ -86,7 +86,7 @@ module.exports = function (N) {
   }
 
 
-  return async function buildDialogsIds(env) {
+  return async function buildEntryIds(env) {
     // Run both functions in parallel and concatenate results
     //
     let results = await Promise.all([ select_visible_before(env), select_visible_after(env) ]);

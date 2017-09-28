@@ -3,8 +3,7 @@
 'use strict';
 
 
-const _       = require('lodash');
-const Promise = require('bluebird');
+const _  = require('lodash');
 
 const LIMIT = 50; // max entries to fetch before and after
 
@@ -170,9 +169,8 @@ module.exports = function (N, apiPath) {
     //
     // Count total amount of visible blog entries
     //
-    let counters_by_status = await Promise.map(
-      env.data.blog_entries_visible_statuses,
-      st => {
+    let counters_by_status = await Promise.all(
+      env.data.blog_entries_visible_statuses.map(st => {
         let query = N.models.blogs.BlogEntry
                         .where('st').equals(st)
                         .where('user').equals(env.data.user._id);
@@ -182,7 +180,7 @@ module.exports = function (N, apiPath) {
         }
 
         return query.count();
-      }
+      })
     );
 
     let total = _.sum(counters_by_status);
@@ -193,9 +191,8 @@ module.exports = function (N, apiPath) {
     let offset = 0;
 
     if (env.data.entries.length) {
-      let counters_by_status = await Promise.map(
-        env.data.blog_entries_visible_statuses,
-        st => {
+      let counters_by_status = await Promise.all(
+        env.data.blog_entries_visible_statuses.map(st => {
           let query = N.models.blogs.BlogEntry
                           .where('st').equals(st)
                           .where('user').equals(env.data.user._id)
@@ -206,7 +203,7 @@ module.exports = function (N, apiPath) {
           }
 
           return query.count();
-        }
+        })
       );
 
       offset = _.sum(counters_by_status);

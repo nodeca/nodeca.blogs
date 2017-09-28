@@ -2,7 +2,6 @@
 
 
 const _              = require('lodash');
-const Promise        = require('bluebird');
 const Mongoose       = require('mongoose');
 const AttachmentInfo = require('./_AttachmentInfo');
 const Schema         = Mongoose.Schema;
@@ -155,12 +154,13 @@ module.exports = function (N, collectionName) {
     let statuses = N.models.blogs.BlogEntry.statuses;
     let updateData = {};
 
-    let count = await Promise.map(
-                        [ statuses.VISIBLE, statuses.HB ],
-                        st => N.models.blogs.BlogComment
-                                  .where('entry').equals(entry_id)
-                                  .where('st').equals(st)
-                                  .count()
+    let count = await Promise.all(
+                        [ statuses.VISIBLE, statuses.HB ].map(st =>
+                          N.models.blogs.BlogComment
+                              .where('entry').equals(entry_id)
+                              .where('st').equals(st)
+                              .count()
+                        )
                       );
 
     // Visible comment count
