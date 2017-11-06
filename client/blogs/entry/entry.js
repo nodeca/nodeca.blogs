@@ -134,6 +134,26 @@ N.wire.once('navigate.done:' + module.apiPath, function page_once() {
   });
 
 
+  // Click report button
+  //
+  N.wire.on(module.apiPath + ':comment_report', function comment_report(data) {
+    let params = { messages: t('@blogs.abuse_report.messages') };
+    let id = data.$this.data('comment-id');
+
+    return Promise.resolve()
+      .then(() => N.wire.emit('common.blocks.abuse_report_dlg', params))
+      .then(() => N.io.rpc('blogs.entry.comment.abuse_report', { comment_id: id, message: params.message }))
+      .then(() => N.wire.emit('notify.info', t('abuse_reported')));
+  });
+
+
+  // Show comment IP
+  //
+  N.wire.on(module.apiPath + ':comment_show_ip', function comment_show_ip(data) {
+    return N.wire.emit('blogs.entry.ip_info_dlg', { comment_id: data.$this.data('comment-id') });
+  });
+
+
   // Click on entry edit button
   //
   N.wire.on(module.apiPath + ':edit', function edit() {

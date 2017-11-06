@@ -1,10 +1,10 @@
 en-US:
   subject:
-    subject: "abuse report about blog entry from #{user_name}"
-    subject_auto: abuse report about blog entry (auto)
+    subject: "abuse report about blog comment from #{user_name}"
+    subject_auto: abuse report about blog comment (auto)
   body:
     header: "Complaint from user #{url}:"
     header_auto: "Complaint (auto):"
-    to: "About [blog entry](#{url}):"
+    to: "About [blog comment](#{url}):"
     message_sent_to: "This message sent to: "
     report_topic: Report topic.
