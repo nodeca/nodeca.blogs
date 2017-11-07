@@ -1,0 +1,184 @@
+- self.own_votes = self.own_votes || {};
+- self.own_bookmarks = self.own_bookmarks || [];
+
+- var entry = self.entry;
+
+mixin render_comments(comments)
+  - var i = 0;
+  while i < comments.length
+    -
+      var comment  = comments[i++];
+      var children = [];
+
+      while (i < comments.length && comments[i].path.indexOf(comment._id) >= 0) {
+        children.push(comments[i++]);
+      }
+
+    - var user = self.users[comment.user] || { hid: 0 };
+
+    .blogs-entry-page__comment-container
+      .blog-comment(
+        class=(self.own_votes[comment._id] === -1) ? 'blog-comment__m-voted-down' : ''
+        class=(self.own_votes[comment._id] === +1) ? 'blog-comment__m-voted-up' : ''
+        id='comment' + comment.hid
+      )
+        .blog-comment__aside
+          if user.hid
+            a.blog-comment__author-link._ucard-popover(
+              href=self.link_to('users.member', { user_hid: user.hid })
+              data-user-id=entry.user
+              data-user-ref='blog_comment:'+user.hid+':'+entry.hid+':'+comment.hid
+            )
+              img.blog-comment__avatar(alt=user.name)&attributes(self.avatar(user, 'sm'))
+          else
+            .blog-comment__avatar.av-anon
+
+        footer.blog-comment__head
+          if user.hid
+            .blog-comment__author
+              a.blog-comment__author-link._ucard-popover(
+                href=self.link_to('users.member', { user_hid: user.hid })
+                data-user-id=entry.user
+                data-user-ref='blog_comment:'+user.hid+':'+entry.hid+':'+comment.hid
+              )
+                = user.name
+
+          .blog-comment__meta
+            span.blog-comment__meta-item.blog-comment__ts!= self.timetag(comment.ts, 'relative')
+
+            //- TODO: edit history
+            span.blog-comment__meta-item.blog-comment__history.icon.icon-history.icon-space-after(
+              title=self.t('last_edited', { date: self.date(new Date(), 'datetime') })
+            )= '0'
+
+        .blog-comment__content
+          .blog-comment__message.markup!= comment.html
+
+          - var tail = self.partial('@blogs.entry.attachments', { post: comment, user: user });
+          if tail
+            .forum-post__tail.markup-tail
+              !=tail
+
+        footer.blog-comment__controls
+          ul.blog-comment__controls-blk
+            if self.runtime.is_member && self.runtime.user_id !== comment.user
+              if self.settings.can_vote && (self.settings.votes_add_max_time === 0 || new Date(comment.ts).getTime() > Date.now() - self.settings.votes_add_max_time * 60 * 60 * 1000)
+
+                li.blog-comment__control-item.blog-comment__vote-up
+                  button.btn.blog-comment__action(
+                    title=self.t('vote_up')
+                    data-on-click='blogs.entry:comment_vote'
+                    data-comment-id=comment._id
+                    data-value=self.own_votes[comment._id] === 1 ? '0' : '1'
+                  )
+                    span.icon.icon-vote-up
+
+                li.blog-comment__control-item.blog-comment__vote-down
+                  button.btn.blog-comment__action(
+                    title=self.t('vote_down')
+                    data-on-click='blogs.entry:comment_vote'
+                    data-comment-id=comment._id
+                    data-value=self.own_votes[comment._id] === -1 ? '0' : '-1'
+                  )
+                    span.icon.icon-vote-down
+
+            if self.settings.can_report_abuse
+              li.blog-comment__control-item
+                button.btn.blog-comment__action.blog-comment__report(title=self.t('report')
+                  data-comment-id=comment._id
+                  data-on-click='blogs.entry:comment_report'
+                )
+                  span.icon.icon-report
+
+            if self.runtime.is_member
+              li.blog-comment__control-item.blog-comment__bookmark
+                button.btn.blog-comment__action.blog-comment__bookmark-add(
+                  data-comment-id=comment._id
+                  data-on-click='blogs.entry:comment_bookmark'
+                  title=self.t('bookmark_add')
+                )
+                  span.icon.icon-bookmark
+                  span.blog-comment__bookmarks-count(data-bm-count=comment.bookmarks)
+
+                button.btn.blog-comment__action.blog-comment__bookmark-remove(
+                  data-comment-id=comment._id
+                  data-on-click='blogs.entry:comment_bookmark'
+                  data-remove='true'
+                  title=self.t('bookmark_remove')
+                )
+                  span.icon.icon-bookmark
+                  span.blog-comment__bookmarks-count(data-bm-count=comment.bookmarks)
+
+            if comment.user === self.runtime.user_id
+              li.blog-comment__control-item.blog-comment__edit
+                button.btn.blog-comment__action(
+                  title=self.t('edit')
+                )
+                  span.icon.icon-edit
+
+              li.blog-comment__control-item.blog-comment__delete
+                button.btn.blog-comment__action(
+                  title=self.t('delete')
+                )
+                  span.icon.icon-x
+
+            if self.settings.blogs_can_create
+              li.blog-comment__control-item.blog-comment__reply
+                //- for wide screen
+                button.full.btn.blog-comment__action(
+                  data-on-click='blogs.entry:reply'
+                  data-comment-id=comment._id
+                  data-comment-hid=comment.hid
+                  data-comment-ts=comment.ts
+                )
+                  span.icon.icon-reply.icon-space-after= self.t('reply')
+                //- for narrow screen
+                button.short.btn.blog-comment__action(
+                  data-on-click='blogs.entry:reply'
+                  data-comment-id=comment._id
+                  data-comment-hid=comment.hid
+                  data-comment-ts=comment.ts
+                  title=self.t('reply')
+                )
+                  span.icon.icon-reply
+
+            li.blog-comment__control-item.blog-comment__votes
+              - var votes = comment.votes || 0;
+              button.btn.blog-comment__action(
+                data-on-click='common.votes_popover'
+                data-votes-popover-placement='left'
+                data-votes-popover-for=comment._id
+                title=self.t('vote_details')
+                data-votes-count=(votes > 0 ? '+' : '') + votes
+              )
+
+            - var showDropdown = false
+            - showDropdown = showDropdown || self.settings.blogs_mod_can_delete
+            - showDropdown = showDropdown || self.settings.blogs_mod_can_add_infractions
+            - showDropdown = showDropdown || self.settings.can_see_ip
+
+            if showDropdown
+              //- no aria parts - visible to moderators only
+              .blog-comment__control-item.blog-comment__mod-menu.dropdown.dropup
+                button.btn.btn-square.blog-comment__action.dropdown-toggle(
+                  data-toggle='dropdown'
+                  role='button'
+                )
+                .dropdown-menu.dropdown-menu-right(role='menu')
+                  if self.settings.blogs_mod_can_add_infractions
+                    button.dropdown-item= self.t('add_infraction')
+
+                  if self.settings.can_see_ip
+                    button.dropdown-item(
+                      data-comment-id=comment._id
+                      data-on-click='blogs.entry:comment_show_ip'
+                    )= self.t('ip_info')
+
+                  if self.settings.blogs_mod_can_delete
+                    button.blog-comment__delete.dropdown-item= self.t('delete')
+                    button.blog-comment__undelete.dropdown-item= self.t('undelete')
+
+      .blogs-entry-page__comment-replies
+        +render_comments(children)
+
++render_comments(self.comments)

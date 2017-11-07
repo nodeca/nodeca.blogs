@@ -166,11 +166,21 @@ N.wire.once('navigate.done:' + module.apiPath, function page_once() {
   // Vote on blog entry
   //
   N.wire.on(module.apiPath + ':entry_vote', function entry_vote(data) {
-    let entry_id = data.$this.data('entry-id');
+    let $entry = $('#entry' + data.$this.data('entry-hid'));
+    let entry_id = $entry.data('entry-id');
     let value    = +data.$this.data('value');
 
     return N.io.rpc('blogs.entry.vote', { entry_id, value })
-      .then(() => N.wire.emit('navigate.reload'));
+      .then(() => N.io.rpc('blogs.entry.get', { entry_id }))
+      .then(res => {
+        let $result = $(N.runtime.render('blogs.entry.blocks.entry', res));
+
+        return N.wire.emit('navigate.update', {
+          $: $result,
+          locals: res,
+          $replace: $entry
+        });
+      });
   });
 
 
@@ -182,6 +192,57 @@ N.wire.once('navigate.done:' + module.apiPath, function page_once() {
 
     return N.io.rpc('blogs.entry.comment.vote', { comment_id, value })
       .then(() => N.wire.emit('navigate.reload'));
+  });
+
+
+  // Delete entry
+  //
+  N.wire.on(module.apiPath + ':delete', function entry_delete(data) {
+    let $entry = $('#entry' + data.$this.data('entry-hid'));
+    let entry_id = $entry.data('entry-id');
+
+    let request = {
+      entry_id,
+      as_moderator: data.$this.data('as-moderator') || false
+    };
+    let params = {
+      canDeleteHard: N.runtime.page_data.settings.blogs_mod_can_hard_delete,
+      asModerator: request.as_moderator
+    };
+
+    return Promise.resolve()
+      .then(() => N.wire.emit('blogs.blocks.blog_entry.entry_delete_dlg', params))
+      .then(() => {
+        request.method = params.method;
+        if (params.reason) request.reason = params.reason;
+        return N.io.rpc('blogs.entry.destroy', request);
+      })
+      .then(() =>
+        N.wire.emit('navigate.to', { apiPath: 'blogs.index' })
+      );
+  });
+
+
+  // Undelete entry
+  //
+  N.wire.on(module.apiPath + ':undelete', function entry_undelete(data) {
+    let $entry = $('#entry' + data.$this.data('entry-hid'));
+    let entry_id = $entry.data('entry-id');
+
+    return Promise.resolve()
+      .then(() => N.io.rpc('blogs.entry.undelete', { entry_id }))
+      .then(() => N.io.rpc('blogs.entry.get', { entry_id }))
+      .then(res => {
+        let $result = $(N.runtime.render('blogs.entry.blocks.entry', res));
+
+        $('#content').removeClass('blogs-entry-page__m-deleted blogs-entry-page__m-deleted-hard');
+
+        return N.wire.emit('navigate.update', {
+          $: $result,
+          locals: res,
+          $replace: $entry
+        });
+      });
   });
 
 

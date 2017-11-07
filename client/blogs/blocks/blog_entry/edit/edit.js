@@ -98,14 +98,25 @@ N.wire.on(module.apiPath + ':begin', function show_editor(data) {
         option_no_quote_collapse: options.user_settings.no_quote_collapse
       };
 
-      N.io.rpc('blogs.entry.edit.update', params).then(() => {
-        // TODO: only change what's necessary here without full page update
-        N.MDEdit.hide();
-        return N.wire.emit('navigate.reload');
-      }).catch(err => {
-        $editor.find('.mdedit-btn__submit').removeClass('disabled');
-        N.wire.emit('error', err);
-      });
+      let $entry = $('#entry' + data.entry_hid);
+
+      N.io.rpc('blogs.entry.edit.update', params)
+        .then(() => N.io.rpc('blogs.entry.get', { entry_id: $entry.data('entry-id') }))
+        .then(res => {
+          N.MDEdit.hide();
+
+          let $result = $(N.runtime.render('blogs.entry.blocks.entry', res));
+
+          return N.wire.emit('navigate.update', {
+            $: $result,
+            locals: res,
+            $replace: $entry
+          });
+        })
+        .catch(err => {
+          $editor.find('.mdedit-btn__submit').removeClass('disabled');
+          N.wire.emit('error', err);
+        });
 
       return false;
     });

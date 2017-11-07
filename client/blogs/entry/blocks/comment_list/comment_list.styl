@@ -1,0 +1,156 @@
+@import "nodeca.core/client/common/_variables"
+
+$aside-size = '$$ N.config.users.avatars.resize.sm.height $$'px
+
+.blog-comment
+  margin-bottom 1rem
+
+.blog-comment__head
+  margin-left $aside-size + 16px
+  margin-bottom 1rem
+  color $body-color-secondary
+  line-height 1.25em
+
+.blog-comment__meta
+  color $body-color-secondary
+  font-size $font-size-xs
+
+.blog-comment__meta-item
+  &:after
+    content ', '
+
+  &:last-child:after
+    content none
+
+.blog-comment__author-link
+  color $body-color-secondary
+  font-size $font-size-sm
+
+.blog-comment__aside
+  float left
+  margin-top .125rem
+
+.blog-comment__avatar
+  display inline-block
+  width $aside-size
+  height $aside-size
+  border-radius 3px
+  box-shadow 0 0 1px $body-color-secondary
+
+.blog-comment__content
+  margin-right 0px
+  margin-left $aside-size + 16px
+  min-height $aside-size - 40 // Dont allow post controls to be above avatar bottom
+
+.blog-comment__message
+  & > p:first-child
+    margin-top -.25rem // Compensate line-height 1.5 rem
+
+.blog-comment__controls
+  text-align right
+  margin-left $aside-size + 16px
+
+.blog-comment__controls-blk
+  margin 0
+  padding 0
+  list-style none
+
+.blog-comment__control-item
+  display inline-block
+
+.blog-comment
+  .blog-comment__action
+    transition opacity .3s ease
+    opacity .3
+  &:hover
+    .blog-comment__action
+      opacity 1
+
+  .blog-comment__votes
+  .blog-comment__infraction
+    .blog-comment__action
+      opacity 1
+
+.blog-comment__action
+  background-color transparent
+  color $body-color-secondary - 20%
+
+  &:hover
+  &:focus
+  &:active
+    background-color $body-bg-secondary
+
+.blog-comment__undelete
+  display none
+
+.blog-comment__m-voted-up
+  .blog-comment__vote-up
+    .blog-comment__action
+      opacity 1
+    .icon
+      color $brand-success
+
+.blog-comment__m-voted-down
+  .blog-comment__vote-down
+    .blog-comment__action
+      opacity 1
+    .icon
+      color $brand-danger
+
+.blog-comment__reply
+  .blog-comment__action
+    color $brand-primary
+
+  .short
+    display none
+
+// override .btn+.btn margin
+.blog-comment__bookmark-remove.blog-comment__bookmark-remove
+  margin 0
+
+.blog-comment__bookmark-remove
+  display none
+
+.blog-comment__m-bookmarked
+  .blog-comment__bookmark-remove
+    display inline-block
+    opacity 1
+    .icon
+      color $brand-success
+  .blog-comment__bookmark-add
+    display none
+
+.blog-comment__bookmarks-count
+  font-size $font-size-xs
+  color $body-color-secondary
+
+.blog-comment__bookmarks-count:after
+  content attr(data-bm-count)
+  margin-left .3em
+
+.blog-comment__bookmarks-count[data-bm-count="0"]:after
+  display none
+
+.blog-comment__votes
+  .blog-comment__action:after
+    content attr(data-votes-count)
+  .blog-comment__action[data-votes-count="0"]
+    display none
+  .blog-comment__action[data-votes-count^="+"]
+    color $brand-success
+    font-weight bold
+
+@media (max-width: $grid-breakpoints.md - 1)
+  .blog-comment__reply
+    .full
+      display none
+    .short
+      display inline-block
+
+@keyframes blog-comment-flash-animation {
+  from  { background: $decorator-color;  }
+  to    { background: none; }
+}
+
+.blog-comment__m-flash
+  animation blog-comment-flash-animation 1.5s ease-in

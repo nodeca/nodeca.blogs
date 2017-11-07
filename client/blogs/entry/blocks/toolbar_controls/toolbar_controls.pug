@@ -98,8 +98,8 @@ if items.length > 0 && items[items.length - 1].indexOf('mod_') === 0
             when 'delete'
               button.dropdown-item(
                 type='button'
-                data-on-click='blogs.blocks.blog_entry:delete'
-                data-entry-id=self.entry._id
+                data-on-click='blogs.entry:delete'
+                data-entry-hid=self.entry.hid
               )= self.t('delete')
 
             when 'mod_add_infraction'
@@ -117,14 +117,14 @@ if items.length > 0 && items[items.length - 1].indexOf('mod_') === 0
             when 'mod_delete'
               button.dropdown-item(
                 type='button'
-                data-on-click='blogs.blocks.blog_entry:delete'
-                data-entry-id=self.entry._id
+                data-on-click='blogs.entry:delete'
+                data-entry-hid=self.entry.hid
                 data-as-moderator='true'
               )= self.t('delete')
 
             when 'mod_undelete'
               button.dropdown-item(
                 type='button'
-                data-on-click='blogs.blocks.blog_entry:undelete'
-                data-entry-id=self.entry._id
+                data-on-click='blogs.entry:undelete'
+                data-entry-hid=self.entry.hid
               )= self.t('undelete')

@@ -1,0 +1,15 @@
+en-US:
+  report: Report to moderator
+  bookmark_add: Add to bookmarks
+  bookmark_remove: Remove from bookmarks
+  vote_up: Vote up
+  vote_down: Vote down
+  vote_details: Click to see details
+  reply: Reply
+  edit: Edit
+  delete: Delete
+  undelete: Undelete
+  last_edited: "Last edited on #{date}"
+
+  ip_info: IP info
+  add_infraction: Add infraction

@@ -108,14 +108,14 @@ each entry in self.entries
 
                 if self.settings.blogs_mod_can_delete
                   button.dropdown-item.blog-entry__delete(
-                    data-on-click='blogs.blocks.blog_entry:delete'
-                    data-entry-id=entry._id
+                    data-on-click='blogs.blocks.entry_list_sole:delete'
+                    data-entry-hid=entry.hid
                     data-as-moderator='true'
                   )= self.t('delete')
 
                   button.dropdown-item.blog-entry__undelete(
-                    data-on-click='blogs.blocks.blog_entry:undelete'
-                    data-entry-id=entry._id
+                    data-on-click='blogs.blocks.entry_list_sole:undelete'
+                    data-entry-hid=entry.hid
                   )= self.t('undelete')
 
       != self.partial('@blogs.blocks.tag_list', { tag_hids: entry.tag_hids })
