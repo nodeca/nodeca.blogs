@@ -158,19 +158,20 @@ async function createEntries() {
     let tags = charlatan.Helpers.shuffle(tags_by_user[user._id]).slice(0, charlatan.Helpers.rand(10));
 
     let entry = new models.blogs.BlogEntry({
-      _id:        new ObjectId(Math.round(date / 1000)),
-      title:      charlatan.Lorem.sentence().slice(0, -1),
+      _id:         new ObjectId(Math.round(date / 1000)),
+      title:       charlatan.Lorem.sentence().slice(0, -1),
       user,
-      st:         models.blogs.BlogEntry.statuses.VISIBLE,
-      ts:         date,
-      views:      charlatan.Helpers.rand(1000),
+      st:          models.blogs.BlogEntry.statuses.VISIBLE,
+      ts:          date,
+      views:       charlatan.Helpers.rand(1000),
       md,
-      html:       result.html,
+      html:        result.html,
       /*eslint-disable new-cap*/
-      ip:         charlatan.Internet.IPv4(),
-      comments:   comment_count,
-      tag_hids:   tags.map(tag => tag.hid),
-      tag_source: tags.map(tag => tag.name).join(', '),
+      ip:          charlatan.Internet.IPv4(),
+      comments:    comment_count,
+      comments_hb: comment_count,
+      tag_hids:    tags.map(tag => tag.hid),
+      tag_source:  tags.map(tag => tag.name).join(', '),
       last_comment_counter: comment_count
     });
 
