@@ -154,6 +154,25 @@ N.wire.once('navigate.done:' + module.apiPath, function page_once() {
   });
 
 
+  // Add/remove bookmark
+  //
+  N.wire.on(module.apiPath + ':comment_bookmark', function entry_bookmark(data) {
+    let $comment   = $('#comment' + data.$this.data('comment-hid'));
+    let comment_id = $comment.data('comment-id');
+    let remove     = data.$this.data('remove') || false;
+
+    return N.io.rpc('blogs.entry.comment.bookmark', { comment_id, remove }).then(res => {
+      if (remove) {
+        $comment.removeClass('blog-comment__m-bookmarked');
+      } else {
+        $comment.addClass('blog-comment__m-bookmarked');
+      }
+
+      $comment.find('.blog-comment__bookmarks-count').attr('data-bm-count', res.count);
+    });
+  });
+
+
   // Add infraction for blog entry
   //
   N.wire.on(module.apiPath + ':entry_add_infraction', function add_infraction(data) {

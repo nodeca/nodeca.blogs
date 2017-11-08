@@ -97,8 +97,6 @@ module.exports = function (N, apiPath) {
                               .where('entry').equals(env.data.entry._id)
                               .lean(true);
 
-    env.data.own_bookmarks = bookmarks;
-
     if (!bookmarks.length) return;
 
     env.res.own_bookmarks = _.map(bookmarks, 'entry');

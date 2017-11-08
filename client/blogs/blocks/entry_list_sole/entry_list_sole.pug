@@ -74,7 +74,7 @@ each entry in self.entries
           if self.runtime.is_member
             li.blog-entry__control-item.blog-entry__bookmark
               button.btn.blog-entry__action.blog-entry__bookmark-add(
-                data-entry-id=entry._id
+                data-entry-hid=entry.hid
                 data-on-click='blogs.blocks.blog_entry:bookmark'
                 title=self.t('bookmark_add')
               )
@@ -82,7 +82,7 @@ each entry in self.entries
                 span.blog-entry__bookmarks-count(data-bm-count=entry.bookmarks)
 
               button.btn.blog-entry__action.blog-entry__bookmark-remove(
-                data-entry-id=entry._id
+                data-entry-hid=entry.hid
                 data-on-click='blogs.blocks.blog_entry:bookmark'
                 data-remove='true'
                 title=self.t('bookmark_remove')

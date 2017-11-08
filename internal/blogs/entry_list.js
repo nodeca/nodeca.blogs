@@ -16,7 +16,6 @@
 //       settings: ...
 //       entries: ...
 //       users: ...
-//       own_bookmarks: ...
 //
 'use strict';
 
@@ -103,8 +102,6 @@ module.exports = function (N, apiPath) {
                               .where('user').equals(env.user_info.user_id)
                               .where('entry').in(env.data.entry_ids)
                               .lean(true);
-
-    env.data.own_bookmarks = bookmarks;
 
     if (!bookmarks.length) return;
 

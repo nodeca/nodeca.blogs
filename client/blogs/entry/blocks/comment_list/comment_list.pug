@@ -1,3 +1,4 @@
+- self.infractions = self.infractions || {};
 - self.own_votes = self.own_votes || {};
 - self.own_bookmarks = self.own_bookmarks || [];
 
@@ -19,6 +20,7 @@ mixin render_comments(comments)
     .blogs-entry-page__comment-container
       .blog-comment(
         id='comment' + comment.hid
+        class=(self.own_bookmarks.indexOf(comment._id) !== -1) ? 'blog-comment__m-bookmarked' : ''
         class=(self.own_votes[comment._id] === -1) ? 'blog-comment__m-voted-down' : ''
         class=(self.own_votes[comment._id] === +1) ? 'blog-comment__m-voted-up' : ''
         data-comment-hid=comment.hid
@@ -106,7 +108,7 @@ mixin render_comments(comments)
             if self.runtime.is_member
               li.blog-comment__control-item.blog-comment__bookmark
                 button.btn.blog-comment__action.blog-comment__bookmark-add(
-                  data-comment-id=comment._id
+                  data-comment-hid=comment.hid
                   data-on-click='blogs.entry:comment_bookmark'
                   title=self.t('bookmark_add')
                 )
@@ -114,7 +116,7 @@ mixin render_comments(comments)
                   span.blog-comment__bookmarks-count(data-bm-count=comment.bookmarks)
 
                 button.btn.blog-comment__action.blog-comment__bookmark-remove(
-                  data-comment-id=comment._id
+                  data-comment-hid=comment.hid
                   data-on-click='blogs.entry:comment_bookmark'
                   data-remove='true'
                   title=self.t('bookmark_remove')

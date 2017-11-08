@@ -27,11 +27,11 @@ N.wire.once(module.apiPath, function blog_entry_setup_handlers() {
   // Add/remove bookmark
   //
   N.wire.on(module.apiPath + ':bookmark', function entry_bookmark(data) {
-    let id     = data.$this.data('entry-id');
-    let remove = data.$this.data('remove') || false;
-    let $entry = data.$this.closest('.blog-entry');
+    let $entry   = $('#entry' + data.$this.data('entry-hid'));
+    let entry_id = $entry.data('entry-id');
+    let remove   = data.$this.data('remove') || false;
 
-    return N.io.rpc('blogs.entry.bookmark', { entry_id: id, remove }).then(res => {
+    return N.io.rpc('blogs.entry.bookmark', { entry_id, remove }).then(res => {
       if (remove) {
         $entry.removeClass('blog-entry__m-bookmarked');
       } else {

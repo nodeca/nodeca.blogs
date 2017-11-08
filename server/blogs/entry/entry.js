@@ -224,16 +224,19 @@ module.exports = function (N, apiPath) {
   // Fetch and fill bookmarks
   //
   N.wire.after(apiPath, async function fetch_and_fill_bookmarks(env) {
-    let bookmarks = await N.models.blogs.BlogEntryBookmark.find()
-                              .where('user').equals(env.user_info.user_id)
-                              .where('entry').equals(env.data.entry._id)
-                              .lean(true);
+    let entry_bookmarks = await N.models.blogs.BlogEntryBookmark.find()
+                                    .where('user').equals(env.user_info.user_id)
+                                    .where('entry').equals(env.data.entry._id)
+                                    .lean(true);
 
-    env.data.own_bookmarks = bookmarks;
+    let comment_bookmarks = await N.models.blogs.BlogCommentBookmark.find()
+                                      .where('user').equals(env.user_info.user_id)
+                                      .where('comment').in(_.map(env.data.comments, '_id'))
+                                      .lean(true);
 
-    if (!bookmarks.length) return;
+    if (!entry_bookmarks.length || !comment_bookmarks.length) return;
 
-    env.res.own_bookmarks = _.map(bookmarks, 'entry');
+    env.res.own_bookmarks = _.map(entry_bookmarks, 'entry').concat(_.map(comment_bookmarks, 'comment'));
   });
 
 
