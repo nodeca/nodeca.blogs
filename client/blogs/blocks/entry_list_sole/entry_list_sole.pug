@@ -9,6 +9,7 @@
 //- show many operations checkbox
 - var many_ops_permitted = self.settings.blogs_mod_can_delete;
 
+- self.infractions = self.infractions || {};
 - self.own_bookmarks = self.own_bookmarks || [];
 
 each entry in self.entries
@@ -48,6 +49,17 @@ each entry in self.entries
             = self.t('read_more')
 
         ul.blog-entry__controls-blk
+          - var infraction = self.infractions[entry._id];
+          if infraction
+            li.blog-entry__control-item.blog-entry__infraction(
+              class=infraction.points === 0 ? 'blog-entry__infraction-m-warning' : ''
+            )
+              a.btn.blog-entry__action(
+                title=self.t('infraction_title', { points: infraction.points, date: self.date(infraction.ts, 'datetime') })
+                href=self.link_to('users.member', { user_hid: user && user.hid }) + '#infraction' + infraction._id
+              )
+                span.icon.icon-infraction
+
           li.blog-entry__control-item
             != self.timetag(entry.ts, 'relative')
 
@@ -98,7 +110,10 @@ each entry in self.entries
               )
               .dropdown-menu.dropdown-menu-right(role='menu')
                 if self.settings.blogs_mod_can_add_infractions
-                  button.dropdown-item= self.t('add_infraction')
+                  button.dropdown-item(
+                    data-on-click='blogs.blocks.entry_list_sole:add_infraction'
+                    data-entry-hid=entry.hid
+                  )= self.t('add_infraction')
 
                 if self.settings.can_see_ip
                   button.dropdown-item(

@@ -1,3 +1,4 @@
+- self.infractions = self.infractions || {};
 - self.own_votes = self.own_votes || {};
 - self.own_bookmarks = self.own_bookmarks || [];
 
@@ -70,6 +71,17 @@
 
   footer.blog-entry__controls
     ul.blog-entry__controls-blk
+      - var infraction = self.infractions[entry._id];
+      if infraction
+        li.blog-entry__control-item.blog-entry__infraction(
+          class=infraction.points === 0 ? 'blog-entry__infraction-m-warning' : ''
+        )
+          a.btn.blog-entry__action(
+            title=self.t('infraction_title', { points: infraction.points, date: self.date(infraction.ts, 'datetime') })
+            href=self.link_to('users.member', { user_hid: user && user.hid }) + '#infraction' + infraction._id
+          )
+            span.icon.icon-infraction
+
       li.blog-entry__control-item.blog-entry__votes
         - var votes = entry.votes || 0;
         button.btn.blog-entry__action(

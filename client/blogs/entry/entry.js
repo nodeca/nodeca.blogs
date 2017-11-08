@@ -154,6 +154,47 @@ N.wire.once('navigate.done:' + module.apiPath, function page_once() {
   });
 
 
+  // Add infraction for blog entry
+  //
+  N.wire.on(module.apiPath + ':entry_add_infraction', function add_infraction(data) {
+    let $entry = $('#entry' + data.$this.data('entry-hid'));
+    let entry_id = $entry.data('entry-id');
+    let params = { entry_id };
+
+    return Promise.resolve()
+      .then(() => N.wire.emit('users.blocks.add_infraction_dlg', params))
+      .then(() => N.io.rpc('blogs.entry.add_infraction', params))
+      .then(() => N.io.rpc('blogs.entry.get', { entry_id }))
+      .then(res => {
+        let $result = $(N.runtime.render('blogs.entry.blocks.entry', res));
+
+        return N.wire.emit('navigate.update', {
+          $: $result,
+          locals: res,
+          $replace: $entry
+        });
+      })
+      .then(() => N.wire.emit('notify.info', t('infraction_added')));
+  });
+
+
+  // Add infraction for a comment
+  //
+  N.wire.on(module.apiPath + ':comment_add_infraction', function add_infraction(data) {
+    let $comment = $('#comment' + data.$this.data('comment-hid'));
+    let comment_id = $comment.data('comment-id');
+    let params = { comment_id };
+
+    return Promise.resolve()
+      .then(() => N.wire.emit('users.blocks.add_infraction_dlg', params))
+      .then(() => N.io.rpc('blogs.entry.comment.add_infraction', params))
+      .then(() =>
+        // TODO
+        N.wire.emit('navigate.reload')
+      );
+  });
+
+
   // Click on entry edit button
   //
   N.wire.on(module.apiPath + ':edit', function edit() {
@@ -242,7 +283,8 @@ N.wire.once('navigate.done:' + module.apiPath, function page_once() {
           locals: res,
           $replace: $entry
         });
-      });
+      })
+      .then(() => N.wire.emit('notify.info', t('entry_undelete_done')));
   });
 
 

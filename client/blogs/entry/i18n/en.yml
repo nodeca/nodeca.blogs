@@ -2,7 +2,10 @@ en-US:
   comments: "Comments (#{count}):"
   add_comment: Add comment
 
+  entry_undelete_done: Blog entry has been restored
+
   abuse_reported: Your report has been sent
+  infraction_added: Infraction has been added
 
   old_entry_reply_confirm: |
     md:**This blog entry is very old!** It was created #{count} days ago, and is probably outdated.

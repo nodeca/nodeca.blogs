@@ -112,6 +112,29 @@ module.exports = function (N, apiPath) {
   });
 
 
+  // Fetch infractions
+  //
+  N.wire.after(apiPath, async function fetch_infractions(env) {
+    let settings = await env.extras.settings.fetch([
+      'blogs_mod_can_add_infractions',
+      'can_see_infractions'
+    ]);
+
+    if (!settings.can_see_infractions && !settings.blogs_mod_can_add_infractions) return;
+
+    let infractions = await N.models.users.Infraction.find()
+                                .where('src').in(env.data.entry_ids)
+                                .where('exists').equals(true)
+                                .select('src points ts')
+                                .lean(true);
+
+    env.res.infractions = infractions.reduce((acc, infraction) => {
+      acc[infraction.src] = infraction;
+      return acc;
+    }, {});
+  });
+
+
   // Collect users
   //
   N.wire.after(apiPath, function collect_users(env) {

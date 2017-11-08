@@ -18,9 +18,11 @@ mixin render_comments(comments)
 
     .blogs-entry-page__comment-container
       .blog-comment(
+        id='comment' + comment.hid
         class=(self.own_votes[comment._id] === -1) ? 'blog-comment__m-voted-down' : ''
         class=(self.own_votes[comment._id] === +1) ? 'blog-comment__m-voted-up' : ''
-        id='comment' + comment.hid
+        data-comment-hid=comment.hid
+        data-comment-id=comment._id
       )
         .blog-comment__aside
           if user.hid
@@ -61,6 +63,17 @@ mixin render_comments(comments)
 
         footer.blog-comment__controls
           ul.blog-comment__controls-blk
+            - var infraction = self.infractions[comment._id];
+            if infraction
+              li.blog-comment__control-item.blog-comment__infraction(
+                class=infraction.points === 0 ? 'blog-comment__infraction-m-warning' : ''
+              )
+                a.btn.blog-comment__action(
+                  title=self.t('infraction_title', { points: infraction.points, date: self.date(infraction.ts, 'datetime') })
+                  href=self.link_to('users.member', { user_hid: user && user.hid }) + '#infraction' + infraction._id
+                )
+                  span.icon.icon-infraction
+
             if self.runtime.is_member && self.runtime.user_id !== comment.user
               if self.settings.can_vote && (self.settings.votes_add_max_time === 0 || new Date(comment.ts).getTime() > Date.now() - self.settings.votes_add_max_time * 60 * 60 * 1000)
 
@@ -166,7 +179,11 @@ mixin render_comments(comments)
                 )
                 .dropdown-menu.dropdown-menu-right(role='menu')
                   if self.settings.blogs_mod_can_add_infractions
-                    button.dropdown-item= self.t('add_infraction')
+                    button.dropdown-item(
+                      type='button'
+                      data-on-click='blogs.entry:comment_add_infraction'
+                      data-comment-hid=comment.hid
+                    )= self.t('add_infraction')
 
                   if self.settings.can_see_ip
                     button.dropdown-item(

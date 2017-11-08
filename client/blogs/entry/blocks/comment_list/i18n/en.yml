@@ -13,3 +13,5 @@ en-US:
 
   ip_info: IP info
   add_infraction: Add infraction
+
+  infraction_title: "#{points} ((point|points)):points, added at #{date}"

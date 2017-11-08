@@ -27,6 +27,30 @@ N.wire.once(module.apiPath, function entry_list_mixed_setup_handlers() {
   });
 
 
+  // Add infraction for blog entry
+  //
+  N.wire.on(module.apiPath + ':add_infraction', function add_infraction(data) {
+    let $entry = $('#entry' + data.$this.data('entry-hid'));
+    let entry_id = $entry.data('entry-id');
+    let params = { entry_id };
+
+    return Promise.resolve()
+      .then(() => N.wire.emit('users.blocks.add_infraction_dlg', params))
+      .then(() => N.io.rpc('blogs.entry.add_infraction', params))
+      .then(() => N.io.rpc('blogs.index.list.by_ids', { entry_ids: [ entry_id ] }))
+      .then(res => {
+        let $result = $(N.runtime.render('blogs.blocks.entry_list_mixed', res));
+
+        return N.wire.emit('navigate.update', {
+          $: $result,
+          locals: res,
+          $replace: $entry
+        });
+      })
+      .then(() => N.wire.emit('notify.info', t('infraction_added')));
+  });
+
+
   // Delete entry handler
   //
   N.wire.on(module.apiPath + ':delete', function entry_delete(data) {

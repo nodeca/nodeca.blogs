@@ -105,6 +105,8 @@ if items.length > 0 && items[items.length - 1].indexOf('mod_') === 0
             when 'mod_add_infraction'
               button.dropdown-item(
                 type='button'
+                data-on-click='blogs.entry:entry_add_infraction'
+                data-entry-hid=self.entry.hid
               )= self.t('add_infraction')
 
             when 'mod_ip_info'

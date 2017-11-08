@@ -22,3 +22,7 @@ packages:
     entries:
       - client/common
       - internal/common
+
+  users:
+    entries:
+      - internal/users
