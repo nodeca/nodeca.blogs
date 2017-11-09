@@ -1,0 +1,25 @@
+.modal.fade(tabindex='-1', role='dialog', aria-hidden='true')
+  .modal-dialog.modal-lg
+    .modal-content
+      .modal-header
+        h4.modal-title= self.t('title')
+        button.close(type='button', tabindex='-1', data-dismiss='modal') &times;
+      .modal-body.comment-history-dlg__content
+        each comment in self.entries.reverse()
+          - var user = self.users[comment.user];
+
+          .comment-history-dlg__comment
+            .comment-history-dlg__meta
+              .comment-history-dlg__meta-author
+                if user
+                  a.comment-history-dlg__meta-author-link(href=self.link_to('users.member', { user_hid: user.hid }))
+                    = user.nick
+              .comment-history-dlg__meta-ts!= self.timetag(comment.ts, 'relative')
+
+            if comment.title_diff
+              .comment-history-dlg__title
+                != comment.title_diff
+
+            if comment.text_diff
+              .comment-history-dlg__diff
+                != comment.text_diff

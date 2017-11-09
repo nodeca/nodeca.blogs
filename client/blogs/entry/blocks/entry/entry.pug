@@ -3,7 +3,7 @@
 - self.own_bookmarks = self.own_bookmarks || [];
 
 - var entry = self.entry;
-- var user = self.users[self.user_id] || {};
+- var user = self.users[self.user_id];
 - var entryStatuses = '$$ JSON.stringify(N.models.blogs.BlogEntry.statuses) $$'
 
 .blog-entry.blogs-entry-page__entry(
@@ -23,16 +23,17 @@
     h1.blog-entry__title.page-head__title(itemprop='name')
       span.blog-entry__title-text= entry.title
 
-      if entry.user === self.runtime.user_id
+      if user && user._id === self.runtime.user_id
         a.blog-entry__edit.icon.icon-edit(
           href='#'
           title=self.t('edit')
-          data-on-click='blogs.entry:edit'
+          data-entry-hid=entry.hid
+          data-on-click='blogs.entry:entry_edit'
         )
 
     .blog-entry__meta
       span.blog-entry__meta-item.blog-entry__author
-        if user.hid
+        if user
           a.blog-entry__author-link._ucard-popover(
             href=self.link_to('users.member', { user_hid: user.hid })
             data-user-id=entry.user

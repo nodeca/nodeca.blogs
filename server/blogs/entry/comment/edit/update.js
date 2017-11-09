@@ -1,10 +1,9 @@
-// Update blog entry
+// Update blog comment
 //
 'use strict';
 
 
-const $         = require('nodeca.core/lib/parser/cheequery');
-const charcount = require('charcount');
+const $ = require('nodeca.core/lib/parser/cheequery');
 
 // If same user edits the same post within 5 minutes, all changes
 // made within that period will be squashed into one diff.
@@ -14,8 +13,7 @@ const HISTORY_GRACE_PERIOD = 5 * 60 * 1000;
 module.exports = function (N, apiPath) {
 
   N.validate(apiPath, {
-    entry_id:                 { format: 'mongo', required: true },
-    title:                    { type: 'string', required: true },
+    comment_id:               { format: 'mongo', required: true },
     txt:                      { type: 'string', required: true },
     attach:                   {
       type: 'array',
@@ -29,24 +27,10 @@ module.exports = function (N, apiPath) {
   });
 
 
-  // Check title length
+  // Fetch comment data and check permissions
   //
-  N.wire.before(apiPath, async function check_title_length(env) {
-    let min_length = await env.extras.settings.fetch('blog_entry_title_min_length');
-
-    if (charcount(env.params.title.trim()) < min_length) {
-      throw {
-        code: N.io.CLIENT_ERROR,
-        message: env.t('err_title_too_short', min_length)
-      };
-    }
-  });
-
-
-  // Fetch entry data and check permissions
-  //
-  N.wire.before(apiPath, function fetch_entry_data(env) {
-    return N.wire.emit('server:blogs.entry.edit.index', env);
+  N.wire.before(apiPath, function fetch_comment_data(env) {
+    return N.wire.emit('server:blogs.entry.comment.edit.index', env);
   });
 
 
@@ -61,7 +45,7 @@ module.exports = function (N, apiPath) {
   //
   N.wire.before(apiPath, async function prepare_options(env) {
     let settings = await N.settings.getByCategory(
-      'blog_entries_markup',
+      'blog_comments_markup',
       { usergroup_ids: env.user_info.usergroups },
       { alias: true });
 
@@ -97,7 +81,7 @@ module.exports = function (N, apiPath) {
   // Check post length
   //
   N.wire.after(apiPath, async function check_post_length(env) {
-    let min_length = await env.extras.settings.fetch('blog_entry_min_length');
+    let min_length = await env.extras.settings.fetch('blog_comment_min_length');
 
     if (env.data.parse_result.text_length < min_length) {
       throw {
@@ -111,7 +95,7 @@ module.exports = function (N, apiPath) {
   // Limit an amount of images in the post
   //
   N.wire.after(apiPath, async function check_images_count(env) {
-    let max_images = await env.extras.settings.fetch('blog_entry_max_images');
+    let max_images = await env.extras.settings.fetch('blog_comment_max_images');
 
     if (max_images <= 0) return;
 
@@ -132,7 +116,7 @@ module.exports = function (N, apiPath) {
   // Limit an amount of emoticons in the post
   //
   N.wire.after(apiPath, async function check_emoji_count(env) {
-    let max_emojis = await env.extras.settings.fetch('blog_entry_max_emojis');
+    let max_emojis = await env.extras.settings.fetch('blog_comment_max_emojis');
 
     if (max_emojis < 0) return;
 
@@ -145,42 +129,41 @@ module.exports = function (N, apiPath) {
   });
 
 
-  // Update entry
+  // Update comment
   //
-  N.wire.after(apiPath, async function update_entry(env) {
+  N.wire.after(apiPath, async function update_comment(env) {
     // save it using model to trigger 'post' hooks (e.g. param_ref update)
-    let entry = await N.models.blogs.BlogEntry.findById(env.data.entry._id)
+    let comment = await N.models.blogs.BlogComment.findById(env.data.comment._id)
                           .lean(false);
 
-    if (!entry) throw N.io.NOT_FOUND;
+    if (!comment) throw N.io.NOT_FOUND;
 
-    entry.title      = env.params.title.trim();
-    entry.md         = env.params.txt;
-    entry.html       = env.data.parse_result.html;
+    comment.md         = env.params.txt;
+    comment.html       = env.data.parse_result.html;
 
-    entry.attach       = env.params.attach;
-    entry.params       = env.data.parse_options;
-    entry.imports      = env.data.parse_result.imports;
-    entry.import_users = env.data.parse_result.import_users;
-    entry.tail         = env.data.parse_result.tail;
+    comment.attach       = env.params.attach;
+    comment.params       = env.data.parse_options;
+    comment.imports      = env.data.parse_result.imports;
+    comment.import_users = env.data.parse_result.import_users;
+    comment.tail         = env.data.parse_result.tail;
 
-    env.data.new_entry = await entry.save();
+    env.data.new_comment = await comment.save();
   });
 
 
   // Save old version in history
   //
-  N.wire.after(apiPath, async function save_entry_history(env) {
-    let orig_entry = env.data.entry;
-    let new_entry  = env.data.new_entry;
+  N.wire.after(apiPath, async function save_comment_history(env) {
+    let orig_comment = env.data.comment;
+    let new_comment  = env.data.new_comment;
 
-    let last_record = await N.models.blogs.BlogEntryHistory.findOne()
-                                .where('entry').equals(orig_entry._id)
+    let last_record = await N.models.blogs.BlogCommentHistory.findOne()
+                                .where('comment').equals(orig_comment._id)
                                 .sort('-_id')
                                 .lean(true);
 
-    let last_update_time = last_record ? last_record.ts   : orig_entry.ts;
-    let last_update_user = last_record ? last_record.user : orig_entry.user;
+    let last_update_time = last_record ? last_record.ts   : orig_comment.ts;
+    let last_update_user = last_record ? last_record.user : orig_comment.user;
     let now = new Date();
 
     // if the same user edits the same post within grace period, history won't be changed
@@ -189,13 +172,13 @@ module.exports = function (N, apiPath) {
           String(last_update_user) === String(env.user_info.user_id))) {
 
       /* eslint-disable no-undefined */
-      last_record = await new N.models.blogs.BlogEntryHistory({
-        entry:       orig_entry._id,
+      last_record = await new N.models.blogs.BlogCommentHistory({
+        comment:     orig_comment._id,
         user:        env.user_info.user_id,
-        md:          orig_entry.md,
-        tail:        orig_entry.tail,
-        title:       orig_entry.title,
-        params_ref:  orig_entry.params_ref
+        md:          orig_comment.md,
+        tail:        orig_comment.tail,
+        //title:       orig_comment.title,
+        params_ref:  orig_comment.params_ref
       }).save();
     }
 
@@ -203,34 +186,34 @@ module.exports = function (N, apiPath) {
     // (e.g. user saves post without changes or reverts change within 5 min),
     // remove redundant history entry
     if (last_record) {
-      let last_entry_str = JSON.stringify({
-        entry:      last_record.entry,
+      let last_comment_str = JSON.stringify({
+        comment:    last_record.comment,
         user:       last_record.user,
         md:         last_record.md,
         tail:       last_record.tail,
-        title:      last_record.title,
+        //title:      last_record.title,
         params_ref: last_record.params_ref
       });
 
-      let next_entry_str = JSON.stringify({
-        entry:      new_entry._id,
+      let next_comment_str = JSON.stringify({
+        comment:    new_comment._id,
         user:       env.user_info.user_id,
-        md:         new_entry.md,
-        tail:       new_entry.tail,
-        title:      new_entry.title,
-        params_ref: new_entry.params_ref
+        md:         new_comment.md,
+        tail:       new_comment.tail,
+        //title:      new_comment.title,
+        params_ref: new_comment.params_ref
       });
 
-      if (last_entry_str === next_entry_str) {
-        await N.models.blogs.BlogEntryHistory.remove({ _id: last_record._id });
+      if (last_comment_str === next_comment_str) {
+        await N.models.blogs.BlogCommentHistory.remove({ _id: last_record._id });
       }
     }
 
-    await N.models.blogs.BlogEntry.update(
-      { _id: orig_entry._id },
+    await N.models.blogs.BlogComment.update(
+      { _id: orig_comment._id },
       { $set: {
         last_edit_ts: new Date(),
-        edit_count: await N.models.blogs.BlogEntryHistory.count({ entry: orig_entry._id })
+        edit_count: await N.models.blogs.BlogCommentHistory.count({ comment: orig_comment._id })
       } }
     );
   });
@@ -239,7 +222,7 @@ module.exports = function (N, apiPath) {
   // Schedule image size fetch
   //
   N.wire.after(apiPath, function fill_image_info(env) {
-    return N.queue.blog_entry_images_fetch(env.data.new_entry._id).postpone();
+    return N.queue.blog_comment_images_fetch(env.data.new_comment._id).postpone();
   });
 
 

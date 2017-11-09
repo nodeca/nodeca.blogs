@@ -207,26 +207,66 @@ N.wire.once('navigate.done:' + module.apiPath, function page_once() {
     return Promise.resolve()
       .then(() => N.wire.emit('users.blocks.add_infraction_dlg', params))
       .then(() => N.io.rpc('blogs.entry.comment.add_infraction', params))
-      .then(() =>
-        // TODO
-        N.wire.emit('navigate.reload')
-      );
+      .then(() => N.io.rpc('blogs.entry.comment.get', { comment_id }))
+      .then(res => {
+        let $result = $(N.runtime.render('blogs.entry.blocks.comment_list', res));
+
+        return N.wire.emit('navigate.update', {
+          $: $result,
+          locals: res,
+          $replace: $comment
+        });
+      });
   });
 
 
   // Click on entry edit button
   //
-  N.wire.on(module.apiPath + ':edit', function edit() {
+  N.wire.on(module.apiPath + ':entry_edit', function edit() {
+    let $entry    = $('#entry' + pageState.entry_hid);
+    let entry_id  = $entry.data('entry-id');
+
     return N.wire.emit('blogs.blocks.blog_entry.edit:begin', {
-      entry_hid: pageState.entry_hid
+      user_hid:    pageState.user_hid,
+      entry_hid:   pageState.entry_hid,
+      entry_title: N.runtime.page_data.entry.title,
+      entry_id
     });
+  });
+
+
+  // Click on comment edit button
+  //
+  N.wire.on(module.apiPath + ':comment_edit', function edit(data) {
+    let comment_hid = data.$this.data('comment-hid');
+    let $comment    = $('#comment' + comment_hid);
+    let comment_id  = $comment.data('comment-id');
+
+    return N.wire.emit('blogs.entry.comment_edit:begin', {
+      user_hid:    pageState.user_hid,
+      entry_hid:   pageState.entry_hid,
+      entry_title: N.runtime.page_data.entry.title,
+      comment_hid,
+      comment_id
+    });
+  });
+
+
+  // Show history popup
+  //
+  N.wire.on(module.apiPath + ':comment_history', function comment_history(data) {
+    let comment_id = data.$this.data('comment-id');
+
+    return Promise.resolve()
+      .then(() => N.io.rpc('blogs.entry.comment.show_history', { comment_id }))
+      .then(res => N.wire.emit('blogs.entry.comment_history_dlg', res));
   });
 
 
   // Vote on blog entry
   //
   N.wire.on(module.apiPath + ':entry_vote', function entry_vote(data) {
-    let $entry = $('#entry' + data.$this.data('entry-hid'));
+    let $entry   = $('#entry' + data.$this.data('entry-hid'));
     let entry_id = $entry.data('entry-id');
     let value    = +data.$this.data('value');
 
@@ -247,11 +287,21 @@ N.wire.once('navigate.done:' + module.apiPath, function page_once() {
   // Vote on blog comment
   //
   N.wire.on(module.apiPath + ':comment_vote', function comment_vote(data) {
-    let comment_id = data.$this.data('comment-id');
+    let $comment   = $('#comment' + data.$this.data('comment-hid'));
+    let comment_id = $comment.data('comment-id');
     let value      = +data.$this.data('value');
 
     return N.io.rpc('blogs.entry.comment.vote', { comment_id, value })
-      .then(() => N.wire.emit('navigate.reload'));
+      .then(() => N.io.rpc('blogs.entry.comment.get', { comment_id }))
+      .then(res => {
+        let $result = $(N.runtime.render('blogs.entry.blocks.comment_list', res));
+
+        return N.wire.emit('navigate.update', {
+          $: $result,
+          locals: res,
+          $replace: $comment
+        });
+      });
   });
 
 

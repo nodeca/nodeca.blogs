@@ -46,6 +46,8 @@ module.exports = function (N, collectionName) {
     del_reason:   String,
     del_by:       Schema.ObjectId,
     prev_st:      { st: Number, ste: Number },
+    edit_count:   Number,
+    last_edit_ts: Date,
 
     attach:       [ Schema.Types.ObjectId ],
     params_ref:   Schema.ObjectId,

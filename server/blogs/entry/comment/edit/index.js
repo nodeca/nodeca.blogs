@@ -1,4 +1,4 @@
-// Get blog entry source, update entry
+// Get comment source
 //
 'use strict';
 
@@ -6,7 +6,7 @@
 module.exports = function (N, apiPath) {
 
   N.validate(apiPath, {
-    entry_id: { format: 'mongo', required: true }
+    comment_id: { format: 'mongo', required: true }
   });
 
 
@@ -17,26 +17,38 @@ module.exports = function (N, apiPath) {
   });
 
 
+  // Fetch comment
+  //
+  N.wire.before(apiPath, async function fetch_comment(env) {
+    env.data.comment = await N.models.blogs.BlogComment
+                                 .findById(env.params.comment_id)
+                                 .lean(true);
+
+    if (!env.data.comment) throw N.io.NOT_FOUND;
+  });
+
+
   // Fetch entry
   //
   N.wire.before(apiPath, async function fetch_entry(env) {
     env.data.entry = await N.models.blogs.BlogEntry
-                               .findById(env.params.entry_id)
+                               .findById(env.data.comment.entry)
                                .lean(true);
 
     if (!env.data.entry) throw N.io.NOT_FOUND;
   });
 
 
-  // Check if user can see this entry
+  // Check if user can see this comment
   //
   N.wire.before(apiPath, async function check_access(env) {
     let access_env = { params: {
-      entries: env.data.entry,
-      user_info: env.user_info
+      comments:  env.data.comment,
+      user_info: env.user_info,
+      preload:   [ env.data.entry ]
     } };
 
-    await N.wire.emit('internal:blogs.access.entry', access_env);
+    await N.wire.emit('internal:blogs.access.comment', access_env);
 
     if (!access_env.data.access_read) throw N.io.NOT_FOUND;
   });
@@ -49,8 +61,18 @@ module.exports = function (N, apiPath) {
 
     if (!can_create) throw N.io.FORBIDDEN;
 
-    if (String(env.user_info.user_id) !== String(env.data.entry.user)) {
+    if (String(env.user_info.user_id) !== String(env.data.comment.user)) {
       throw N.io.FORBIDDEN;
+    }
+
+    let blogs_edit_comments_max_time = await env.extras.settings.fetch('blogs_edit_comments_max_time');
+
+    if (blogs_edit_comments_max_time !== 0 &&
+        env.data.comment.ts < Date.now() - blogs_edit_comments_max_time * 60 * 1000) {
+      throw {
+        code: N.io.CLIENT_ERROR,
+        message: env.t('@blogs.entry.comment.edit.err_perm_expired')
+      };
     }
   });
 
@@ -58,25 +80,25 @@ module.exports = function (N, apiPath) {
   // Fetch parser params
   //
   N.wire.before(apiPath, async function fetch_parser_params(env) {
-    env.data.parser_params = await N.models.core.MessageParams.getParams(env.data.entry.params_ref);
+    env.data.parser_params = await N.models.core.MessageParams.getParams(env.data.comment.params_ref);
   });
 
 
   // Fetch attachments info
   //
   N.wire.before(apiPath, async function fetch_attachments(env) {
-    if (!env.data.entry.attach || !env.data.entry.attach.length) {
+    if (!env.data.comment.attach || !env.data.comment.attach.length) {
       env.data.attachments = [];
       return;
     }
 
     let attachments = await N.models.users.MediaInfo.find()
-                                .where('media_id').in(env.data.entry.attach)
+                                .where('media_id').in(env.data.comment.attach)
                                 .select('media_id file_name type')
                                 .lean(true);
 
     // Sort in the same order as it was in post
-    env.data.attachments = env.data.entry.attach.reduce((acc, media_id) => {
+    env.data.attachments = env.data.comment.attach.reduce((acc, media_id) => {
       let attach = attachments.find(attachment => String(attachment.media_id) === String(media_id));
 
       if (attach) {
@@ -92,15 +114,15 @@ module.exports = function (N, apiPath) {
   N.wire.on(apiPath, function fill_data(env) {
     env.data.users = env.data.users || [];
 
-    if (env.data.entry.user)   env.data.users.push(env.data.entry.user);
-    if (env.data.entry.del_by) env.data.users.push(env.data.entry.del_by);
+    if (env.data.comment.user)   env.data.users.push(env.data.comment.user);
+    if (env.data.comment.del_by) env.data.users.push(env.data.comment.del_by);
 
-    if (env.data.entry.import_users) {
-      env.data.users = env.data.users.concat(env.data.entry.import_users);
+    if (env.data.comment.import_users) {
+      env.data.users = env.data.users.concat(env.data.comment.import_users);
     }
 
-    env.res.md = env.data.entry.md;
-    env.res.title = env.data.entry.title;
+    env.res.user_id = env.data.comment.user;
+    env.res.md = env.data.comment.md;
     env.res.attachments = env.data.attachments;
     env.res.params = env.data.parser_params;
   });

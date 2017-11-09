@@ -1,0 +1,5 @@
+en-US:
+  edit_comment: "Edit <a href='#{comment_url}'>##{comment_hid}</a> in &quot;#{entry_title}&quot;"
+
+  options_btn:
+    options: Options

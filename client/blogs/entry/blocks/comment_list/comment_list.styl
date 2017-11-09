@@ -1,9 +1,15 @@
 @import "nodeca.core/client/common/_variables"
 
 $aside-size = '$$ N.config.users.avatars.resize.sm.height $$'px
+$max-indent = 5
 
 .blog-comment
   margin-bottom 1rem
+  margin-left ($aside-size + 16px) * ($max-indent - 1)
+
+for $level in (0..$max-indent - 2)
+  .blog-comment__level-{$level}
+    margin-left ($aside-size + 16px) * $level
 
 .blog-comment__head
   margin-left $aside-size + 16px
@@ -25,6 +31,9 @@ $aside-size = '$$ N.config.users.avatars.resize.sm.height $$'px
 .blog-comment__author-link
   color $body-color-secondary
   font-size $font-size-sm
+
+.blog-comment__history
+  color inherit
 
 .blog-comment__aside
   float left

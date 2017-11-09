@@ -2,7 +2,10 @@
 //
 // data:
 //
+// - user_hid
 // - entry_hid
+// - entry_title
+// - entry_id
 //
 'use strict';
 
@@ -36,7 +39,7 @@ N.wire.before(module.apiPath + ':begin', function fetch_options(data) {
   let entryData;
 
   return Promise.resolve()
-    .then(() => N.io.rpc('blogs.entry.edit.index', { entry_hid: data.entry_hid }))
+    .then(() => N.io.rpc('blogs.entry.edit.index', { entry_id: data.entry_id }))
     .then(response => {
       entryData = response;
 
@@ -74,7 +77,7 @@ N.wire.on(module.apiPath + ':begin', function show_editor(data) {
   $editor
     .on('show.nd.mdedit', () => {
       let title = t('edit_entry', {
-        entry_title: _.escape(entry.title),
+        entry_title: _.escape(data.entry_title),
         entry_url: N.router.linkTo('blogs.entry', {
           user_hid:  data.user_hid,
           entry_hid: data.entry_hid
@@ -89,7 +92,7 @@ N.wire.on(module.apiPath + ':begin', function show_editor(data) {
       $editor.find('.mdedit-btn__submit').addClass('disabled');
 
       let params = {
-        entry_hid:                data.entry_hid,
+        entry_id:                 data.entry_id,
         title:                    $('.blog-entry-create__title').val(),
         txt:                      N.MDEdit.text(),
         attach:                   _.map(N.MDEdit.attachments(), 'media_id'),
