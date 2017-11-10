@@ -11,6 +11,13 @@ en-US:
   undelete: Undelete
   last_edited: "Last edited on #{date}"
 
+  del_reason: "Deletion reason: #{text}"
+  del_by: "Deleted by:"
+  del_comment_text: Blog comment is deleted.
+  del_hard_comment_text: Blog comment is hard deleted.
+  hb_comment_text: Hellbanned
+  expand: Expand
+
   ip_info: IP info
   add_infraction: Add infraction
 

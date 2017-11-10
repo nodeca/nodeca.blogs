@@ -173,6 +173,25 @@ N.wire.once('navigate.done:' + module.apiPath, function page_once() {
   });
 
 
+  // Expand deleted or hellbanned comment
+  //
+  N.wire.on(module.apiPath + ':comment_expand', function expand(data) {
+    let comment_id = data.$this.data('comment-id');
+
+    return Promise.resolve()
+      .then(() => N.io.rpc('blogs.entry.comment.get', { comment_id }))
+      .then(res => {
+        let $result = $(N.runtime.render('blogs.entry.blocks.comment_list', _.assign(res, { expand: true })));
+
+        return N.wire.emit('navigate.update', {
+          $: $result,
+          locals: res,
+          $replace: data.$this.closest('.blog-comment')
+        });
+      });
+  });
+
+
   // Add infraction for blog entry
   //
   N.wire.on(module.apiPath + ':entry_add_infraction', function add_infraction(data) {
@@ -333,6 +352,33 @@ N.wire.once('navigate.done:' + module.apiPath, function page_once() {
   });
 
 
+  // Delete comment handler
+  //
+  N.wire.on(module.apiPath + ':comment_delete', function comment_delete(data) {
+    let $comment = $('#comment' + data.$this.data('comment-hid'));
+    let comment_id = $comment.data('comment-id');
+
+    let request = {
+      comment_id,
+      as_moderator: data.$this.data('as-moderator') || false
+    };
+    let params = {
+      canDeleteHard: N.runtime.page_data.settings.blogs_mod_can_hard_delete,
+      asModerator: request.as_moderator
+    };
+
+    return Promise.resolve()
+      .then(() => N.wire.emit('blogs.entry.comment_delete_dlg', params))
+      .then(() => {
+        request.method = params.method;
+        if (params.reason) request.reason = params.reason;
+        return N.io.rpc('blogs.entry.comment.destroy', request);
+      })
+      // TODO
+      .then(() => N.wire.emit('navigate.reload'));
+  });
+
+
   // Undelete entry
   //
   N.wire.on(module.apiPath + ':undelete', function entry_undelete(data) {
@@ -354,6 +400,27 @@ N.wire.once('navigate.done:' + module.apiPath, function page_once() {
         });
       })
       .then(() => N.wire.emit('notify.info', t('entry_undelete_done')));
+  });
+
+
+  // Undelete entry handler
+  //
+  N.wire.on(module.apiPath + ':comment_undelete', function comment_undelete(data) {
+    let $comment = $('#comment' + data.$this.data('comment-hid'));
+    let comment_id = $comment.data('comment-id');
+
+    return Promise.resolve()
+      .then(() => N.io.rpc('blogs.entry.comment.undelete', { comment_id }))
+      .then(() => N.io.rpc('blogs.entry.comment.get', { comment_id }))
+      .then(res => {
+        let $result = $(N.runtime.render('blogs.entry.blocks.comment_list', res));
+
+        return N.wire.emit('navigate.update', {
+          $: $result,
+          locals: res,
+          $replace: $comment
+        });
+      });
   });
 
 

@@ -79,10 +79,12 @@ module.exports = function (N, apiPath) {
   N.wire.on(apiPath, function delete_entry(env) {
     let statuses = N.models.blogs.BlogEntry.statuses;
     let update = {
-      st: env.params.method === 'hard' ? statuses.DELETED_HARD : statuses.DELETED,
-      $unset: { ste: 1 },
-      prev_st: _.pick(env.data.entry, [ 'st', 'ste' ]),
-      del_by: env.user_info.user_id
+      $set: {
+        st: env.params.method === 'hard' ? statuses.DELETED_HARD : statuses.DELETED,
+        prev_st: _.pick(env.data.entry, [ 'st', 'ste' ]),
+        del_by: env.user_info.user_id
+      },
+      $unset: { ste: 1 }
     };
 
     if (env.params.reason) {

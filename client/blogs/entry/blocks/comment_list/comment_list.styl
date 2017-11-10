@@ -47,13 +47,40 @@ for $level in (0..$max-indent - 2)
   box-shadow 0 0 1px $body-color-secondary
 
 .blog-comment__content
-  margin-right 0px
   margin-left $aside-size + 16px
-  min-height $aside-size - 40 // Dont allow post controls to be above avatar bottom
+  margin-right 0px
 
 .blog-comment__message
   & > p:first-child
     margin-top -.25rem // Compensate line-height 1.5 rem
+
+.blog-comment__content-collapsed
+  margin-left $aside-size + 16px
+  margin-right 0px
+  font-size $font-size-sm
+  color $body-color-secondary
+
+.blog-comment__m-deleted
+.blog-comment__m-hb
+.blog-comment__m-deleted-hard
+  background-color $deleted-bg
+
+.blog-comment__del-by-user
+  color inherit
+
+.blog-comment__m-deleted
+.blog-comment__m-deleted-hard
+  .blog-comment__undelete
+    display block
+
+  .blog-comment__edit
+  .blog-comment__delete
+  .blog-comment__reply
+  .blog-comment__votes
+  .blog-comment__vote-up
+  .blog-comment__vote-down
+  .blog-comment__bookmark
+    display none
 
 .blog-comment__controls
   text-align right

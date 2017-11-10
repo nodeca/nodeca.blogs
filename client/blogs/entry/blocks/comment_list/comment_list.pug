@@ -1,3 +1,5 @@
+- var commentStatuses = '$$ JSON.stringify(N.models.blogs.BlogComment.statuses) $$'
+
 - self.infractions = self.infractions || {};
 - self.own_votes = self.own_votes || {};
 - self.own_bookmarks = self.own_bookmarks || [];
@@ -6,182 +8,282 @@
 
 each comment in self.comments
   - var user = self.users[comment.user];
+  - var visible = [ commentStatuses.DELETED, commentStatuses.DELETED_HARD, commentStatuses.HB ].indexOf(comment.st) === -1;
+  - var collapsed = !self.expand && !visible;
 
-  .blog-comment(
-    id='comment' + comment.hid
-    class=(self.own_bookmarks.indexOf(comment._id) !== -1) ? 'blog-comment__m-bookmarked' : ''
-    class=(self.own_votes[comment._id] === -1) ? 'blog-comment__m-voted-down' : ''
-    class=(self.own_votes[comment._id] === +1) ? 'blog-comment__m-voted-up' : ''
-    class='blog-comment__level-' + comment.path.length
-    data-comment-hid=comment.hid
-    data-comment-id=comment._id
-  )
-    .blog-comment__aside
-      if user
-        a.blog-comment__author-link._ucard-popover(
-          href=self.link_to('users.member', { user_hid: user.hid })
-          data-user-id=entry.user
-          data-user-ref='blog_comment:'+user.hid+':'+entry.hid+':'+comment.hid
-        )
-          img.blog-comment__avatar(alt=user.name)&attributes(self.avatar(user, 'sm'))
-      else
-        .blog-comment__avatar.av-anon
+  if !collapsed
 
-    footer.blog-comment__head
-      if user
-        .blog-comment__author
+    .blog-comment(
+      id='comment' + comment.hid
+      class=(comment.st === commentStatuses.DELETED) ? 'blog-comment__m-deleted' : ''
+      class=(comment.st === commentStatuses.DELETED_HARD) ? 'blog-comment__m-deleted-hard' : ''
+      class=(self.own_bookmarks.indexOf(comment._id) !== -1) ? 'blog-comment__m-bookmarked' : ''
+      class=(self.own_votes[comment._id] === -1) ? 'blog-comment__m-voted-down' : ''
+      class=(self.own_votes[comment._id] === +1) ? 'blog-comment__m-voted-up' : ''
+      class='blog-comment__level-' + comment.path.length
+      data-comment-hid=comment.hid
+      data-comment-id=comment._id
+    )
+      .blog-comment__aside
+        if user
           a.blog-comment__author-link._ucard-popover(
             href=self.link_to('users.member', { user_hid: user.hid })
             data-user-id=entry.user
             data-user-ref='blog_comment:'+user.hid+':'+entry.hid+':'+comment.hid
           )
-            = user.name
+            img.blog-comment__avatar(alt=user.name)&attributes(self.avatar(user, 'sm'))
+        else
+          .blog-comment__avatar.av-anon
 
-      .blog-comment__meta
-        span.blog-comment__meta-item.blog-comment__ts!= self.timetag(comment.ts, 'relative')
-
-        if comment.edit_count
-          a.blog-comment__meta-item.blog-comment__history.icon.icon-history.icon-space-after(
-            href='#'
-            title=self.t('last_edited', { date: self.date(comment.last_edit_ts, 'datetime') })
-            data-on-click='blogs.entry:comment_history'
-            data-comment-id=comment._id
-          )= comment.edit_count
-
-    .blog-comment__content
-      .blog-comment__message.markup!= comment.html
-
-      - var tail = self.partial('@blogs.entry.attachments', { post: comment, user: user });
-      if tail
-        .forum-post__tail.markup-tail
-          !=tail
-
-    footer.blog-comment__controls
-      ul.blog-comment__controls-blk
-        - var infraction = self.infractions[comment._id];
-        if infraction
-          li.blog-comment__control-item.blog-comment__infraction(
-            class=infraction.points === 0 ? 'blog-comment__infraction-m-warning' : ''
-          )
-            a.btn.blog-comment__action(
-              title=self.t('infraction_title', { points: infraction.points, date: self.date(infraction.ts, 'datetime') })
-              href=self.link_to('users.member', { user_hid: user && user.hid }) + '#infraction' + infraction._id
+      footer.blog-comment__head
+        if user
+          .blog-comment__author
+            a.blog-comment__author-link._ucard-popover(
+              href=self.link_to('users.member', { user_hid: user.hid })
+              data-user-id=entry.user
+              data-user-ref='blog_comment:'+user.hid+':'+entry.hid+':'+comment.hid
             )
-              span.icon.icon-infraction
+              = user.name
 
-        if self.runtime.is_member && self.runtime.user_id !== comment.user
-          if self.settings.can_vote && (self.settings.votes_add_max_time === 0 || new Date(comment.ts).getTime() > Date.now() - self.settings.votes_add_max_time * 60 * 60 * 1000)
+        .blog-comment__meta
+          span.blog-comment__meta-item.blog-comment__ts!= self.timetag(comment.ts, 'relative')
 
-            li.blog-comment__control-item.blog-comment__vote-up
-              button.btn.blog-comment__action(
-                title=self.t('vote_up')
-                data-on-click='blogs.entry:comment_vote'
-                data-comment-hid=comment.hid
-                data-value=self.own_votes[comment._id] === 1 ? '0' : '1'
+          if comment.edit_count
+            a.blog-comment__meta-item.blog-comment__history.icon.icon-history.icon-space-after(
+              href='#'
+              title=self.t('last_edited', { date: self.date(comment.last_edit_ts, 'datetime') })
+              data-on-click='blogs.entry:comment_history'
+              data-comment-id=comment._id
+            )= comment.edit_count
+
+      .blog-comment__content
+        .blog-comment__message.markup!= comment.html
+
+        - var tail = self.partial('@blogs.entry.attachments', { post: comment, user: user });
+        if tail
+          .forum-post__tail.markup-tail
+            !=tail
+
+      footer.blog-comment__controls
+        ul.blog-comment__controls-blk
+          - var infraction = self.infractions[comment._id];
+          if infraction
+            li.blog-comment__control-item.blog-comment__infraction(
+              class=infraction.points === 0 ? 'blog-comment__infraction-m-warning' : ''
+            )
+              a.btn.blog-comment__action(
+                title=self.t('infraction_title', { points: infraction.points, date: self.date(infraction.ts, 'datetime') })
+                href=self.link_to('users.member', { user_hid: user && user.hid }) + '#infraction' + infraction._id
               )
-                span.icon.icon-vote-up
+                span.icon.icon-infraction
 
-            li.blog-comment__control-item.blog-comment__vote-down
-              button.btn.blog-comment__action(
-                title=self.t('vote_down')
-                data-on-click='blogs.entry:comment_vote'
-                data-comment-hid=comment.hid
-                data-value=self.own_votes[comment._id] === -1 ? '0' : '-1'
-              )
-                span.icon.icon-vote-down
+          if self.runtime.is_member && self.runtime.user_id !== comment.user
+            if self.settings.can_vote && (self.settings.votes_add_max_time === 0 || new Date(comment.ts).getTime() > Date.now() - self.settings.votes_add_max_time * 60 * 60 * 1000)
 
-        if self.settings.can_report_abuse
-          li.blog-comment__control-item
-            button.btn.blog-comment__action.blog-comment__report(title=self.t('report')
-              data-comment-id=comment._id
-              data-on-click='blogs.entry:comment_report'
-            )
-              span.icon.icon-report
-
-        if self.runtime.is_member
-          li.blog-comment__control-item.blog-comment__bookmark
-            button.btn.blog-comment__action.blog-comment__bookmark-add(
-              data-comment-hid=comment.hid
-              data-on-click='blogs.entry:comment_bookmark'
-              title=self.t('bookmark_add')
-            )
-              span.icon.icon-bookmark
-              span.blog-comment__bookmarks-count(data-bm-count=comment.bookmarks)
-
-            button.btn.blog-comment__action.blog-comment__bookmark-remove(
-              data-comment-hid=comment.hid
-              data-on-click='blogs.entry:comment_bookmark'
-              data-remove='true'
-              title=self.t('bookmark_remove')
-            )
-              span.icon.icon-bookmark
-              span.blog-comment__bookmarks-count(data-bm-count=comment.bookmarks)
-
-        if user && user._id === self.runtime.user_id && (self.settings.blogs_edit_comments_max_time === 0 || new Date(comment.ts).getTime() > Date.now() - self.settings.blogs_edit_comments_max_time * 60 * 1000)
-          li.blog-comment__control-item.blog-comment__edit
-            button.btn.blog-comment__action(
-              data-on-click='blogs.entry:comment_edit'
-              data-comment-hid=comment.hid
-              title=self.t('edit')
-            )
-              span.icon.icon-edit
-
-        if self.settings.blogs_can_create
-          li.blog-comment__control-item.blog-comment__reply
-            //- for wide screen
-            button.full.btn.blog-comment__action(
-              data-on-click='blogs.entry:reply'
-              data-comment-id=comment._id
-              data-comment-hid=comment.hid
-              data-comment-ts=comment.ts
-            )
-              span.icon.icon-reply.icon-space-after= self.t('reply')
-            //- for narrow screen
-            button.short.btn.blog-comment__action(
-              data-on-click='blogs.entry:reply'
-              data-comment-id=comment._id
-              data-comment-hid=comment.hid
-              data-comment-ts=comment.ts
-              title=self.t('reply')
-            )
-              span.icon.icon-reply
-
-        li.blog-comment__control-item.blog-comment__votes
-          - var votes = comment.votes || 0;
-          button.btn.blog-comment__action(
-            data-on-click='common.votes_popover'
-            data-votes-popover-placement='left'
-            data-votes-popover-for=comment._id
-            title=self.t('vote_details')
-            data-votes-count=(votes > 0 ? '+' : '') + votes
-          )
-
-        - var showDropdown = false
-        - showDropdown = showDropdown || self.settings.blogs_mod_can_delete
-        - showDropdown = showDropdown || self.settings.blogs_mod_can_add_infractions
-        - showDropdown = showDropdown || self.settings.can_see_ip
-
-        if showDropdown
-          //- no aria parts - visible to moderators only
-          .blog-comment__control-item.blog-comment__mod-menu.dropdown.dropup
-            button.btn.btn-square.blog-comment__action.dropdown-toggle(
-              data-toggle='dropdown'
-              role='button'
-            )
-            .dropdown-menu.dropdown-menu-right(role='menu')
-              if self.settings.blogs_mod_can_add_infractions
-                button.dropdown-item(
-                  type='button'
-                  data-on-click='blogs.entry:comment_add_infraction'
+              li.blog-comment__control-item.blog-comment__vote-up
+                button.btn.blog-comment__action(
+                  title=self.t('vote_up')
+                  data-on-click='blogs.entry:comment_vote'
                   data-comment-hid=comment.hid
-                )= self.t('add_infraction')
+                  data-value=self.own_votes[comment._id] === 1 ? '0' : '1'
+                )
+                  span.icon.icon-vote-up
 
-              if self.settings.can_see_ip
-                button.dropdown-item(
-                  data-comment-id=comment._id
-                  data-on-click='blogs.entry:comment_show_ip'
-                )= self.t('ip_info')
+              li.blog-comment__control-item.blog-comment__vote-down
+                button.btn.blog-comment__action(
+                  title=self.t('vote_down')
+                  data-on-click='blogs.entry:comment_vote'
+                  data-comment-hid=comment.hid
+                  data-value=self.own_votes[comment._id] === -1 ? '0' : '-1'
+                )
+                  span.icon.icon-vote-down
 
-              if self.settings.blogs_mod_can_delete
-                button.blog-comment__delete.dropdown-item= self.t('delete')
-                button.blog-comment__undelete.dropdown-item= self.t('undelete')
+          if self.settings.can_report_abuse
+            li.blog-comment__control-item
+              button.btn.blog-comment__action.blog-comment__report(title=self.t('report')
+                data-comment-id=comment._id
+                data-on-click='blogs.entry:comment_report'
+              )
+                span.icon.icon-report
+
+          if self.runtime.is_member
+            li.blog-comment__control-item.blog-comment__bookmark
+              button.btn.blog-comment__action.blog-comment__bookmark-add(
+                data-comment-hid=comment.hid
+                data-on-click='blogs.entry:comment_bookmark'
+                title=self.t('bookmark_add')
+              )
+                span.icon.icon-bookmark
+                span.blog-comment__bookmarks-count(data-bm-count=comment.bookmarks)
+
+              button.btn.blog-comment__action.blog-comment__bookmark-remove(
+                data-comment-hid=comment.hid
+                data-on-click='blogs.entry:comment_bookmark'
+                data-remove='true'
+                title=self.t('bookmark_remove')
+              )
+                span.icon.icon-bookmark
+                span.blog-comment__bookmarks-count(data-bm-count=comment.bookmarks)
+
+          if user && user._id === self.runtime.user_id && (self.settings.blogs_edit_comments_max_time === 0 || new Date(comment.ts).getTime() > Date.now() - self.settings.blogs_edit_comments_max_time * 60 * 1000)
+            li.blog-comment__control-item.blog-comment__edit
+              button.btn.blog-comment__action(
+                data-on-click='blogs.entry:comment_edit'
+                data-comment-hid=comment.hid
+                title=self.t('edit')
+              )
+                span.icon.icon-edit
+
+            //- allow blog owner to remove any comments
+            if self.runtime.is_member && self.runtime.user_id === entry.user
+              li.blog-comment__control-item.blog-comment__delete
+                button.btn.blog-comment__action.blog-comment__delete(
+                  data-on-click='blogs.entry:comment_delete'
+                  data-comment-hid=comment.hid
+                )
+                  span.icon.icon-x
+
+          if self.settings.blogs_can_create
+            li.blog-comment__control-item.blog-comment__reply
+              //- for wide screen
+              button.full.btn.blog-comment__action(
+                data-on-click='blogs.entry:reply'
+                data-comment-id=comment._id
+                data-comment-hid=comment.hid
+                data-comment-ts=comment.ts
+              )
+                span.icon.icon-reply.icon-space-after= self.t('reply')
+              //- for narrow screen
+              button.short.btn.blog-comment__action(
+                data-on-click='blogs.entry:reply'
+                data-comment-id=comment._id
+                data-comment-hid=comment.hid
+                data-comment-ts=comment.ts
+                title=self.t('reply')
+              )
+                span.icon.icon-reply
+
+          li.blog-comment__control-item.blog-comment__votes
+            - var votes = comment.votes || 0;
+            button.btn.blog-comment__action(
+              data-on-click='common.votes_popover'
+              data-votes-popover-placement='left'
+              data-votes-popover-for=comment._id
+              title=self.t('vote_details')
+              data-votes-count=(votes > 0 ? '+' : '') + votes
+            )
+
+          - var showDropdown = false
+          - showDropdown = showDropdown || self.settings.blogs_mod_can_delete
+          - showDropdown = showDropdown || self.settings.blogs_mod_can_add_infractions
+          - showDropdown = showDropdown || self.settings.can_see_ip
+
+          if showDropdown
+            //- no aria parts - visible to moderators only
+            .blog-comment__control-item.blog-comment__mod-menu.dropdown.dropup
+              button.btn.btn-square.blog-comment__action.dropdown-toggle(
+                data-toggle='dropdown'
+                role='button'
+              )
+              .dropdown-menu.dropdown-menu-right(role='menu')
+                if self.settings.blogs_mod_can_add_infractions
+                  button.dropdown-item(
+                    type='button'
+                    data-on-click='blogs.entry:comment_add_infraction'
+                    data-comment-hid=comment.hid
+                  )= self.t('add_infraction')
+
+                if self.settings.can_see_ip
+                  button.dropdown-item(
+                    data-comment-id=comment._id
+                    data-on-click='blogs.entry:comment_show_ip'
+                  )= self.t('ip_info')
+
+                if self.settings.blogs_mod_can_delete
+                  button.blog-comment__delete.dropdown-item(
+                    data-on-click='blogs.entry:comment_delete'
+                    data-comment-hid=comment.hid
+                    data-as-moderator='true'
+                  )= self.t('delete')
+
+                  button.blog-comment__undelete.dropdown-item(
+                    data-on-click='blogs.entry:comment_undelete'
+                    data-comment-hid=comment.hid
+                  )= self.t('undelete')
+
+  else
+
+    .blog-comment.blog-entry__m-collapsed(
+      id='comment' + comment.hid
+      class=(comment.st === commentStatuses.DELETED) ? 'blog-comment__m-deleted' : ''
+      class=(comment.st === commentStatuses.DELETED_HARD) ? 'blog-comment__m-deleted-hard' : ''
+      class=(self.own_bookmarks.indexOf(comment._id) !== -1) ? 'blog-comment__m-bookmarked' : ''
+      class=(self.own_votes[comment._id] === -1) ? 'blog-comment__m-voted-down' : ''
+      class=(self.own_votes[comment._id] === +1) ? 'blog-comment__m-voted-up' : ''
+      class='blog-comment__level-' + comment.path.length
+      data-comment-hid=comment.hid
+      data-comment-id=comment._id
+    )
+      .blog-comment__aside
+        if user
+          a.blog-comment__author-link._ucard-popover(
+            href=self.link_to('users.member', { user_hid: user.hid })
+            data-user-id=entry.user
+            data-user-ref='blog_comment:'+user.hid+':'+entry.hid+':'+comment.hid
+          )
+            img.blog-comment__avatar(alt=user.name)&attributes(self.avatar(user, 'sm'))
+        else
+          .blog-comment__avatar.av-anon
+
+      footer.blog-comment__head
+        if user
+          .blog-comment__author
+            a.blog-comment__author-link._ucard-popover(
+              href=self.link_to('users.member', { user_hid: user.hid })
+              data-user-id=entry.user
+              data-user-ref='blog_comment:'+user.hid+':'+entry.hid+':'+comment.hid
+            )
+              = user.name
+
+        .blog-comment__meta
+          span.blog-comment__meta-item.blog-comment__ts!= self.timetag(comment.ts, 'relative')
+
+          if comment.edit_count
+            a.blog-comment__meta-item.blog-comment__history.icon.icon-history.icon-space-after(
+              href='#'
+              title=self.t('last_edited', { date: self.date(comment.last_edit_ts, 'datetime') })
+              data-on-click='blogs.entry:comment_history'
+              data-comment-id=comment._id
+            )= comment.edit_count
+
+      .blog-comment__content-collapsed
+        case comment.st
+          when commentStatuses.DELETED
+            = self.t('del_comment_text')
+          when commentStatuses.DELETED_HARD
+            = self.t('del_hard_comment_text')
+          when commentStatuses.HB
+            = self.t('hb_comment_text')
+
+        if comment.del_reason
+          .blog-comment__del-reason=self.t('del_reason', { text: comment.del_reason })
+        if comment.del_by
+          .blog-comment__del-by
+            = self.t('del_by')
+            = ' '
+            - var delUser = self.users[comment.del_by] || {}
+            a.blog-comment__del-by-user._ucard-popover(
+              href=self.link_to('users.member', { user_hid: delUser.hid })
+              data-user-id=comment.del_by
+              data-user-ref='blog_comment:'+user.hid+':'+entry.hid+':'+comment.hid
+            )= delUser.name
+
+      footer.blog-comment__controls
+        ul.blog-comment__controls-blk
+          li.blog-entry__control-item
+            button.btn.blog-entry__action(
+              data-on-click='blogs.entry:comment_expand'
+              title=self.t('expand')
+              data-comment-id=comment._id
+            )
+              span.icon.icon-expand
