@@ -134,14 +134,14 @@ each comment in self.comments
               )
                 span.icon.icon-edit
 
-            //- allow blog owner to remove any comments
-            if self.runtime.is_member && self.runtime.user_id === entry.user
-              li.blog-comment__control-item.blog-comment__delete
-                button.btn.blog-comment__action.blog-comment__delete(
-                  data-on-click='blogs.entry:comment_delete'
-                  data-comment-hid=comment.hid
-                )
-                  span.icon.icon-x
+          //- allow blog owner to remove any comments
+          if self.runtime.is_member && self.runtime.user_id === entry.user
+            li.blog-comment__control-item.blog-comment__delete
+              button.btn.blog-comment__action.blog-comment__delete(
+                data-on-click='blogs.entry:comment_delete'
+                data-comment-hid=comment.hid
+              )
+                span.icon.icon-x
 
           if self.settings.blogs_can_create
             li.blog-comment__control-item.blog-comment__reply

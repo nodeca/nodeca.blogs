@@ -132,10 +132,11 @@ module.exports = function (N, apiPath) {
       let update = {
         $set: {
           st: env.params.method === 'hard' ? statuses.DELETED_HARD : statuses.DELETED,
-          prev_st: _.pick(comment, [ 'st', 'ste' ]),
+          // if comment is already deleted (i.e. DELETED -> DELETED_HARD), keep original prev_st
+          prev_st: comment.prev_st || _.pick(comment, [ 'st', 'ste' ]),
           del_by: env.user_info.user_id
         },
-        $unset: { ste: 1 }
+        $unset: { ste: 1, del_reason: 1 }
       };
 
       env.data.removed_comment_ids.push(comment._id);
@@ -156,6 +157,12 @@ module.exports = function (N, apiPath) {
       { $rename: { value: 'backup' } },
       { multi: true }
     );
+  });
+
+  // Update comment counters
+  //
+  N.wire.after(apiPath, function update_counters(env) {
+    return N.models.blogs.BlogEntry.updateCounters(env.data.entry._id);
   });
 
   // TODO: schedule search index update

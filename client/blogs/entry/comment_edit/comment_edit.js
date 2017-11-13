@@ -105,7 +105,10 @@ N.wire.on(module.apiPath + ':begin', function show_editor(data) {
       let $comment = $('#comment' + data.comment_hid);
 
       N.io.rpc('blogs.entry.comment.edit.update', params)
-        .then(() => N.io.rpc('blogs.entry.comment.get', { comment_id: $comment.data('comment-id') }))
+        .then(() => N.io.rpc('blogs.entry.comment.get', {
+          entry_hid: data.entry_hid,
+          comment_ids: [ $comment.data('comment-id') ]
+        }))
         .then(res => {
           N.MDEdit.hide();
 

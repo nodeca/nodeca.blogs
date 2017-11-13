@@ -179,7 +179,10 @@ N.wire.once('navigate.done:' + module.apiPath, function page_once() {
     let comment_id = data.$this.data('comment-id');
 
     return Promise.resolve()
-      .then(() => N.io.rpc('blogs.entry.comment.get', { comment_id }))
+      .then(() => N.io.rpc('blogs.entry.comment.get', {
+        entry_hid: pageState.entry_hid,
+        comment_ids: [ comment_id ]
+      }))
       .then(res => {
         let $result = $(N.runtime.render('blogs.entry.blocks.comment_list', _.assign(res, { expand: true })));
 
@@ -226,7 +229,10 @@ N.wire.once('navigate.done:' + module.apiPath, function page_once() {
     return Promise.resolve()
       .then(() => N.wire.emit('users.blocks.add_infraction_dlg', params))
       .then(() => N.io.rpc('blogs.entry.comment.add_infraction', params))
-      .then(() => N.io.rpc('blogs.entry.comment.get', { comment_id }))
+      .then(() => N.io.rpc('blogs.entry.comment.get', {
+        entry_hid: pageState.entry_hid,
+        comment_ids: [ comment_id ]
+      }))
       .then(res => {
         let $result = $(N.runtime.render('blogs.entry.blocks.comment_list', res));
 
@@ -311,7 +317,10 @@ N.wire.once('navigate.done:' + module.apiPath, function page_once() {
     let value      = +data.$this.data('value');
 
     return N.io.rpc('blogs.entry.comment.vote', { comment_id, value })
-      .then(() => N.io.rpc('blogs.entry.comment.get', { comment_id }))
+      .then(() => N.io.rpc('blogs.entry.comment.get', {
+        entry_hid: pageState.entry_hid,
+        comment_ids: [ comment_id ]
+      }))
       .then(res => {
         let $result = $(N.runtime.render('blogs.entry.blocks.comment_list', res));
 
@@ -374,8 +383,42 @@ N.wire.once('navigate.done:' + module.apiPath, function page_once() {
         if (params.reason) request.reason = params.reason;
         return N.io.rpc('blogs.entry.comment.destroy', request);
       })
-      // TODO
-      .then(() => N.wire.emit('navigate.reload'));
+      .then(res => {
+        let removed_ids = res.removed_comment_ids;
+
+        return N.io.rpc('blogs.entry.comment.get', {
+          entry_hid: pageState.entry_hid,
+          comment_ids: removed_ids
+        })
+          .then(res => {
+            let comment_counter = $('.blogs-entry-page__comment-count');
+            comment_counter.attr('data-count', comment_counter.attr('data-count') - removed_ids.length);
+
+            if (res.comments.length === 0) {
+              // for users who can't see deleted comments we just show hide animation
+              for (let id of removed_ids) {
+                let $comment = $(`.blog-comment[data-comment-id='${id}']`);
+                $comment.fadeOut(() => $comment.remove());
+              }
+              return;
+            }
+
+            let $result = $(N.runtime.render('blogs.entry.blocks.comment_list', res));
+
+            // remove all child comments then $replace main comment with the entire block
+            removed_ids.forEach(id => {
+              if (id === comment_id) return;
+              let $comment = $(`.blog-comment[data-comment-id='${id}']`);
+              $comment.remove();
+            });
+
+            return N.wire.emit('navigate.update', {
+              $: $result,
+              locals: res,
+              $replace: $comment
+            });
+          });
+      });
   });
 
 
@@ -411,8 +454,14 @@ N.wire.once('navigate.done:' + module.apiPath, function page_once() {
 
     return Promise.resolve()
       .then(() => N.io.rpc('blogs.entry.comment.undelete', { comment_id }))
-      .then(() => N.io.rpc('blogs.entry.comment.get', { comment_id }))
+      .then(() => N.io.rpc('blogs.entry.comment.get', {
+        entry_hid: pageState.entry_hid,
+        comment_ids: [ comment_id ]
+      }))
       .then(res => {
+        let comment_counter = $('.blogs-entry-page__comment-count');
+        comment_counter.attr('data-count', +comment_counter.attr('data-count') + 1);
+
         let $result = $(N.runtime.render('blogs.entry.blocks.comment_list', res));
 
         return N.wire.emit('navigate.update', {

@@ -45,7 +45,8 @@ article#content.blogs-entry-page(
     if self.comments && self.comments.length
       #comments.blogs-entry-page__comments
         .blogs-entry-page__comment-header
-          = self.t('comments', self.comments.length)
+          = self.t('comments')
+          span.blogs-entry-page__comment-count(data-count=self.comments.length)
 
         != self.partial('blocks.comment_list')
 

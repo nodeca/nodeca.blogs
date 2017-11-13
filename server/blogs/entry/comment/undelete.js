@@ -70,6 +70,23 @@ module.exports = function (N, apiPath) {
   });
 
 
+  // Prevent restoring a comment with removed parent
+  //
+  N.wire.before(apiPath, async function check_parent(env) {
+    if (!env.data.comment.path.length) return;
+
+    let parent_id = env.data.comment.path[env.data.comment.path.length - 1];
+    let parent = await N.models.blogs.BlogComment.findById(parent_id)
+                           .lean(true);
+
+    let statuses = N.models.blogs.BlogComment.statuses;
+
+    if (!parent || parent.st === statuses.DELETED || parent.st === statuses.DELETED_HARD) {
+      throw { code: N.io.CLIENT_ERROR, message: env.t('err_parent_deleted') };
+    }
+  });
+
+
   // Restore comment
   //
   N.wire.on(apiPath, function restore_comment(env) {
@@ -92,6 +109,13 @@ module.exports = function (N, apiPath) {
       { $rename: { backup: 'value' } },
       { multi: true }
     );
+  });
+
+
+  // Update comment counters
+  //
+  N.wire.after(apiPath, function update_counters(env) {
+    return N.models.blogs.BlogEntry.updateCounters(env.data.entry._id);
   });
 
   // TODO: schedule search index update

@@ -1,5 +1,5 @@
 en-US:
-  comments: "Comments (#{count}):"
+  comments: Comments
   add_comment: Add comment
 
   entry_undelete_done: Blog entry has been restored

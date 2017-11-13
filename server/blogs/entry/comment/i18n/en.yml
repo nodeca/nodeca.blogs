@@ -8,3 +8,6 @@ en-US:
   add_infraction:
     err_perm_receive: You can't add infractions to this user
     err_infraction_exists: Can't give infraction twice
+
+  undelete:
+    err_parent_deleted: Cannot restore a comment if its parent is deleted
