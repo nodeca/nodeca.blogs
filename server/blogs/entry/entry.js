@@ -12,9 +12,8 @@ const sanitize_tag     = require('nodeca.blogs/lib/sanitizers/blog_tag');
 module.exports = function (N, apiPath) {
 
   N.validate(apiPath, {
-    user_hid:    { type: 'integer', minimum: 1, required: true },
-    entry_hid:   { type: 'integer', minimum: 1, required: true },
-    comment_hid: { type: 'integer', minimum: 1 }
+    user_hid:  { type: 'integer', minimum: 1, required: true },
+    entry_hid: { type: 'integer', minimum: 1, required: true }
   });
 
 
