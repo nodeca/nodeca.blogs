@@ -6,9 +6,6 @@
 
 - var entryStatuses = '$$ JSON.stringify(N.models.blogs.BlogEntry.statuses) $$'
 
-//- show many operations checkbox
-- var many_ops_permitted = self.settings.blogs_mod_can_delete;
-
 - self.infractions = self.infractions || {};
 - self.own_bookmarks = self.own_bookmarks || [];
 
@@ -29,12 +26,6 @@ each entry in self.entries
       data-entry-hid=entry.hid
       data-entry-id=entry._id
     )
-      if many_ops_permitted
-        label.blog-entry__select(title=self.t('multiselect_hint'))
-          input.blog-entry__select-cb(
-            type='checkbox'
-          )
-
       header.blog-entry__head
         .blog-entry__title
           a.blog-entry__link(href=self.link_to('blogs.entry', { user_hid: user.hid, entry_hid: entry.hid }))
@@ -147,12 +138,6 @@ each entry in self.entries
       data-entry-hid=entry.hid
       data-entry-id=entry._id
     )
-      if many_ops_permitted
-        label.blog-entry__select(title=self.t('multiselect_hint'))
-          input.blog-entry__select-cb(
-            type='checkbox'
-          )
-
       header.blog-entry__head
         .blog-entry__title
           a.blog-entry__link(href=self.link_to('blogs.entry', { user_hid: user.hid, entry_hid: entry.hid }))

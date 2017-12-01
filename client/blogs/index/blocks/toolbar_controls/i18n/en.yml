@@ -1,7 +1,3 @@
 en-US:
   new_entry: New entry
   my_blog: My blog
-  many_header: "With #{count} ((entry|entries)):"
-  many_unselect: Clear selection
-  many_delete: Delete
-  many_undelete: Undelete
