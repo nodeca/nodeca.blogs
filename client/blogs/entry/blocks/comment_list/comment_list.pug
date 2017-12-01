@@ -59,10 +59,9 @@ each comment in self.comments
       .blog-comment__content
         .blog-comment__message.markup!= comment.html
 
-        - var tail = self.partial('@blogs.entry.attachments', { post: comment, user: user });
-        if tail
-          .forum-post__tail.markup-tail
-            !=tail
+        if comment.tail && comment.tail.length
+          .blog-comment__tail.markup-tail
+            != self.partial('@users.blocks.attachments', { message: comment })
 
       footer.blog-comment__controls
         ul.blog-comment__controls-blk
