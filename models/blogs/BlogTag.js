@@ -22,6 +22,9 @@ module.exports = function (N, collectionName) {
   // get tag by hid
   BlogTag.index({ hid: 1 });
 
+  // get tag by name
+  BlogTag.index({ name: 1 });
+
   // select categories for a user
   BlogTag.index({ user: 1, is_category: 1 });
 

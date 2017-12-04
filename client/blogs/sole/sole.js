@@ -489,6 +489,16 @@ N.wire.once('navigate.done:' + module.apiPath, function blogs_sole_init_handlers
   });
 
 
+  // Edit categories
+  //
+  N.wire.on(module.apiPath + ':edit_categories', function edit_categories() {
+    return Promise.resolve()
+      .then(() => N.wire.emit('blogs.sole.categories_edit'))
+      .then(() => N.wire.emit('notify.info', t('category_list_update_done')))
+      .then(() => N.wire.emit('navigate.reload'));
+  });
+
+
   // User presses "home" button
   //
   N.wire.on(module.apiPath + ':nav_to_start', function navigate_to_start() {

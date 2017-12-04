@@ -8,6 +8,9 @@ if self.settings.blogs_can_create
 if self.runtime.is_member && !self.current_tag
   - items.push('subscription')
 
+if self.user_id === self.runtime.user_id && !self.current_tag
+  - items.push('categories')
+
 - var show_menu = items.filter(function (item) { return item !== 'new_entry'; }).length > 0;
 
 
@@ -38,9 +41,16 @@ if self.runtime.is_member && !self.current_tag
             when 'new_entry'
               button.dropdown-item.d-sm-none(
                 type='button'
+                data-on-click='blogs.blocks.blog_entry.create:begin'
               )= self.t('new_entry')
 
             when 'subscription'
               button.dropdown-item(
                 type='button'
               )= self.t('subscription')
+
+            when 'categories'
+              button.dropdown-item(
+                type='button'
+                data-on-click='blogs.sole:edit_categories'
+              )= self.t('categories')

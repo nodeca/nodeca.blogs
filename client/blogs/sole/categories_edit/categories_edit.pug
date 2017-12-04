@@ -1,0 +1,16 @@
+.modal.fade(tabindex='-1' role='dialog' aria-hidden='true')
+  .modal-dialog(role='document')
+    .modal-content
+      form(data-on-submit=self.apiPath + ':submit')
+        .modal-header
+          h4.modal-title=self.t('title')
+          button.close(type='button' tabindex='-1' data-dismiss='modal') &times;
+
+        .modal-body
+          .form-group
+            textarea.form-control(name='categories')= self.categories.map(function (c) { return c.name }).join(', ')
+            small.form-text.text-muted= self.t('help')
+
+        .modal-footer
+          button.btn.btn-secondary(type='button' tabindex='6' data-dismiss='modal')=self.t('cancel')
+          button.btn.btn-danger(type='submit' tabindex='7')=self.t('ok')
