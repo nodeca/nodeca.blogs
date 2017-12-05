@@ -7,7 +7,7 @@ const _ = require('lodash');
 // Page state
 //
 // - user_hid:           hid of the user (blog owner)
-// - tag_hid:            hid of the selected tag
+// - tag:                selected tag (string)
 // - first_offset:       offset of the first entry in the DOM
 // - current_offset:     offset of the current entry (first in the viewport)
 // - reached_start:      true if no more pages exist above first loaded one
@@ -40,7 +40,7 @@ N.wire.on('navigate.done:' + module.apiPath, function page_setup(data) {
       last_entry_hid = $('.blogs-sole').data('last-entry-hid');
 
   pageState.user_hid           = data.params.user_hid;
-  pageState.tag_hid            = $('.blogs-sole').data('tag-hid');
+  pageState.tag                = $('.blogs-sole').data('tag');
   pageState.first_offset       = pagination.chunk_offset;
   pageState.current_offset     = -1;
   pageState.entry_count        = pagination.total;
@@ -135,7 +135,7 @@ N.wire.on('navigate.done:' + module.apiPath, function location_updater_init() {
     if (pageState.current_offset !== offset) {
       let $query = {};
 
-      if (pageState.tag_hid) $query.tag = pageState.tag_hid;
+      if (pageState.tag) $query.tag = pageState.tag;
 
       if (currentIdx >= 0) {
         $query.from = $(entries[currentIdx]).data('entry-hid');
@@ -146,7 +146,7 @@ N.wire.on('navigate.done:' + module.apiPath, function location_updater_init() {
         $query
       });
 
-      if ((pageState.current_offset >= 0) !== (offset >= 0)) {
+      if ((pageState.current_offset >= 0) !== (offset >= 0) && !pageState.tag) {
         $('meta[name="robots"]').remove();
 
         if (offset >= 0) {
@@ -309,7 +309,7 @@ N.wire.once('navigate.done:' + module.apiPath, function blogs_sole_init_handlers
 
     N.io.rpc('blogs.sole.list.by_range', {
       user_hid: pageState.user_hid,
-      tag_hid:  pageState.tag_hid,
+      tag:      pageState.tag,
       start:    last_entry_id,
       before:   LOAD_ENTRIES_COUNT,
       after:    0
@@ -408,7 +408,7 @@ N.wire.once('navigate.done:' + module.apiPath, function blogs_sole_init_handlers
 
     N.io.rpc('blogs.sole.list.by_range', {
       user_hid: pageState.user_hid,
-      tag_hid:  pageState.tag_hid,
+      tag:      pageState.tag,
       start:    last_entry_id,
       before:   0,
       after:    LOAD_ENTRIES_COUNT
@@ -489,16 +489,6 @@ N.wire.once('navigate.done:' + module.apiPath, function blogs_sole_init_handlers
   });
 
 
-  // Edit categories
-  //
-  N.wire.on(module.apiPath + ':edit_categories', function edit_categories() {
-    return Promise.resolve()
-      .then(() => N.wire.emit('blogs.sole.categories_edit'))
-      .then(() => N.wire.emit('notify.info', t('category_list_update_done')))
-      .then(() => N.wire.emit('navigate.reload'));
-  });
-
-
   // User presses "home" button
   //
   N.wire.on(module.apiPath + ':nav_to_start', function navigate_to_start() {
@@ -510,7 +500,7 @@ N.wire.once('navigate.done:' + module.apiPath, function blogs_sole_init_handlers
 
     let $query = {};
 
-    if (pageState.tag_hid) $query.tag = pageState.tag_hid;
+    if (pageState.tag) $query.tag = pageState.tag;
 
     return N.wire.emit('navigate.to', {
       apiPath: 'blogs.sole',
@@ -533,7 +523,7 @@ N.wire.once('navigate.done:' + module.apiPath, function blogs_sole_init_handlers
 
     let $query = { from: String($('.blogs-sole').data('last-entry-hid')) };
 
-    if (pageState.tag_hid) $query.tag = pageState.tag_hid;
+    if (pageState.tag) $query.tag = pageState.tag;
 
     return N.wire.emit('navigate.to', {
       apiPath: 'blogs.sole',

@@ -14,7 +14,7 @@ module.exports = function (N, apiPath) {
     $query: {
       type: 'object',
       properties: {
-        tag:  { type: 'string' }, // tag hid
+        tag:  { type: 'string' },
         from: { type: 'string' },
         prev: { 'enum': [ '' ] },
         next: { 'enum': [ '' ] }
@@ -35,8 +35,10 @@ module.exports = function (N, apiPath) {
       prev = typeof query.prev !== 'undefined';
       next = typeof query.next !== 'undefined';
 
+      let tag_not_found = env.data.current_tag_name && !env.data.current_tag;
+
       // get hid by id
-      if (query.from && _.isInteger(+query.from)) {
+      if (query.from && _.isInteger(+query.from) && !tag_not_found) {
         let q = N.models.blogs.BlogEntry.findOne();
 
         if (env.data.current_tag) {
@@ -100,16 +102,19 @@ module.exports = function (N, apiPath) {
   // Fetch current tag
   //
   N.wire.before(apiPath, async function fetch_current_tag(env) {
-    env.data.current_tag = null;
+    let normalized_tag = N.models.blogs.BlogTag.normalize(env.params.$query && env.params.$query.tag || '');
 
-    if (env.params.$query && env.params.$query.tag && _.isInteger(+env.params.$query.tag)) {
+    env.data.current_tag = null;
+    env.data.current_tag_name = normalized_tag;
+
+    if (normalized_tag) {
       env.data.current_tag = await N.models.blogs.BlogTag.findOne()
-                                       .where('hid').in(+env.params.$query.tag)
+                                       .where('name').equals(normalized_tag)
                                        .where('user').in(env.data.user._id)
                                        .lean(true);
     }
 
-    env.res.current_tag = env.data.current_tag && env.data.current_tag.hid || 0;
+    env.res.current_tag = normalized_tag;
   });
 
 
@@ -153,6 +158,16 @@ module.exports = function (N, apiPath) {
   // Fill pagination (progress)
   //
   N.wire.after(apiPath, async function fill_pagination(env) {
+    // tag not found
+    if (env.data.current_tag_name && !env.data.current_tag) {
+      env.res.pagination = {
+        total: 0,
+        per_page: await env.extras.settings.fetch('blog_entries_per_page'),
+        chunk_offset: 0
+      };
+      return;
+    }
+
     //
     // Count total amount of visible blog entries
     //
@@ -212,7 +227,9 @@ module.exports = function (N, apiPath) {
     env.res.head = env.res.head || {};
     env.res.head.title = env.t('title_with_user', { user: env.user_info.is_member ? user.name : user.nick });
 
-    if (env.params.$query && env.params.$query.from) {
+    if (env.data.current_tag_name) {
+      env.res.head.robots = 'noindex,nofollow';
+    } else if (env.params.$query && env.params.$query.from) {
       env.res.head.robots = 'noindex,follow';
     }
   });
@@ -237,9 +254,9 @@ module.exports = function (N, apiPath) {
       params:  { user_hid: user.hid }
     });
 
-    if (env.data.current_tag) {
+    if (env.data.current_tag_name) {
       env.data.breadcrumbs.push({
-        text: env.data.current_tag.name
+        text: env.data.current_tag_name
       });
     }
 
@@ -252,10 +269,12 @@ module.exports = function (N, apiPath) {
   N.wire.after(apiPath, async function fill_prev_next(env) {
     env.res.head = env.res.head || {};
 
+    let tag_not_found = env.data.current_tag_name && !env.data.current_tag;
+
     //
     // Fetch entry after last one, turn it into a link to the next page
     //
-    if (env.data.entries.length > 0) {
+    if (env.data.entries.length > 0 && !tag_not_found) {
       let last_entry_id = env.data.entries[0]._id;
 
       let query = N.models.blogs.BlogEntry.findOne();
@@ -286,7 +305,7 @@ module.exports = function (N, apiPath) {
     //
     // Fetch entry before first one, turn it into a link to the previous page
     //
-    if (env.data.entries.length > 0) {
+    if (env.data.entries.length > 0 && !tag_not_found) {
       let last_entry_id = env.data.entries[0]._id;
 
       let query = N.models.blogs.BlogEntry.findOne();
@@ -317,7 +336,7 @@ module.exports = function (N, apiPath) {
     //
     // Fetch last entry for the "move to bottom" button
     //
-    if (env.data.entries.length > 0) {
+    if (env.data.entries.length > 0 && !tag_not_found) {
       let query = N.models.blogs.BlogEntry.findOne();
 
       if (env.data.current_tag) {

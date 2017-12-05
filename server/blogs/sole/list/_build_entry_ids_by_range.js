@@ -6,6 +6,7 @@
 //
 // - env.data.user
 // - env.data.current_tag
+// - env.data.current_tag_name
 // - env.data.select_before
 // - env.data.select_after
 // - env.data.select_start
@@ -33,6 +34,9 @@ module.exports = function (N) {
     // first page, don't need to fetch anything
     if (!env.data.select_start) return [];
 
+    // tag not found
+    if (env.data.current_tag_name && !env.data.current_tag) return [];
+
     let query = N.models.blogs.BlogEntry.find();
 
     if (env.data.current_tag) {
@@ -56,6 +60,9 @@ module.exports = function (N) {
     let count = env.data.select_after;
 
     if (env.data.select_after <= 0) return [];
+
+    // tag not found
+    if (env.data.current_tag_name && !env.data.current_tag) return [];
 
     let query = N.models.blogs.BlogEntry.find();
 

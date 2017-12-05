@@ -38,8 +38,13 @@ N.wire.on(module.apiPath, function show_dialog() {
         if (!result) return reject('CANCELED');
 
         N.io.rpc('blogs.sole.categories_edit.update', {
-          categories: result.categories.split(',').map(s => s.trim())
-        }).then(resolve, reject);
+          categories: result.categories
+        }).then(res => {
+          let $result = $(N.runtime.render('blogs.blocks.tag_list', res));
+
+          $('.blogs-sole__meta .blogs-tag-list').replaceWith($result);
+        }).then(() => N.wire.emit('notify.info', t('category_list_update_done')))
+          .then(resolve, reject);
       })
       .modal('show');
   });

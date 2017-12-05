@@ -56,6 +56,11 @@ module.exports = function (N, collectionName) {
   });
 
 
+  BlogTag.statics.normalize = function (name) {
+    return name.trim().toLowerCase();
+  };
+
+
   N.wire.on('init:models', function emit_init_BlogTag() {
     return N.wire.emit('init:models.' + collectionName, BlogTag);
   });

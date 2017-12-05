@@ -1,14 +1,13 @@
 - self.users = self.users || {};
 - self.add_raw_data('pagination', self.pagination)
 - var user = self.users[self.user_id] || {};
-- var tag = self.current_tag && self.tags[self.current_tag] || {};
 
 article#content.blogs-sole(
   data-keymap= {
     'home': 'blogs.sole:nav_to_start',
     'end':  'blogs.sole:nav_to_end'
   }
-  data-tag-hid=        self.current_tag
+  data-tag=            self.current_tag
   data-last-entry-hid= self.last_entry_hid
   data-top-marker=     self.entries && self.entries.length > 0 ? self.entries[0]._id : null
   data-bottom-marker=  self.entries && self.entries.length > 0 ? self.entries[self.entries.length - 1]._id : null
@@ -25,7 +24,7 @@ article#content.blogs-sole(
 
     var navbar_args = {
       title_html: self.current_tag ?
-                  self.partial('@blogs.sole.blocks.title_tag', { user: user, tag: tag }) :
+                  self.partial('@blogs.sole.blocks.title_tag', { user: user, tag: self.current_tag }) :
                   self.partial('@blogs.sole.blocks.title_user', { user: user }),
       level_up: self.current_tag ?
                 self.link_to('blogs.sole', { user_hid: user.hid }) :
@@ -67,7 +66,7 @@ article#content.blogs-sole(
 
     header.page-head.blogs-sole__head
       if self.current_tag
-        h1.blogs-index__title.page-head__title(itemprop='name')= self.t('title_tag', { tag: tag.name })
+        h1.blogs-index__title.page-head__title(itemprop='name')= self.t('title_tag', { tag: self.current_tag })
       else
         a.blogs-sole__avatar(href=self.link_to('users.member', { user_hid: user.hid }))
           img.blogs-sole__userpic(alt=user.name)&attributes(self.avatar(user, 'sm'))
@@ -112,4 +111,4 @@ article#content.blogs-sole(
         if self.head.next
           a.btn.btn-secondary(href=self.head.next)= self.t('next_page')
     else
-      p!= self.t('no_entries')
+      p!= self.current_tag ? self.t('tag_no_entries') : self.t('user_no_entries')

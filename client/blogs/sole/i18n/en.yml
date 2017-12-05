@@ -1,8 +1,8 @@
 en-US:
   title_tag: 'Tag: #{tag}'
-  no_entries: This user has no blog entries.
+  user_no_entries: This user has no blog entries.
+  tag_no_entries: No blog entries have been found for this tag.
   next_page: Older
   prev_page: Newer
 
   search_entries: in blogs
-  category_list_update_done: Categories have been updated

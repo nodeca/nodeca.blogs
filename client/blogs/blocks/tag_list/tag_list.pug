@@ -31,4 +31,4 @@ if self.tag_hids.length
           class=tag.is_category ? 'blogs-tag-list__category' : ''
         )
           - var user = self.users && self.users[tag.user] || {};
-          a.blogs-tag-list__link(href=self.link_to('blogs.sole', { user_hid: user.hid, $query: { tag: tag.hid } }))= tag.name
+          a.blogs-tag-list__link(href=self.link_to('blogs.sole', { user_hid: user.hid, $query: { tag: tag.name } }))= tag.name

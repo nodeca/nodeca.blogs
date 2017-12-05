@@ -8,12 +8,7 @@ const _ = require('lodash');
 module.exports = function (N, apiPath) {
 
   N.validate(apiPath, {
-    categories: {
-      type: 'array',
-      required: true,
-      uniqueItems: true,
-      items: { type: 'string', required: true }
-    }
+    categories: { type: 'string', required: 'true' }
   });
 
 
@@ -36,6 +31,8 @@ module.exports = function (N, apiPath) {
   // Update categories
   //
   N.wire.on(apiPath, async function update_categories(env) {
+    let categories = _.uniq(env.params.categories.split(',').map(N.models.blogs.BlogTag.normalize));
+
     let existing_tags = await N.models.blogs.BlogTag.find()
                                   .where('user').equals(env.user_info.user_id)
                                   .lean(true);
@@ -48,7 +45,7 @@ module.exports = function (N, apiPath) {
       { multi: true }
     );
 
-    for (let title of env.params.categories) {
+    for (let title of categories) {
       title = title.trim().toLowerCase().replace(/\s+/, ' ').replace(/^\s+|\s+$/g, '');
 
       let existing_tag = existing_tags_by_name[title];
@@ -66,5 +63,24 @@ module.exports = function (N, apiPath) {
         });
       }
     }
+  });
+
+
+  // Fetch data to refresh tag list
+  //
+  N.wire.after(apiPath, async function fetch_categories(env) {
+    let categories = await N.models.blogs.BlogTag.find()
+                               .where('user').in(env.user_info.user_id)
+                               .where('is_category').equals(true)
+                               .sort('hid')
+                               .lean(true);
+
+    env.res.tag_hids = _.map(categories, 'hid');
+    env.res.tags = _.keyBy(categories.map(tag => _.pick(tag, [
+      '_id', 'hid', 'user', 'name', 'is_category'
+    ])), 'hid');
+
+    env.data.users = env.data.users || [];
+    env.data.users.push(env.user_info.user_id);
   });
 };

@@ -12,7 +12,7 @@ module.exports = function (N, apiPath) {
 
   N.validate(apiPath, {
     user_hid: { type: 'integer', minimum: 1, required: true },
-    tag_hid:  { type: 'integer', required: true }, // could be 0 (no tag)
+    tag:      { type: 'string' },
     start:    { format: 'mongo', required: true },
     before:   { type: 'integer', minimum: 0, maximum: LIMIT, required: true },
     after:    { type: 'integer', minimum: 0, maximum: LIMIT, required: true }
@@ -44,19 +44,19 @@ module.exports = function (N, apiPath) {
   // Fetch current tag
   //
   N.wire.before(apiPath, async function fetch_current_tag(env) {
-    if (env.params.tag_hid) {
+    let normalized_tag = N.models.blogs.BlogTag.normalize(env.params.$query && env.params.$query.tag || '');
+
+    env.data.current_tag = null;
+    env.data.current_tag_name = normalized_tag;
+
+    if (normalized_tag) {
       env.data.current_tag = await N.models.blogs.BlogTag.findOne()
-                                       .where('hid').in(env.params.tag_hid)
+                                       .where('name').equals(normalized_tag)
                                        .where('user').in(env.data.user._id)
                                        .lean(true);
-
-      if (!env.data.current_tag) {
-        // This can only happen if tag existed when a page was loaded,
-        // but deleted before prefetch occured. No more results would be
-        // shown in this case.
-        env.data.current_tag = { hid: 0 };
-      }
     }
+
+    env.res.current_tag = normalized_tag;
   });
 
 
@@ -99,10 +99,12 @@ module.exports = function (N, apiPath) {
   N.wire.after(apiPath, async function fill_prev_next(env) {
     env.res.head = env.res.head || {};
 
+    let tag_not_found = env.data.current_tag_name && !env.data.current_tag;
+
     //
     // Fetch entry after last one, turn it into a link to the next page
     //
-    if (env.params.after > 0 && env.data.entries.length > 0) {
+    if (env.params.after > 0 && env.data.entries.length > 0 && !tag_not_found) {
       let last_entry_id = env.data.entries[0]._id;
 
       let query = N.models.blogs.BlogEntry.findOne();
@@ -133,7 +135,7 @@ module.exports = function (N, apiPath) {
     //
     // Fetch entry before first one, turn it into a link to the previous page
     //
-    if (env.params.before > 0 && env.data.entries.length > 0) {
+    if (env.params.before > 0 && env.data.entries.length > 0 && !tag_not_found) {
       let last_entry_id = env.data.entries[0]._id;
 
       let query = N.models.blogs.BlogEntry.findOne();
@@ -166,6 +168,16 @@ module.exports = function (N, apiPath) {
   // Fill pagination (progress)
   //
   N.wire.after(apiPath, async function fill_pagination(env) {
+    // tag not found
+    if (env.data.current_tag_name && !env.data.current_tag) {
+      env.res.pagination = {
+        total: 0,
+        per_page: await env.extras.settings.fetch('blog_entries_per_page'),
+        chunk_offset: 0
+      };
+      return;
+    }
+
     //
     // Count total amount of visible blog entries
     //
