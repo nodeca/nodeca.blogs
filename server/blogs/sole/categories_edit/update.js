@@ -33,11 +33,11 @@ module.exports = function (N, apiPath) {
   N.wire.on(apiPath, async function update_categories(env) {
     let categories = _.uniq(env.params.categories.split(',').map(N.models.blogs.BlogTag.normalize));
 
-    let existing_tags = await N.models.blogs.BlogTag.find()
-                                  .where('user').equals(env.user_info.user_id)
-                                  .lean(true);
+    let store = N.settings.getStore('user');
 
-    let existing_tags_by_name = _.keyBy(existing_tags, 'name');
+    await store.set({
+      blogs_categories: { value: categories.join(',') }
+    }, { user_id: env.user_info.user_id });
 
     await N.models.blogs.BlogTag.update(
       { user: env.user_info.user_id },
@@ -45,42 +45,10 @@ module.exports = function (N, apiPath) {
       { multi: true }
     );
 
-    for (let title of categories) {
-      title = title.trim().toLowerCase().replace(/\s+/, ' ').replace(/^\s+|\s+$/g, '');
-
-      let existing_tag = existing_tags_by_name[title];
-
-      if (existing_tag) {
-        await N.models.blogs.BlogTag.update(
-          { _id: existing_tag._id },
-          { is_category: true }
-        );
-      } else {
-        await N.models.blogs.BlogTag.create({
-          name: title,
-          user: env.user_info.user_id,
-          is_category: true
-        });
-      }
-    }
-  });
-
-
-  // Fetch data to refresh tag list
-  //
-  N.wire.after(apiPath, async function fetch_categories(env) {
-    let categories = await N.models.blogs.BlogTag.find()
-                               .where('user').in(env.user_info.user_id)
-                               .where('is_category').equals(true)
-                               .sort('hid')
-                               .lean(true);
-
-    env.res.tag_hids = _.map(categories, 'hid');
-    env.res.tags = _.keyBy(categories.map(tag => _.pick(tag, [
-      '_id', 'hid', 'user', 'name', 'is_category'
-    ])), 'hid');
-
-    env.data.users = env.data.users || [];
-    env.data.users.push(env.user_info.user_id);
+    await N.models.blogs.BlogTag.update(
+      { user: env.user_info.user_id, name: { $in: categories } },
+      { $set: { is_category: true } },
+      { multi: true }
+    );
   });
 };

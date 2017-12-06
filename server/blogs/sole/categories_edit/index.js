@@ -27,10 +27,9 @@ module.exports = function (N, apiPath) {
   // Fill category data
   //
   N.wire.on(apiPath, async function fill_data(env) {
-    env.res.categories = await N.models.blogs.BlogTag.find()
-                                   .where('user').equals(env.user_info.user_id)
-                                   .where('is_category').equals(true)
-                                   .sort('hid')
-                                   .lean(true);
+    let store = N.settings.getStore('user');
+    let { value } = await store.get('blogs_categories', { user_id: env.user_info.user_id });
+
+    env.res.categories = value.replace(/,/g, ', ');
   });
 };

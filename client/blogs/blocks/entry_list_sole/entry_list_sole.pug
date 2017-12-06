@@ -124,7 +124,7 @@ each entry in self.entries
                     data-entry-hid=entry.hid
                   )= self.t('undelete')
 
-      != self.partial('@blogs.blocks.tag_list', { tag_hids: entry.tag_hids })
+      != self.partial('@blogs.blocks.tag_list', { tags: self.entry_tags[entry._id] })
 
   else
 

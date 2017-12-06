@@ -1,32 +1,9 @@
--
-  // filter out nonexistent tags
-  self.tag_hids = self.tag_hids.filter(function (hid) {
-    return self.tags && self.tags[hid];
-  });
-
-if self.tag_hids.length
+if self.tags.length
   .blogs-tag-list
     = self.t('tags')
 
-    -
-      var tag_priority = {};
-
-      self.tag_hids.forEach(function (hid, i) {
-        tag_priority[hid] = i;
-      });
-
-      // sort tags in the order they appeared in the array (categories first)
-      var tags = self.tag_hids.map(function (hid) {
-        return self.tags && self.tags[hid];
-      }).sort(function (t1, t2) {
-        if (t1.is_category && !t2.is_category) return -1;
-        if (t2.is_category && !t1.is_category) return 1;
-
-        return tag_priority[t1.hid] - tag_priority[t2.hid];
-      });
-
     ul.blogs-tag-list__list
-      each tag in tags
+      each tag in self.tags
         li.blogs-tag-list__item(
           class=tag.is_category ? 'blogs-tag-list__category' : ''
         )

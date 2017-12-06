@@ -152,4 +152,4 @@
       li.blog-entry__control-item
         span.icon.icon-views.icon-space-after= entry.views
 
-  != self.partial('@blogs.blocks.tag_list', { tag_hids: entry.tag_hids })
+  != self.partial('@blogs.blocks.tag_list', { tags: self.entry_tags })

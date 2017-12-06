@@ -14,6 +14,7 @@ let result;
 //
 N.wire.before(module.apiPath, function fetch_categories() {
   return N.io.rpc('blogs.sole.categories_edit.index').then(res => {
+    result = null;
     categories = res;
   });
 });
@@ -39,11 +40,10 @@ N.wire.on(module.apiPath, function show_dialog() {
 
         N.io.rpc('blogs.sole.categories_edit.update', {
           categories: result.categories
-        }).then(res => {
-          let $result = $(N.runtime.render('blogs.blocks.tag_list', res));
-
-          $('.blogs-sole__meta .blogs-tag-list').replaceWith($result);
         }).then(() => N.wire.emit('notify.info', t('category_list_update_done')))
+          // we need to update tags in the header and tags in all blog posts,
+          // so full reload is necessary there
+          .then(() => N.wire.emit('navigate.reload'))
           .then(resolve, reject);
       })
       .modal('show');

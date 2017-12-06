@@ -3,6 +3,7 @@
 'use strict';
 
 
+const _         = require('lodash');
 const charlatan = require('charlatan');
 const ObjectId  = require('mongoose').Types.ObjectId;
 
@@ -42,18 +43,36 @@ async function createDemoUsers() {
 
 
 async function createTags() {
+  let store = settings.getStore('user');
+
   for (let user of users) {
     tags_by_user[user._id] = [];
 
+    let tag_names = [];
+
     for (let i = charlatan.Helpers.rand(MAX_TAG_COUNT); i > 0; i--) {
-      let tag = await new models.blogs.BlogTag({
-        name:        charlatan.Lorem.word(),
+      tag_names.push(charlatan.Lorem.word());
+    }
+
+    let categories = [];
+
+    for (let tag_name of _.uniq(tag_names)) {
+      let tag = await models.blogs.BlogTag.create({
+        name:        tag_name,
         user:        user._id,
         is_category: !charlatan.Helpers.rand(3) // 1/3 of tags are categories
-      }).save();
+      });
 
       tags_by_user[user._id].push(tag);
+
+      if (tag.is_category) {
+        categories.push(tag.name);
+      }
     }
+
+    await store.set({
+      blogs_categories: { value: charlatan.Helpers.shuffle(categories).join(',') }
+    }, { user_id: user._id });
   }
 }
 

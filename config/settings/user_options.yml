@@ -1,0 +1,6 @@
+setting_schemas:
+  user:
+    blogs_categories:
+      hidden: true
+      type: string
+      default: ''

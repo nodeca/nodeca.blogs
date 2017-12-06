@@ -84,21 +84,6 @@ module.exports = function (N, apiPath) {
   });
 
 
-  // Fetch all categories for this user
-  //
-  N.wire.before(apiPath, async function fetch_categories(env) {
-    let categories = await N.models.blogs.BlogTag.find()
-                               .where('user').in(env.data.user._id)
-                               .where('is_category').equals(true)
-                               .sort('hid')
-                               .lean(true);
-
-    env.data.categories = categories;
-
-    env.res.category_hids = _.map(env.data.categories, 'hid');
-  });
-
-
   // Fetch current tag
   //
   N.wire.before(apiPath, async function fetch_current_tag(env) {
@@ -144,14 +129,44 @@ module.exports = function (N, apiPath) {
       }
     }
 
-    let tags = await N.models.blogs.BlogTag.find()
-                         .where('hid').in(Array.from(tagset.values()))
-                         .limit(20)
-                         .lean(true);
+    let tags_by_hid = _.keyBy(
+      await N.models.blogs.BlogTag.find()
+                .where('hid').in(Array.from(tagset.values()))
+                .lean(true),
+      'hid'
+    );
 
-    env.res.tags = _.keyBy(tags.concat(env.data.categories).map(tag => _.pick(tag, [
-      '_id', 'hid', 'user', 'name', 'is_category'
-    ])), 'hid');
+    env.res.entry_tags = {};
+
+    for (let entry of env.data.entries) {
+      let tags = (entry.tag_hids || [])
+                   .map((hid, idx) => [ tags_by_hid[hid], idx ])
+                   .filter(([ tag ]) => !!tag)
+                   .sort(([ t1, idx1 ], [ t2, idx2 ]) => {
+                     // move categories before all other tags
+                     if (t1.is_category && !t2.is_category) return -1;
+                     if (t2.is_category && !t1.is_category) return 1;
+                     return idx1 - idx2;
+                   })
+                   .map(([ tag ]) => _.pick(tag, [ 'user', 'name', 'is_category' ]));
+
+      env.res.entry_tags[entry._id] = tags;
+    }
+  });
+
+
+  // Fetch categories
+  //
+  N.wire.after(apiPath, async function fetch_categories(env) {
+    let store = N.settings.getStore('user');
+    let { value } = await store.get('blogs_categories', { user_id: env.data.user._id });
+    let names = value.split(',');
+
+    env.res.categories = names.map(name => ({
+      name,
+      user: env.data.user._id,
+      is_category: true
+    }));
   });
 
 

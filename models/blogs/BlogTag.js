@@ -20,13 +20,11 @@ module.exports = function (N, collectionName) {
   /////////////////////////////////////////////////////////////////////////////
 
   // get tag by hid
-  BlogTag.index({ hid: 1 });
+  //BlogTag.index({ hid: 1 });
 
-  // get tag by name
-  BlogTag.index({ name: 1 });
-
-  // select categories for a user
-  BlogTag.index({ user: 1, is_category: 1 });
+  // - select categories for a user
+  // - find category by name
+  BlogTag.index({ user: 1, name: 1 });
 
 
   // Set 'hid' for the new tag.

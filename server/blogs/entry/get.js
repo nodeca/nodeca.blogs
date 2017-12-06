@@ -6,7 +6,6 @@
 
 const _                = require('lodash');
 const sanitize_entry   = require('nodeca.blogs/lib/sanitizers/blog_entry');
-const sanitize_tag     = require('nodeca.blogs/lib/sanitizers/blog_tag');
 
 
 module.exports = function (N, apiPath) {
@@ -62,13 +61,29 @@ module.exports = function (N, apiPath) {
   //
   N.wire.before(apiPath, async function fetch_tags(env) {
     if (!env.data.entry.tag_hids || !env.data.entry.tag_hids.length) {
-      env.data.tags = [];
+      env.res.entry_tags = [];
       return;
     }
 
-    env.data.tags = await N.models.blogs.BlogTag.find()
-                             .where('hid').in(env.data.entry.tag_hids)
-                             .lean(true);
+    let tags_by_hid = _.keyBy(
+      await N.models.blogs.BlogTag.find()
+                .where('hid').in(env.data.entry.tag_hids)
+                .lean(true),
+      'hid'
+    );
+
+    let tags = (env.data.entry.tag_hids || [])
+                 .map((hid, idx) => [ tags_by_hid[hid], idx ])
+                 .filter(([ tag ]) => !!tag)
+                 .sort(([ t1, idx1 ], [ t2, idx2 ]) => {
+                   // move categories before all other tags
+                   if (t1.is_category && !t2.is_category) return -1;
+                   if (t2.is_category && !t1.is_category) return 1;
+                   return idx1 - idx2;
+                 })
+                 .map(([ tag ]) => _.pick(tag, [ 'user', 'name', 'is_category' ]));
+
+    env.res.entry_tags = tags;
   });
 
 
@@ -85,7 +100,6 @@ module.exports = function (N, apiPath) {
     }
 
     env.res.entry    = await sanitize_entry(N, env.data.entry, env.user_info);
-    env.res.tags     = _.keyBy(await sanitize_tag(N, env.data.tags, env.user_info), 'hid');
   });
 
 

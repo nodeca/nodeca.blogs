@@ -76,7 +76,7 @@ article#content.blogs-sole(
             href=self.link_to('users.member', { user_hid: user.hid })
           )= user.name
 
-          != self.partial('@blogs.blocks.tag_list', { tag_hids: self.category_hids })
+          != self.partial('@blogs.blocks.tag_list', { tags: self.categories })
 
       != self.partial('@blogs.sole.blocks.toolbar_controls')
 
