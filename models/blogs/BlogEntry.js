@@ -39,7 +39,7 @@ module.exports = function (N, collectionName) {
     ste:          Number, // real state if user is hellbanned
     ip:           String,
     tag_hids:     [ Number ],
-    tag_source:   String,
+    tags:         [ String ],
     ts:           { type: Date, 'default': Date.now },
     comments:     { type: Number, 'default': 0 },
     comments_hb:  { type: Number, 'default': 0 },

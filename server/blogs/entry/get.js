@@ -65,23 +65,32 @@ module.exports = function (N, apiPath) {
       return;
     }
 
-    let tags_by_hid = _.keyBy(
+    // db query is only used to check if this tag is a category
+    let tags_by_name = _.keyBy(
       await N.models.blogs.BlogTag.find()
                 .where('hid').in(env.data.entry.tag_hids)
                 .lean(true),
-      'hid'
+      'name_lc'
     );
 
-    let tags = (env.data.entry.tag_hids || [])
-                 .map((hid, idx) => [ tags_by_hid[hid], idx ])
-                 .filter(([ tag ]) => !!tag)
-                 .sort(([ t1, idx1 ], [ t2, idx2 ]) => {
+    let tags = (env.data.entry.tags || [])
+                 .map((name, idx) => {
+                   let name_lc = N.models.blogs.BlogTag.normalize(name);
+                   return [ name, tags_by_name[name_lc] && tags_by_name[name_lc].is_category, idx ];
+                 })
+                 /* eslint-disable no-unused-vars */
+                 .sort(([ t1, cat1, idx1 ], [ t2, cat2, idx2 ]) => {
+                 /* eslint-enable no-unused-vars */
                    // move categories before all other tags
-                   if (t1.is_category && !t2.is_category) return -1;
-                   if (t2.is_category && !t1.is_category) return 1;
+                   if (cat1 && !cat2) return -1;
+                   if (cat2 && !cat1) return 1;
                    return idx1 - idx2;
                  })
-                 .map(([ tag ]) => _.pick(tag, [ 'user', 'name', 'is_category' ]));
+                 .map(([ name, cat ]) => ({
+                   name,
+                   user: env.data.user._id,
+                   is_category: cat
+                 }));
 
     env.res.entry_tags = tags;
   });

@@ -30,6 +30,10 @@ module.exports = function (N, apiPath) {
     let store = N.settings.getStore('user');
     let { value } = await store.get('blogs_categories', { user_id: env.user_info.user_id });
 
-    env.res.categories = value.replace(/,/g, ', ');
+    try {
+      env.res.categories = JSON.parse(value);
+    } catch (__) {
+      env.res.categories = [];
+    }
   });
 };

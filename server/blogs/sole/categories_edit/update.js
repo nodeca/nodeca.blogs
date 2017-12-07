@@ -31,12 +31,15 @@ module.exports = function (N, apiPath) {
   // Update categories
   //
   N.wire.on(apiPath, async function update_categories(env) {
-    let categories = _.uniq(env.params.categories.split(',').map(N.models.blogs.BlogTag.normalize));
+    let categories = _.uniqBy(
+      env.params.categories.split(',').map(s => s.trim()),
+      N.models.blogs.BlogTag.normalize
+    );
 
     let store = N.settings.getStore('user');
 
     await store.set({
-      blogs_categories: { value: categories.join(',') }
+      blogs_categories: { value: JSON.stringify(categories) }
     }, { user_id: env.user_info.user_id });
 
     await N.models.blogs.BlogTag.update(
@@ -46,7 +49,7 @@ module.exports = function (N, apiPath) {
     );
 
     await N.models.blogs.BlogTag.update(
-      { user: env.user_info.user_id, name: { $in: categories } },
+      { user: env.user_info.user_id, name_lc: { $in: categories.map(N.models.blogs.BlogTag.normalize) } },
       { $set: { is_category: true } },
       { multi: true }
     );

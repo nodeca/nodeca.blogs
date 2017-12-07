@@ -9,7 +9,7 @@ module.exports = function (N, collectionName) {
 
   let BlogTag = new Schema({
     hid:         Number,
-    name:        String,
+    name_lc:     String,
     user:        Schema.ObjectId,
     is_category: Boolean
   }, {
@@ -24,7 +24,7 @@ module.exports = function (N, collectionName) {
 
   // - select categories for a user
   // - find category by name
-  BlogTag.index({ user: 1, name: 1 });
+  BlogTag.index({ user: 1, name_lc: 1 });
 
 
   // Set 'hid' for the new tag.
@@ -55,7 +55,7 @@ module.exports = function (N, collectionName) {
 
 
   BlogTag.statics.normalize = function (name) {
-    return name.trim().toLowerCase();
+    return name.replace(/\s+/g, ' ').trim().toLowerCase();
   };
 
 

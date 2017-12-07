@@ -58,7 +58,7 @@ async function createTags() {
 
     for (let tag_name of _.uniq(tag_names)) {
       let tag = await models.blogs.BlogTag.create({
-        name:        tag_name,
+        name_lc:     tag_name,
         user:        user._id,
         is_category: !charlatan.Helpers.rand(3) // 1/3 of tags are categories
       });
@@ -66,12 +66,14 @@ async function createTags() {
       tags_by_user[user._id].push(tag);
 
       if (tag.is_category) {
-        categories.push(tag.name);
+        categories.push(tag.name_lc);
       }
     }
 
     await store.set({
-      blogs_categories: { value: charlatan.Helpers.shuffle(categories).join(',') }
+      blogs_categories: {
+        value: JSON.stringify(charlatan.Helpers.shuffle(categories))
+      }
     }, { user_id: user._id });
   }
 }
@@ -190,7 +192,7 @@ async function createEntries() {
       comments:    comment_count,
       comments_hb: comment_count,
       tag_hids:    tags.map(tag => tag.hid),
-      tag_source:  tags.map(tag => tag.name).join(', '),
+      tags:        tags.map(tag => tag.name_lc),
       last_comment_counter: comment_count
     });
 

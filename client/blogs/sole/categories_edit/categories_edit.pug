@@ -8,7 +8,7 @@
 
         .modal-body
           .form-group
-            textarea.form-control(name='categories')= self.categories
+            textarea.form-control(name='categories')= self.categories.join(', ')
             small.form-text.text-muted= self.t('help')
 
         .modal-footer
