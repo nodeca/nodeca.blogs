@@ -13,6 +13,7 @@
   class=(self.own_bookmarks.indexOf(entry._id) !== -1) ? 'blog-entry__m-bookmarked' : ''
   class=(self.own_votes[entry._id] === -1) ? 'blog-entry__m-voted-down' : ''
   class=(self.own_votes[entry._id] === +1) ? 'blog-entry__m-voted-up' : ''
+  data-user-hid=user.hid
   data-entry-hid=entry.hid
   data-entry-id=entry._id
 )

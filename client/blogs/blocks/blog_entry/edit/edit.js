@@ -67,6 +67,12 @@ N.wire.before(module.apiPath + ':begin', function fetch_options(data) {
 // Show editor and add handlers for editor events
 //
 N.wire.on(module.apiPath + ':begin', function show_editor(data) {
+  let resolve, reject;
+  let promise = new Promise((_resolve, _reject) => {
+    resolve = _resolve;
+    reject = _reject;
+  });
+
   let $editor = N.MDEdit.show({
     text: entry.md,
     attachments: entry.attachments
@@ -101,28 +107,24 @@ N.wire.on(module.apiPath + ':begin', function show_editor(data) {
         option_no_quote_collapse: options.user_settings.no_quote_collapse
       };
 
-      let $entry = $('#entry' + data.entry_hid);
-
       N.io.rpc('blogs.entry.edit.update', params)
-        .then(() => N.io.rpc('blogs.entry.get', { entry_id: $entry.data('entry-id') }))
-        .then(res => {
+        .then(() => {
           N.MDEdit.hide();
-
-          let $result = $(N.runtime.render('blogs.entry.blocks.entry', res));
-
-          return N.wire.emit('navigate.update', {
-            $: $result,
-            locals: res,
-            $replace: $entry
-          });
-        })
-        .catch(err => {
+          resolve();
+        }, err => {
           $editor.find('.mdedit-btn__submit').removeClass('disabled');
-          N.wire.emit('error', err);
+          reject(err);
         });
 
       return false;
+    })
+    .on('hidden.nd.mdedit', () => {
+      // always called when editor is hidden; on submit it first calls resolve
+      // and then reject is called which is doing nothing
+      reject('CANCELED');
     });
+
+  return promise;
 });
 
 

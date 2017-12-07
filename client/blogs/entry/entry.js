@@ -252,11 +252,21 @@ N.wire.once('navigate.done:' + module.apiPath, function page_once() {
     let entry_id  = $entry.data('entry-id');
 
     return N.wire.emit('blogs.blocks.blog_entry.edit:begin', {
-      user_hid:    pageState.user_hid,
-      entry_hid:   pageState.entry_hid,
-      entry_title: N.runtime.page_data.entry.title,
+      user_hid:    $entry.data('user-hid'),
+      entry_hid:   $entry.data('entry-hid'),
+      entry_title: $entry.find('.blog-entry__title').text(),
       entry_id
-    });
+    }).then(() => N.io.rpc('blogs.entry.get', { entry_id }))
+      .then(res => {
+        let $result = $(N.runtime.render('blogs.entry.blocks.entry', res));
+
+        return N.wire.emit('navigate.update', {
+          $: $result,
+          locals: res,
+          $replace: $entry
+        });
+      })
+      .catch(err => N.wire.emit('error', err));
   });
 
 

@@ -51,6 +51,30 @@ N.wire.once(module.apiPath, function entry_list_sole_setup_handlers() {
   });
 
 
+  // Edit entry handler
+  //
+  N.wire.on(module.apiPath + ':edit', function edit(data) {
+    let $entry = $('#entry' + data.$this.data('entry-hid'));
+    let entry_id = $entry.data('entry-id');
+
+    return N.wire.emit('blogs.blocks.blog_entry.edit:begin', {
+      user_hid:    $entry.data('user-hid'),
+      entry_hid:   $entry.data('entry-hid'),
+      entry_title: $entry.find('.blog-entry__title').text(),
+      entry_id
+    }).then(() => N.io.rpc('blogs.sole.list.by_ids', { entry_ids: [ entry_id ] }))
+      .then(res => {
+        let $result = $(N.runtime.render('blogs.blocks.entry_list_sole', res));
+
+        return N.wire.emit('navigate.update', {
+          $: $result,
+          locals: res,
+          $replace: $entry
+        });
+      });
+  });
+
+
   // Delete entry handler
   //
   N.wire.on(module.apiPath + ':delete', function entry_delete(data) {

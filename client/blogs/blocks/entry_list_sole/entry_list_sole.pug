@@ -23,6 +23,7 @@ each entry in self.entries
       class=(entry.st === entryStatuses.HB) ? 'blog-entry__m-hb' : ''
       class=(self.own_bookmarks.indexOf(entry._id) !== -1) ? 'blog-entry__m-bookmarked' : ''
       class=(self.ignored_users[entry.user]) ? 'blog-entry__m-ignored' : ''
+      data-user-hid=user.hid
       data-entry-hid=entry.hid
       data-entry-id=entry._id
     )
@@ -30,6 +31,14 @@ each entry in self.entries
         .blog-entry__title
           a.blog-entry__link(href=self.link_to('blogs.entry', { user_hid: user.hid, entry_hid: entry.hid }))
             = entry.title
+
+          if user && user._id === self.runtime.user_id
+            a.blog-entry__edit.icon.icon-edit(
+              href='#'
+              title=self.t('edit')
+              data-entry-hid=entry.hid
+              data-on-click='blogs.blocks.entry_list_sole:edit'
+            )
 
       .blog-entry__content
         .blog-entry__message.markup!= entry.html
@@ -135,6 +144,7 @@ each entry in self.entries
       class=(entry.st === entryStatuses.HB) ? 'blog-entry__m-hb' : ''
       class=(self.own_bookmarks.indexOf(entry._id) !== -1) ? 'blog-entry__m-bookmarked' : ''
       class=(self.ignored_users[entry.user]) ? 'blog-entry__m-ignored' : ''
+      data-user-hid=user.hid
       data-entry-hid=entry.hid
       data-entry-id=entry._id
     )
