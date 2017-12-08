@@ -1,0 +1,10 @@
+a.blog-entry-create__tag-widget(
+  href='#'
+  class=self.tags.length === 0 ? 'blog-entry-create__tag-widget-empty' : ''
+  data-on-click='blogs.blocks.blog_entry.create:tags_edit'
+)
+  if self.tags.length
+    = self.t('tags')
+    = self.tags.join(', ')
+  else
+    = self.t('click_to_add_tags')

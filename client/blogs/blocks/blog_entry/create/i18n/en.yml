@@ -6,3 +6,7 @@ en-US:
 
   title_input:
     blog_entry_title: Title
+
+  tag_widget:
+    click_to_add_tags: Click here to add tags
+    tags: 'Tags: '

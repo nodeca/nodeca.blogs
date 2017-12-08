@@ -7,6 +7,8 @@ const _ = require('lodash');
 
 
 let options;
+let tags;
+let $editor;
 
 
 function updateOptions() {
@@ -16,6 +18,15 @@ function updateOptions() {
     quote_collapse:  options.user_settings.no_quote_collapse ? false : options.parse_options.quote_collapse,
     emoji:           options.user_settings.no_emojis         ? false : options.parse_options.emoji
   }));
+}
+
+function updateTags(t) {
+  tags = t;
+
+  $editor.find('.blog-entry-create__tag-widget')
+         .replaceWith($(N.runtime.render(module.apiPath + '.tag_widget', { tags })));
+
+  N.wire.emit('mdedit.content_footer_update');
 }
 
 
@@ -45,11 +56,14 @@ N.wire.before(module.apiPath + ':begin', function fetch_options() {
 // Show editor and add handlers for editor events
 //
 N.wire.on(module.apiPath + ':begin', function show_editor() {
-  let $editor = N.MDEdit.show({
+  tags = [];
+
+  $editor = N.MDEdit.show({
     draftKey: [ 'blog_entry_create', N.runtime.user_hid ].join('_'),
     draftCustomFields: {
       '.blog-entry-create__title': 'input'
-    }
+    },
+    contentFooter: $(N.runtime.render(module.apiPath + '.tag_widget', { tags }))[0]
   });
 
   updateOptions();
@@ -75,6 +89,7 @@ N.wire.on(module.apiPath + ':begin', function show_editor() {
       };
 
       N.io.rpc('blogs.entry.create', params).then(response => {
+        $editor = null;
         N.MDEdit.hide({ removeDraft: true });
         N.wire.emit('navigate.to', {
           apiPath: 'blogs.entry',
@@ -90,6 +105,15 @@ N.wire.on(module.apiPath + ':begin', function show_editor() {
 
       return false;
     });
+});
+
+
+// Open tag input dialog
+//
+N.wire.on(module.apiPath + ':tags_edit', function show_tags_input_dlg() {
+  let data = { tags };
+
+  return N.wire.emit('blogs.blocks.tags_edit_dlg', data).then(() => updateTags(data.tags));
 });
 
 
