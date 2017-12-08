@@ -60,7 +60,9 @@ module.exports = function (N, apiPath) {
   // Fetch tags
   //
   N.wire.before(apiPath, async function fetch_tags(env) {
-    if (!env.data.entry.tag_hids || !env.data.entry.tag_hids.length) {
+    let entry = env.data.entry;
+
+    if (!entry.tag_hids || !entry.tag_hids.length) {
       env.res.entry_tags = [];
       return;
     }
@@ -68,12 +70,12 @@ module.exports = function (N, apiPath) {
     // db query is only used to check if this tag is a category
     let tags_by_name = _.keyBy(
       await N.models.blogs.BlogTag.find()
-                .where('hid').in(env.data.entry.tag_hids)
+                .where('hid').in(entry.tag_hids)
                 .lean(true),
       'name_lc'
     );
 
-    let tags = (env.data.entry.tags || [])
+    let tags = (entry.tags || [])
                  .map((name, idx) => {
                    let name_lc = N.models.blogs.BlogTag.normalize(name);
                    return [ name, tags_by_name[name_lc] && tags_by_name[name_lc].is_category, idx ];
@@ -88,7 +90,7 @@ module.exports = function (N, apiPath) {
                  })
                  .map(([ name, cat ]) => ({
                    name,
-                   user: env.data.user._id,
+                   user: entry.user,
                    is_category: cat
                  }));
 

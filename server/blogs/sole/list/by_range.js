@@ -109,7 +109,7 @@ module.exports = function (N, apiPath) {
                    })
                    .map(([ name, cat ]) => ({
                      name,
-                     user: env.data.user._id,
+                     user: entry.user,
                      is_category: cat
                    }));
 
