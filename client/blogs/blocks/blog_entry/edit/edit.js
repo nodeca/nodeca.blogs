@@ -14,6 +14,8 @@ const _ = require('lodash');
 
 let options;
 let entry;
+let tags;
+let $footer;
 
 
 function updateOptions() {
@@ -23,6 +25,14 @@ function updateOptions() {
     quote_collapse:  options.user_settings.no_quote_collapse ? false : options.parse_options.quote_collapse,
     emoji:           options.user_settings.no_emojis         ? false : options.parse_options.emoji
   }));
+}
+
+function updateTags(t) {
+  tags = t;
+
+  $footer.html(N.runtime.render('blogs.blocks.content_tags', { tags, apiPath: module.apiPath }));
+
+  N.wire.emit('mdedit.content_footer_update');
 }
 
 
@@ -73,9 +83,14 @@ N.wire.on(module.apiPath + ':begin', function show_editor(data) {
     reject = _reject;
   });
 
+  tags = [];
+
+  $footer = $('<div></div>').html(N.runtime.render('blogs.blocks.content_tags', { tags, apiPath: module.apiPath }));
+
   let $editor = N.MDEdit.show({
     text: entry.md,
-    attachments: entry.attachments
+    attachments: entry.attachments,
+    contentFooter: $footer[0]
   });
 
   updateOptions();
@@ -125,6 +140,15 @@ N.wire.on(module.apiPath + ':begin', function show_editor(data) {
     });
 
   return promise;
+});
+
+
+// Open tag input dialog
+//
+N.wire.on(module.apiPath + ':tags_edit', function show_tags_input_dlg() {
+  let data = { tags };
+
+  return N.wire.emit('blogs.blocks.tags_edit_dlg', data).then(() => updateTags(data.tags));
 });
 
 

@@ -1,0 +1,22 @@
+@import "nodeca.core/client/common/_variables"
+
+.blogs-content-tags
+  background-color $body-bg-secondary
+  cursor pointer
+  padding 0 0.2em
+
+.blogs-content-tags__header
+  display inline
+
+.blogs-content-tags__list
+  margin 0
+  padding 0
+  list-style none
+  display inline
+
+.blogs-content-tags__item
+  display inline
+
+.blogs-content-tags__item + .blogs-content-tags__item
+  &:before
+    content ', '

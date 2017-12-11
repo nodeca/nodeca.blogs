@@ -8,7 +8,7 @@ const _ = require('lodash');
 
 let options;
 let tags;
-let $editor;
+let $footer;
 
 
 function updateOptions() {
@@ -23,8 +23,7 @@ function updateOptions() {
 function updateTags(t) {
   tags = t;
 
-  $editor.find('.blog-entry-create__tag-widget')
-         .replaceWith($(N.runtime.render(module.apiPath + '.tag_widget', { tags })));
+  $footer.html(N.runtime.render('blogs.blocks.content_tags', { tags, apiPath: module.apiPath }));
 
   N.wire.emit('mdedit.content_footer_update');
 }
@@ -58,12 +57,14 @@ N.wire.before(module.apiPath + ':begin', function fetch_options() {
 N.wire.on(module.apiPath + ':begin', function show_editor() {
   tags = [];
 
-  $editor = N.MDEdit.show({
+  $footer = $('<div></div>').html(N.runtime.render('blogs.blocks.content_tags', { tags, apiPath: module.apiPath }));
+
+  let $editor = N.MDEdit.show({
     draftKey: [ 'blog_entry_create', N.runtime.user_hid ].join('_'),
     draftCustomFields: {
       '.blog-entry-create__title': 'input'
     },
-    contentFooter: $(N.runtime.render(module.apiPath + '.tag_widget', { tags }))[0]
+    contentFooter: $footer[0]
   });
 
   updateOptions();
@@ -89,7 +90,7 @@ N.wire.on(module.apiPath + ':begin', function show_editor() {
       };
 
       N.io.rpc('blogs.entry.create', params).then(response => {
-        $editor = null;
+        $footer = null;
         N.MDEdit.hide({ removeDraft: true });
         N.wire.emit('navigate.to', {
           apiPath: 'blogs.entry',
