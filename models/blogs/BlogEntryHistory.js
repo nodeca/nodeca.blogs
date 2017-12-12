@@ -21,6 +21,8 @@ module.exports = function (N, collectionName) {
     // markdown source before changes
     md:         String,
 
+    tags:       [ String ],
+
     // tail before changes, schema is the same as in BlogEntry
     tail:       [ AttachmentInfo ],
 

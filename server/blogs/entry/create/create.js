@@ -3,6 +3,7 @@
 'use strict';
 
 
+const _         = require('lodash');
 const $         = require('nodeca.core/lib/parser/cheequery');
 const charcount = require('charcount');
 
@@ -12,6 +13,11 @@ module.exports = function (N, apiPath) {
   N.validate(apiPath, {
     title:                    { type: 'string', required: true },
     txt:                      { type: 'string', required: true },
+    tags:                     {
+      type: 'array',
+      required: true,
+      items: { type: 'string', required: true }
+    },
     attach:                   {
       type: 'array',
       required: true,
@@ -149,6 +155,51 @@ module.exports = function (N, apiPath) {
   });
 
 
+  // Save tags
+  //
+  N.wire.after(apiPath, async function save_tags(env) {
+    let store = N.settings.getStore('user');
+    let { value } = await store.get('blogs_categories', { user_id: env.user_info.user_id });
+    let categories;
+
+    try {
+      categories = JSON.parse(value);
+    } catch (__) {
+      categories = [];
+    }
+
+    categories = categories.map(N.models.blogs.BlogTag.normalize);
+
+    let tags = _.uniqBy(env.params.tags, N.models.blogs.BlogTag.normalize);
+
+    let tags_by_name = _.keyBy(
+      await N.models.blogs.BlogTag.find()
+                .where('user').equals(env.user_info.user_id)
+                .where('name_lc').in(tags.map(N.models.blogs.BlogTag.normalize))
+                .lean(true),
+      'name_lc'
+    );
+
+    for (let tag of tags) {
+      tag = N.models.blogs.BlogTag.normalize(tag);
+
+      if (tags_by_name[tag]) continue;
+
+      // create all tags that don't already exist
+      let new_tag = await N.models.blogs.BlogTag.create({
+        name_lc: tag,
+        user: env.user_info.user_id,
+        is_category: categories.indexOf(tag) !== -1
+      });
+
+      tags_by_name[tag] = new_tag;
+    }
+
+    env.data.tags = tags;
+    env.data.tag_hids = tags.map(tag => tags_by_name[N.models.blogs.BlogTag.normalize(tag)].hid);
+  });
+
+
   // Create new entry
   //
   N.wire.after(apiPath, async function create_entry(env) {
@@ -161,8 +212,8 @@ module.exports = function (N, apiPath) {
     entry.md         = env.params.txt;
     entry.html       = env.data.parse_result.html;
     entry.ip         = env.req.ip;
-    entry.tag_hids   = []; // TODO
-    entry.tag_source = ''; // TODO
+    entry.tags       = env.data.tags;
+    entry.tag_hids   = env.data.tag_hids;
     entry.ts         = Date.now();
 
     entry.attach       = env.params.attach;

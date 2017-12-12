@@ -56,6 +56,7 @@ module.exports = function (N, apiPath) {
     for (let item of history) {
       env.res.history.push({
         md:    item.md,
+        tags:  item.tags,
         tail:  item.tail,
         title: item.title,
         ts:    previous_ts,
@@ -72,6 +73,7 @@ module.exports = function (N, apiPath) {
     /* eslint-disable no-undefined */
     env.res.history.push({
       md:    env.data.entry.md,
+      tags:  env.data.entry.tags,
       tail:  env.data.entry.tail,
       title: env.data.entry.title,
       ts:    previous_ts,

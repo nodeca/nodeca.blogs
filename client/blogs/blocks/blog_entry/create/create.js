@@ -20,9 +20,7 @@ function updateOptions() {
   }));
 }
 
-function updateTags(t) {
-  tags = t;
-
+function updateTagsView() {
   $footer.html(N.runtime.render('blogs.blocks.content_tags', { tags, apiPath: module.apiPath }));
 
   N.wire.emit('mdedit.content_footer_update');
@@ -62,7 +60,13 @@ N.wire.on(module.apiPath + ':begin', function show_editor() {
   let $editor = N.MDEdit.show({
     draftKey: [ 'blog_entry_create', N.runtime.user_hid ].join('_'),
     draftCustomFields: {
-      '.blog-entry-create__title': 'input'
+      '.blog-entry-create__title': 'input',
+      tags: (...args) => {
+        if (args.length === 0) return tags;
+
+        tags = args[0];
+        updateTagsView();
+      }
     },
     contentFooter: $footer[0]
   });
@@ -83,6 +87,7 @@ N.wire.on(module.apiPath + ':begin', function show_editor() {
       let params = {
         title:                    $('.blog-entry-create__title').val(),
         txt:                      N.MDEdit.text(),
+        tags,
         attach:                   _.map(N.MDEdit.attachments(), 'media_id'),
         option_no_mlinks:         options.user_settings.no_mlinks,
         option_no_emojis:         options.user_settings.no_emojis,
@@ -114,7 +119,11 @@ N.wire.on(module.apiPath + ':begin', function show_editor() {
 N.wire.on(module.apiPath + ':tags_edit', function show_tags_input_dlg() {
   let data = { tags };
 
-  return N.wire.emit('blogs.blocks.tags_edit_dlg', data).then(() => updateTags(data.tags));
+  return N.wire.emit('blogs.blocks.tags_edit_dlg', data)
+             .then(() => {
+               tags = data.tags;
+               updateTagsView();
+             });
 });
 
 

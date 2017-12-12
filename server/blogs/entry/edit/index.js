@@ -101,6 +101,7 @@ module.exports = function (N, apiPath) {
 
     env.res.md = env.data.entry.md;
     env.res.title = env.data.entry.title;
+    env.res.tags = env.data.entry.tags;
     env.res.attachments = env.data.attachments;
     env.res.params = env.data.parser_params;
   });

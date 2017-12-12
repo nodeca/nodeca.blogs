@@ -3,6 +3,7 @@
 'use strict';
 
 
+const _         = require('lodash');
 const $         = require('nodeca.core/lib/parser/cheequery');
 const charcount = require('charcount');
 
@@ -17,6 +18,11 @@ module.exports = function (N, apiPath) {
     entry_id:                 { format: 'mongo', required: true },
     title:                    { type: 'string', required: true },
     txt:                      { type: 'string', required: true },
+    tags:                     {
+      type: 'array',
+      required: true,
+      items: { type: 'string', required: true }
+    },
     attach:                   {
       type: 'array',
       required: true,
@@ -145,6 +151,51 @@ module.exports = function (N, apiPath) {
   });
 
 
+  // Save tags
+  //
+  N.wire.after(apiPath, async function save_tags(env) {
+    let store = N.settings.getStore('user');
+    let { value } = await store.get('blogs_categories', { user_id: env.user_info.user_id });
+    let categories;
+
+    try {
+      categories = JSON.parse(value);
+    } catch (__) {
+      categories = [];
+    }
+
+    categories = categories.map(N.models.blogs.BlogTag.normalize);
+
+    let tags = _.uniqBy(env.params.tags, N.models.blogs.BlogTag.normalize);
+
+    let tags_by_name = _.keyBy(
+      await N.models.blogs.BlogTag.find()
+                .where('user').equals(env.user_info.user_id)
+                .where('name_lc').in(tags.map(N.models.blogs.BlogTag.normalize))
+                .lean(true),
+      'name_lc'
+    );
+
+    for (let tag of tags) {
+      tag = N.models.blogs.BlogTag.normalize(tag);
+
+      if (tags_by_name[tag]) continue;
+
+      // create all tags that don't already exist
+      let new_tag = await N.models.blogs.BlogTag.create({
+        name_lc: tag,
+        user: env.user_info.user_id,
+        is_category: categories.indexOf(tag) !== -1
+      });
+
+      tags_by_name[tag] = new_tag;
+    }
+
+    env.data.tags = tags;
+    env.data.tag_hids = tags.map(tag => tags_by_name[N.models.blogs.BlogTag.normalize(tag)].hid);
+  });
+
+
   // Update entry
   //
   N.wire.after(apiPath, async function update_entry(env) {
@@ -157,6 +208,8 @@ module.exports = function (N, apiPath) {
     entry.title      = env.params.title.trim();
     entry.md         = env.params.txt;
     entry.html       = env.data.parse_result.html;
+    entry.tags       = env.data.tags;
+    entry.tag_hids   = env.data.tag_hids;
 
     entry.attach       = env.params.attach;
     entry.params       = env.data.parse_options;
@@ -193,6 +246,7 @@ module.exports = function (N, apiPath) {
         entry:       orig_entry._id,
         user:        env.user_info.user_id,
         md:          orig_entry.md,
+        tags:        orig_entry.tags,
         tail:        orig_entry.tail,
         title:       orig_entry.title,
         params_ref:  orig_entry.params_ref
@@ -207,6 +261,7 @@ module.exports = function (N, apiPath) {
         entry:      last_record.entry,
         user:       last_record.user,
         md:         last_record.md,
+        tags:       last_record.tags,
         tail:       last_record.tail,
         title:      last_record.title,
         params_ref: last_record.params_ref
@@ -216,6 +271,7 @@ module.exports = function (N, apiPath) {
         entry:      new_entry._id,
         user:       env.user_info.user_id,
         md:         new_entry.md,
+        tags:       new_entry.tags,
         tail:       new_entry.tail,
         title:      new_entry.title,
         params_ref: new_entry.params_ref

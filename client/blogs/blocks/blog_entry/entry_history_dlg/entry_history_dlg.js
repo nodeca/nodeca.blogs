@@ -30,6 +30,12 @@ function get_source(post) {
     result += '\n';
   }
 
+  // add tags
+  if (post.tags.length) {
+    result += '\n';
+    result += t('tags') + post.tags.join(', ') + '\n';
+  }
+
   return result;
 }
 

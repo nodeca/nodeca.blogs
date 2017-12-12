@@ -1,12 +1,12 @@
-.blogs-content-tags(
-  class=self.tags.length === 0 ? 'blogs-content-tags__m-empty' : ''
+.editor-content-tags(
+  class=self.tags.length === 0 ? 'editor-content-tags__m-empty' : ''
   data-on-click=self.apiPath + ':tags_edit'
 )
   if self.tags.length
-    .blogs-content-tags__header= self.t('tags')
+    .editor-content-tags__header= self.t('tags')
 
-    ul.blogs-content-tags__list
+    ul.editor-content-tags__list
       each tag in self.tags
-        li.blogs-content-tags__item= tag
+        li.editor-content-tags__item= tag
   else
-    .blogs-content-tags__header= self.t('click_to_add_tags')
+    .editor-content-tags__header= self.t('click_to_add_tags')
