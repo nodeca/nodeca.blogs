@@ -28,7 +28,7 @@ function updateOptions() {
 }
 
 function updateTagsView() {
-  $footer.html(N.runtime.render('blogs.blocks.content_tags', { tags, apiPath: module.apiPath }));
+  $footer.html(N.runtime.render('mdedit.content_tags', { tags, apiPath: module.apiPath }));
 
   N.wire.emit('mdedit.content_footer_update');
 }
@@ -84,7 +84,7 @@ N.wire.on(module.apiPath + ':begin', function show_editor(data) {
 
   tags = entry.tags || [];
 
-  $footer = $('<div></div>').html(N.runtime.render('blogs.blocks.content_tags', { tags, apiPath: module.apiPath }));
+  $footer = $('<div></div>').html(N.runtime.render('mdedit.content_tags', { tags, apiPath: module.apiPath }));
 
   let $editor = N.MDEdit.show({
     text: entry.md,
