@@ -292,6 +292,30 @@ module.exports = function (N, apiPath) {
   });
 
 
+  // Remove unused tags
+  //
+  N.wire.after(apiPath, async function remove_tags(env) {
+    let orig_entry = env.data.entry;
+    let new_entry  = env.data.new_entry;
+    let tags = new Set();
+
+    for (let hid of orig_entry.tag_hids || []) tags.add(hid);
+    for (let hid of new_entry.tag_hids  || []) tags.delete(hid);
+
+    // check each tag that was present in the original entry,
+    // and isn't present anymore after changes
+    for (let hid of tags) {
+      let entry = await N.models.blogs.BlogEntry.findOne()
+                            .where('tag_hids').equals(hid)
+                            .lean(true);
+
+      if (!entry) {
+        await N.models.blogs.BlogTag.remove({ hid });
+      }
+    }
+  });
+
+
   // Schedule image size fetch
   //
   N.wire.after(apiPath, function fill_image_info(env) {
