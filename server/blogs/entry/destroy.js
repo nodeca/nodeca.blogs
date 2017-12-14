@@ -121,7 +121,12 @@ module.exports = function (N, apiPath) {
     );
   });
 
-  // TODO: schedule search index update
+
+  // Schedule search index update
+  //
+  N.wire.after(apiPath, async function add_search_index(env) {
+    await N.queue.blog_entries_search_update_with_comments([ env.data.entry._id ]).postpone();
+  });
 
   // TODO: log moderator actions
 };

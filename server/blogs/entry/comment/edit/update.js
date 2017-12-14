@@ -226,7 +226,11 @@ module.exports = function (N, apiPath) {
   });
 
 
-  // TODO: schedule search index update
+  // Schedule search index update
+  //
+  N.wire.after(apiPath, async function add_search_index(env) {
+    await N.queue.blog_comments_search_update_by_ids([ env.data.new_comment._id ]).postpone();
+  });
 
 
   // Mark user as active

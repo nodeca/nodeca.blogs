@@ -12,6 +12,7 @@ let result;
 // Init dialog
 //
 N.wire.on(module.apiPath, function show_dialog(data) {
+  result = null;
   $dialog = $(N.runtime.render(module.apiPath, _.assign({ apiPath: module.apiPath }, data)));
   $('body').append($dialog);
 

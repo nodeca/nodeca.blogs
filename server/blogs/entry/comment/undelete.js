@@ -118,7 +118,13 @@ module.exports = function (N, apiPath) {
     return N.models.blogs.BlogEntry.updateCounters(env.data.entry._id);
   });
 
-  // TODO: schedule search index update
+
+  // Schedule search index update
+  //
+  N.wire.after(apiPath, async function add_search_index(env) {
+    await N.queue.blog_entries_search_update_by_ids([ env.data.entry._id ]).postpone();
+    await N.queue.blog_comments_search_update_by_ids([ env.data.comment._id ]).postpone();
+  });
 
   // TODO: log moderator actions
 };

@@ -1,0 +1,23 @@
+search:
+  general:
+    menu:
+      blog_entries:
+        priority: 30
+
+      blog_comments:
+        priority: 40
+
+  indexes:
+    'blog_entries : _default_content':
+      rt_field: [ content ]
+      rt_attr_timestamp: [ ts ]
+      rt_attr_string: [ object_id ]
+      rt_attr_uint: [ comment_count ]
+      rt_attr_bool: [ public, visible ]
+
+    'blog_comments : _default_topic':
+      rt_field: [ content ]
+      rt_attr_timestamp: [ ts ]
+      rt_attr_string: [ object_id ]
+      rt_attr_bigint: [ entry_uid ]
+      rt_attr_bool: [ public, visible ]

@@ -331,8 +331,14 @@ module.exports = function (N, apiPath) {
   });
 
 
-  // TODO: schedule search index update
-  // TODO: set marker position (read/unread flag)
+  // Schedule search index update
+  //
+  N.wire.after(apiPath, async function add_search_index(env) {
+    await N.queue.blog_entries_search_update_by_ids([ env.data.entry._id ]).postpone();
+    await N.queue.blog_comments_search_update_by_ids([ env.data.new_comment._id ]).postpone();
+  });
+
+
   // TODO: add notification for user whose post was replied to
   // TODO: add notification for subscribers
 

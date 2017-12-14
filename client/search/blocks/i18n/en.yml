@@ -1,0 +1,6 @@
+en-US:
+  blog_entries:
+    comments: "#{count} ((comment|comments))"
+    not_found: No entries found.
+  blog_comments:
+    not_found: No comments found.

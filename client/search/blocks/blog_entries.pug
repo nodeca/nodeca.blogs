@@ -1,0 +1,31 @@
+if self.results.length
+
+  each result in self.results
+    - var user = self.users[result.entry.user];
+
+    article.search-result.search-result__m-with-content
+      header.search-result__header
+        a.search-result__title(
+          href=self.link_to('blogs.entry', { user_hid: user && user.hid, entry_hid: result.entry.hid })
+        )= result.entry.title
+
+        ul.search-result__stat
+          li.search-result__stat-item
+            != self.timetag(result.entry.ts, 'relative')
+
+          li.search-result__stat-item
+            if user
+              img.search-result__stat-avatar(alt=user.name)&attributes(self.avatar(user, 'sm'))
+              a.search-result__stat-link._ucard-popover(
+                href=self.link_to('users.member', { user_hid: user.hid })
+                data-user-id=result.entry.user
+              )= user.nick
+
+          li.search-result__stat-item
+            = self.t('comments', result.entry.comments)
+
+      .search-result__content
+        .markup!= result.entry.html
+
+else
+  .search-results__empty= self.t('not_found')
