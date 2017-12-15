@@ -3,6 +3,7 @@
 // In:
 //
 // - params.query
+// - params.user_hid
 // - params.sort
 // - params.period
 // - params.skip
@@ -21,6 +22,7 @@
 
 const _              = require('lodash');
 const sanitize_entry = require('nodeca.blogs/lib/sanitizers/blog_entry');
+const docid_sole     = require('nodeca.blogs/lib/search/docid_sole');
 const sphinx_escape  = require('nodeca.search').escape;
 
 
@@ -33,6 +35,11 @@ module.exports = function (N, apiPath) {
 
     let query  = 'SELECT object_id FROM blog_entries WHERE MATCH(?) AND public=1';
     let params = [ sphinx_escape(locals.params.query) ];
+
+    if (locals.params.user_hid) {
+      query += ' AND user_uid=?';
+      params.push(docid_sole(N, locals.params.user_hid));
+    }
 
     if (locals.params.period > 0) {
       query += ' AND ts > ?';
@@ -143,7 +150,12 @@ module.exports = function (N, apiPath) {
   N.wire.on(apiPath, async function generate_snippets(locals) {
     if (!locals.results.length) return;
 
-    let htmls = locals.results.map(result => result.entry.html);
+    let htmls = [];
+
+    locals.results.forEach(result => {
+      htmls.push(_.escape(result.entry.title));
+      htmls.push(result.entry.html);
+    });
 
     let query = `
       CALL SNIPPETS(
@@ -162,7 +174,8 @@ module.exports = function (N, apiPath) {
     let snippets = await N.search.execute(query, args);
 
     locals.results.forEach((result, i) => {
-      result.entry.html = snippets[i].snippet;
+      result.entry.title_html = snippets[2 * i].snippet;
+      result.entry.html       = snippets[2 * i + 1].snippet;
     });
   });
 };

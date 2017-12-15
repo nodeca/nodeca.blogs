@@ -3,6 +3,7 @@
 // In:
 //
 // - params.query
+// - params.user_hid
 // - params.entry_hid
 // - params.sort
 // - params.period
@@ -24,6 +25,7 @@ const _                = require('lodash');
 const sanitize_entry   = require('nodeca.blogs/lib/sanitizers/blog_entry');
 const sanitize_comment = require('nodeca.blogs/lib/sanitizers/blog_comment');
 const docid_entries    = require('nodeca.blogs/lib/search/docid_entries');
+const docid_sole       = require('nodeca.blogs/lib/search/docid_sole');
 const sphinx_escape    = require('nodeca.search').escape;
 
 
@@ -37,9 +39,14 @@ module.exports = function (N, apiPath) {
     let query  = 'SELECT object_id FROM blog_comments WHERE MATCH(?) AND public=1';
     let params = [ sphinx_escape(locals.params.query) ];
 
+    if (locals.params.user_hid) {
+      query += ' AND user_uid=?';
+      params.push(docid_sole(N, locals.params.user_hid));
+    }
+
     if (locals.params.entry_hid) {
       query += ' AND entry_uid=?';
-      params.push(docid_entries(N, locals.params.entry_hid));
+      params.push(docid_entries(N, locals.params.user_hid));
     }
 
     if (locals.params.period > 0) {

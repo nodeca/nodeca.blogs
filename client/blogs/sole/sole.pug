@@ -44,8 +44,9 @@ article#content.blogs-sole(
       },
       search_areas: [
         {
-          title: self.t('search_entries'),
-          method: 'search.blog_entries'
+          title: self.t('search_sole'),
+          method: 'search.blogs_sole',
+          params: { hid: String(user.hid) }
         }
       ]
     };

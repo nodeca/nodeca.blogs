@@ -5,3 +5,8 @@ i18n:
         menu:
           blog_entries: 'Blog entries'
           blog_comments: 'Blog comments'
+
+      blogs_sole:
+        menu:
+          blog_entries: 'Blog entries'
+          blog_comments: 'Blog comments'
