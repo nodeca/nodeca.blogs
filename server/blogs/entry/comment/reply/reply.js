@@ -3,6 +3,7 @@
 'use strict';
 
 
+const _ = require('lodash');
 const $ = require('nodeca.core/lib/parser/cheequery');
 
 
@@ -340,7 +341,40 @@ module.exports = function (N, apiPath) {
 
 
   // TODO: add notification for user whose post was replied to
-  // TODO: add notification for subscribers
+
+
+  // Add new comment notification for subscribers
+  //
+  N.wire.after(apiPath, async function add_new_comment_notification(env) {
+    let subscriptions = await N.models.users.Subscription.find()
+                                  .where('to').equals(env.data.entry._id)
+                                  .where('type').equals(N.models.users.Subscription.types.WATCHING)
+                                  .where('to_type').equals(N.shared.content_type.BLOG_ENTRY)
+                                  .lean(true);
+
+    if (!subscriptions.length) return;
+
+    let subscribed_users = _.map(subscriptions, 'user');
+
+    let ignore = _.keyBy(
+      await N.models.users.Ignore.find()
+                .where('from').in(subscribed_users)
+                .where('to').equals(env.user_info.user_id)
+                .select('from to -_id')
+                .lean(true),
+      'from'
+    );
+
+    subscribed_users = subscribed_users.filter(user_id => !ignore[user_id]);
+
+    if (!subscribed_users.length) return;
+
+    await N.wire.emit('internal:users.notify', {
+      src: env.data.new_comment._id,
+      to: subscribed_users,
+      type: 'BLOGS_NEW_COMMENT'
+    });
+  });
 
 
   // Mark user as active

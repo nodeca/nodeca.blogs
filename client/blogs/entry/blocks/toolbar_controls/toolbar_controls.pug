@@ -1,5 +1,5 @@
 - var entryStatuses = '$$ JSON.stringify(N.models.blogs.BlogEntry.statuses) $$'
-
+- var subscriptionTypes = '$$ JSON.stringify(N.models.users.Subscription.types) $$'
 - var menu_rnd_id = 'rnd' + String(Math.random()).slice(2, 10)
 
 - var items = []
@@ -57,6 +57,29 @@ if items.length > 0 && items[items.length - 1].indexOf('mod_') === 0
       title=self.t('add_comment')
     )
 
+  - var subscriptionIcon = 'icon-track-normal'
+  - var subscriptionTitle = self.t('subs_normal')
+
+  if (self.subscription === subscriptionTypes.MUTED)
+    - subscriptionIcon = 'icon-track-muted'
+    - subscriptionTitle = self.t('subs_muted')
+  else if (self.subscription === subscriptionTypes.TRACKING)
+    - subscriptionIcon = 'icon-track-tracking'
+    - subscriptionTitle = self.t('subs_tracking')
+  else if (self.subscription === subscriptionTypes.WATCHING)
+    - subscriptionIcon = 'icon-track-watching'
+    - subscriptionTitle = self.t('subs_watching')
+
+  if (self.subscription && self.subscription !== subscriptionTypes.NORMAL)
+    button.btn.btn-secondary.btn-square.d-none.d-sm-inline-block.icon(
+      type='button'
+      title=subscriptionTitle
+      class=subscriptionIcon
+      data-on-click='blogs.entry:subscription'
+      data-entry-id=self.entry._id
+      data-entry-subscription=self.subscription
+    )
+
   if items.length > 0
     .page-actions__dropdown
       button.btn.btn-secondary.btn-square.icon.icon-dropdown.dropdown-toggle(
@@ -93,7 +116,13 @@ if items.length > 0 && items[items.length - 1].indexOf('mod_') === 0
             when 'subscription'
               button.dropdown-item(
                 type='button'
-              )= self.t('subscription')
+                data-on-click='blogs.entry:subscription'
+                data-entry-id=self.entry._id
+                data-entry-subscription=self.subscription
+              )
+                if self.subscription && self.subscription !== subscriptionTypes.NORMAL
+                  span.icon.icon-space-after(class=subscriptionIcon)
+                = self.t('subscription')
 
             when 'delete'
               button.dropdown-item(

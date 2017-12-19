@@ -114,6 +114,23 @@ module.exports = function (N, apiPath) {
   });
 
 
+  // Fill subscription type
+  //
+  N.wire.after(apiPath, async function fill_subscription(env) {
+    if (!env.user_info.is_member) {
+      env.res.subscription = null;
+      return;
+    }
+
+    let subscription = await N.models.users.Subscription.findOne()
+                                 .where('user').equals(env.user_info.user_id)
+                                 .where('to').equals(env.data.entry._id)
+                                 .lean(true);
+
+    env.res.subscription = subscription ? subscription.type : null;
+  });
+
+
   // Fetch and fill bookmarks
   //
   N.wire.after(apiPath, async function fetch_and_fill_bookmarks(env) {

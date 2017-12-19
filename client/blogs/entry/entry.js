@@ -483,6 +483,29 @@ N.wire.once('navigate.done:' + module.apiPath, function page_once() {
   });
 
 
+  // Subscription handler
+  //
+  N.wire.on(module.apiPath + ':subscription', function subscription(data) {
+    let id = data.$this.data('entry-id');
+    let params = { subscription: data.$this.data('entry-subscription') };
+
+    return Promise.resolve()
+      .then(() => N.wire.emit('blogs.entry.subscription', params))
+      .then(() => N.io.rpc('blogs.entry.subscribe', { entry_id: id, type: params.subscription }))
+      .then(() => {
+        N.runtime.page_data.subscription = params.subscription;
+      })
+      .then(() => {
+        $('.blogs-entry__toolbar-controls')
+          .replaceWith(N.runtime.render(module.apiPath + '.blocks.toolbar_controls', {
+            entry:        N.runtime.page_data.entry,
+            settings:     N.runtime.page_data.settings,
+            subscription: N.runtime.page_data.subscription
+          }));
+      });
+  });
+
+
   // When user clicks "create dialog" button in usercard popup,
   // add title & link to editor.
   //
