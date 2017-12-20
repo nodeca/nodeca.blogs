@@ -199,6 +199,7 @@ module.exports = function (N, apiPath) {
     let subscription = await N.models.users.Subscription.findOne()
                                  .where('user').equals(env.user_info.user_id)
                                  .where('to').equals(env.data.entry._id)
+                                 .where('to_type').equals(N.shared.content_type.BLOG_ENTRY)
                                  .lean(true);
 
     env.res.subscription = subscription ? subscription.type : null;

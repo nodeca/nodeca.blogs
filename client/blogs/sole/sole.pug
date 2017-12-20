@@ -1,5 +1,10 @@
+- self.add_raw_data('settings',     self.settings)
+- self.add_raw_data('user_id',      self.user_id)
+- self.add_raw_data('current_tag',  self.current_tag)
+- self.add_raw_data('subscription', self.subscription)
+- self.add_raw_data('pagination',   self.pagination)
+
 - self.users = self.users || {};
-- self.add_raw_data('pagination', self.pagination)
 - var user = self.users[self.user_id] || {};
 
 article#content.blogs-sole(
@@ -7,7 +12,6 @@ article#content.blogs-sole(
     'home': 'blogs.sole:nav_to_start',
     'end':  'blogs.sole:nav_to_end'
   }
-  data-tag=            self.current_tag
   data-last-entry-hid= self.last_entry_hid
   data-top-marker=     self.entries && self.entries.length > 0 ? self.entries[0]._id : null
   data-bottom-marker=  self.entries && self.entries.length > 0 ? self.entries[self.entries.length - 1]._id : null

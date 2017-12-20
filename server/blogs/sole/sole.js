@@ -184,6 +184,24 @@ module.exports = function (N, apiPath) {
   });
 
 
+  // Fill subscription type
+  //
+  N.wire.after(apiPath, async function fill_subscription(env) {
+    if (!env.user_info.is_member) {
+      env.res.subscription = null;
+      return;
+    }
+
+    let subscription = await N.models.users.Subscription.findOne()
+                                 .where('user').equals(env.user_info.user_id)
+                                 .where('to').equals(env.data.user._id)
+                                 .where('to_type').equals(N.shared.content_type.BLOG_SOLE)
+                                 .lean(true);
+
+    env.res.subscription = subscription ? subscription.type : null;
+  });
+
+
   // Fill pagination (progress)
   //
   N.wire.after(apiPath, async function fill_pagination(env) {

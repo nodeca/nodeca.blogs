@@ -1,0 +1,3 @@
+en-US:
+  subject: '#{project_name}: new blog entry from #{user}'
+  reply: Reply

@@ -2,3 +2,8 @@ en-US:
   new_entry: New entry
   subscription: Subscription
   categories: Categories
+
+  subs_muted: Muted. You will never be notified of new entries in this blog.
+  subs_normal: Normal. You will be notified if someone mentions your @name or replies to your comment.
+  subs_tracking: Tracking. You will see updates in your subscriptions list.
+  subs_watching: Watching. You will be notified immediately on every new blog entry.
