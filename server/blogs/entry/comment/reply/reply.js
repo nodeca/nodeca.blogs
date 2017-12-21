@@ -340,7 +340,25 @@ module.exports = function (N, apiPath) {
   });
 
 
-  // TODO: add notification for user whose post was replied to
+  // Add reply notification for parent comment owner
+  //
+  N.wire.after(apiPath, async function add_reply_notification(env) {
+    if (!env.data.parent_comment) return;
+
+    let ignore_data = await N.models.users.Ignore.findOne()
+                                .where('from').equals(env.data.parent_comment.user)
+                                .where('to').equals(env.user_info.user_id)
+                                .select('from to -_id')
+                                .lean(true);
+
+    if (ignore_data) return;
+
+    await N.wire.emit('internal:users.notify', {
+      src:  env.data.new_comment._id,
+      to:   env.data.parent_comment.user,
+      type: 'BLOGS_REPLY'
+    });
+  });
 
 
   // Add new comment notification for subscribers

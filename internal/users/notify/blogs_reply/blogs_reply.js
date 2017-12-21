@@ -1,4 +1,4 @@
-// Deliver `BLOGS_NEW_COMMENT` notification
+// Deliver `BLOGS_REPLY` notification
 //
 'use strict';
 
@@ -9,8 +9,8 @@ const user_info = require('nodeca.users/lib/user_info');
 
 
 module.exports = function (N) {
-  N.wire.on('internal:users.notify.deliver', async function notify_deliver_blogs_new_comment(local_env) {
-    if (local_env.type !== 'BLOGS_NEW_COMMENT') return;
+  N.wire.on('internal:users.notify.deliver', async function notify_deliver_froum_reply(local_env) {
+    if (local_env.type !== 'BLOGS_REPLY') return;
 
     let comment = await N.models.blogs.BlogComment.findById(local_env.src).lean(true);
 
@@ -20,48 +20,35 @@ module.exports = function (N) {
 
     if (!entry) return;
 
-    let user = await N.models.users.User.findById(entry.user).lean(true);
+    let blog_user = await N.models.users.User.findById(entry.user).lean(true);
 
-    if (!user) return;
+    if (!blog_user) return;
 
-    // Fetch parent comment if it exists
-    let parent_comment;
+    let comment_user = await N.models.users.User.findById(comment.user).lean(true);
 
-    if (comment.path && comment.path.length) {
-      let parent_id = comment.path[comment.path.length - 1];
-
-      parent_comment = await N.models.blogs.BlogComment.findById(parent_id).lean(true);
-    }
+    if (!comment_user) return;
 
     // Fetch user info
     let users_info = await user_info(N, local_env.to);
 
-    // Filter post owner (don't send notification to user who create this post)
+    // Filter by post owner (don't send notification if user replies to her own post)
     //
-    local_env.to = local_env.to.filter(user_id => String(user_id) !== String(entry.user));
+    local_env.to = local_env.to.filter(user_id => String(user_id) !== String(comment.user));
 
-    // If parent comment is set, don't send user this notification because reply
-    // notification has been already sent
-    //
-    if (parent_comment) {
-      local_env.to = local_env.to.filter(user_id => String(user_id) !== String(parent_comment.user));
-    }
-
-    // Filter users who aren't watching this entry
+    // Filter users who muted this entry
     //
     let Subscription = N.models.users.Subscription;
 
     let subscriptions = await Subscription.find()
                                 .where('user').in(local_env.to)
                                 .where('to').equals(entry._id)
-                                .where('type').equals(Subscription.types.WATCHING)
-                                .where('to_type').equals(N.shared.content_type.BLOG_ENTRY)
+                                .where('type').equals(Subscription.types.MUTED)
                                 .lean(true);
 
-    let watching = subscriptions.map(subscription => String(subscription.user));
+    let muted = subscriptions.map(subscription => String(subscription.user));
 
-    // Only if `user_id` in both arrays
-    local_env.to = _.intersection(local_env.to, watching);
+    // If `user_id` only in `local_env.to`
+    local_env.to = _.difference(local_env.to, muted);
 
     // Filter users by access
     //
@@ -91,19 +78,19 @@ module.exports = function (N) {
       helpers.t = (phrase, params) => N.i18n.t(locale, phrase, params);
       helpers.t.exists = phrase => N.i18n.hasPhrase(locale, phrase);
 
-      let subject = N.i18n.t(locale, 'users.notify.blogs_new_comment.subject', {
+      let subject = N.i18n.t(locale, 'users.notify.blogs_reply.subject', {
         project_name: general_project_name,
-        entry_title: entry.title
+        user_name: comment_user.name
       });
 
       let url = N.router.linkTo('blogs.entry', {
-        user_hid:  user.hid,
+        user_hid:  blog_user.hid,
         entry_hid: entry.hid,
         $anchor:   'comment' + comment.hid
       });
 
       let unsubscribe = N.router.linkTo('blogs.entry.unsubscribe', {
-        user_hid:  user.hid,
+        user_hid:  blog_user.hid,
         entry_hid: entry.hid
       });
 

@@ -1,0 +1,16 @@
+- var user = self.users[self.user_id] || {};
+
+#content.blogs-sole-unsubscribe
+  != self.partial('@common.blocks.navbar.logo_apps')
+
+  .layout__container.container-fluid
+    != self.partial('@users.blocks.announces')
+
+    header.page-head
+      h1.page-head__title(itemprop='name')= self.t('title')
+
+    - var url = self.link_to('blogs.sole', { user_hid: self.user_id });
+    - var link = '<a href="' + pug.escape(url) + '">' + pug.escape(user && user.nick) + '</a>';
+    != self.partial('button')
+    = ' '
+    != self.t('message', { link: link })
