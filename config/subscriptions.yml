@@ -1,0 +1,8 @@
+users:
+  subscriptions:
+    blogs_entry:
+      to_type: BLOG_ENTRY
+      priority: 30
+    blogs_sole:
+      to_type: BLOG_SOLE
+      priority: 40

@@ -31,4 +31,5 @@ packages:
 
   users:
     entries:
+      - client/users
       - internal/users

@@ -1,0 +1,26 @@
+- self.users = self.users || {};
+- var entry = self.blog_entries[self.item.to];
+- var user = self.users[(entry || {}).user];
+
+if entry && user
+  li.user-subscriptions-item
+    .row
+      .col-sm-9
+        h2.user-subscriptions-item__title
+          a.user-subscriptions-item__title-link(href=self.link_to('blogs.entry', { user_hid: user.hid, entry_hid: entry.hid }))=entry.title
+        .user-subscriptions-item__desc
+          a.user-subscriptions-item__desc-link(href=self.link_to('blogs.sole', { user_hid: user.hid }))=user.name
+      .col-sm-3
+        button(
+          title=self.t('delete_subscription')
+          data-on-click='users.subscriptions:delete'
+          data-subscription=self.item
+          data-block-name=self.block_name
+        ).user-subscriptions-item__btn-delete.btn.btn-secondary.btn-sm.btn-square.icon.icon-x.float-right
+        button(
+          title=self.t('edit_subscription')
+          data-on-click='users.subscriptions:update'
+          data-subscription=self.item
+          data-block-name=self.block_name
+          class=self.icon(self.item.type)
+        ).user-subscriptions-item__btn-edit.btn.btn-secondary.btn-sm.btn-square.icon.float-right
