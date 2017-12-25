@@ -5,7 +5,7 @@
 
 const from2    = require('from2');
 const multi    = require('multistream');
-const pump     = require('pump');
+const pumpify  = require('pumpify');
 const through2 = require('through2');
 
 
@@ -38,7 +38,7 @@ module.exports = function (N, apiPath) {
 
     users = null;
 
-    let tag_stream = pump(
+    let tag_stream = pumpify.obj(
       N.models.blogs.BlogTag.find()
           .where('is_category').equals(true)
           .select('hid user')
@@ -62,7 +62,7 @@ module.exports = function (N, apiPath) {
       })
     );
 
-    let entry_stream = pump(
+    let entry_stream = pumpify.obj(
       N.models.blogs.BlogEntry.find()
           .where('st').equals(N.models.blogs.BlogEntry.statuses.VISIBLE)
           .select('hid user')
