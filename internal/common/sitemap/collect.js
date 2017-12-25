@@ -38,30 +38,6 @@ module.exports = function (N, apiPath) {
 
     users = null;
 
-    let tag_stream = pumpify.obj(
-      N.models.blogs.BlogTag.find()
-          .where('is_category').equals(true)
-          .select('hid user')
-          .sort('hid')
-          .lean(true)
-          .cursor(),
-
-      through2.obj(function (tag, encoding, callback) {
-        let hid = user_id_to_hid[tag.user];
-
-        if (hid) {
-          this.push({
-            loc: N.router.linkTo('blogs.sole', {
-              user_hid: hid,
-              $query: { tag: tag.hid }
-            })
-          });
-        }
-
-        callback();
-      })
-    );
-
     let entry_stream = pumpify.obj(
       N.models.blogs.BlogEntry.find()
           .where('st').equals(N.models.blogs.BlogEntry.statuses.VISIBLE)
@@ -88,7 +64,7 @@ module.exports = function (N, apiPath) {
 
     data.streams.push({
       name: 'blogs',
-      stream: multi.obj([ from2.obj(buffer), tag_stream, entry_stream ])
+      stream: multi.obj([ from2.obj(buffer), entry_stream ])
     });
   });
 };
