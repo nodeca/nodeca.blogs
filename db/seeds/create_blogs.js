@@ -189,8 +189,6 @@ async function createEntries() {
       html:        result.html,
       /*eslint-disable new-cap*/
       ip:          charlatan.Internet.IPv4(),
-      comments:    comment_count,
-      comments_hb: comment_count,
       tag_hids:    tags.map(tag => tag.hid),
       tags:        tags.map(tag => tag.name_lc),
       last_comment_counter: comment_count
@@ -203,6 +201,8 @@ async function createEntries() {
     await addVotes(entry, shared.content_type.BLOG_ENTRY);
 
     await createComments(await entry.save());
+
+    await models.blogs.BlogEntry.updateCache(entry._id);
   }
 }
 

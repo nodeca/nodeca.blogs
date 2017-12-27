@@ -328,7 +328,7 @@ module.exports = function (N, apiPath) {
   // Update comment counters
   //
   N.wire.after(apiPath, function update_counters(env) {
-    return N.models.blogs.BlogEntry.updateCounters(env.data.entry._id);
+    return N.models.blogs.BlogEntry.updateCache(env.data.entry._id);
   });
 
 
@@ -337,6 +337,20 @@ module.exports = function (N, apiPath) {
   N.wire.after(apiPath, async function add_search_index(env) {
     await N.queue.blog_entries_search_update_by_ids([ env.data.entry._id ]).postpone();
     await N.queue.blog_comments_search_update_by_ids([ env.data.new_comment._id ]).postpone();
+  });
+
+
+  // Set marker position
+  //
+  N.wire.after(apiPath, async function set_marker_pos(env) {
+    await N.models.users.Marker.setPos(
+      env.user_info.user_id,
+      env.data.entry._id,
+      env.data.new_comment.hid,
+      env.data.new_comment.hid,
+      env.data.entry.user,
+      'blog_entry'
+    );
   });
 
 

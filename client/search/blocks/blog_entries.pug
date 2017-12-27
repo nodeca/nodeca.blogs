@@ -23,7 +23,7 @@ if self.results.length
               )= user.nick
 
           li.search-result__stat-item
-            = self.t('comments', result.entry.comments)
+            = self.t('comments', result.entry.cache.comment_count)
 
       .search-result__content
         .markup!= result.entry.html

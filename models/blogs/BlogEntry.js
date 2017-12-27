@@ -29,6 +29,16 @@ module.exports = function (N, collectionName) {
     DELETED_HARD: 4
   };
 
+  let cache = {
+    comment_count:    { type: Number, 'default': 0 },
+
+    // used to display last comment author in tracker
+    last_comment:     Schema.ObjectId,
+    last_comment_hid: Number,
+    last_user:        Schema.ObjectId,
+    last_ts:          Date
+  };
+
   let BlogEntry = new Schema({
     hid:          Number,
     title:        String,
@@ -41,8 +51,6 @@ module.exports = function (N, collectionName) {
     tag_hids:     [ Number ],
     tags:         [ String ],
     ts:           { type: Date, 'default': Date.now },
-    comments:     { type: Number, 'default': 0 },
-    comments_hb:  { type: Number, 'default': 0 },
 
     views:        { type: Number, 'default': 0 },
     votes:        { type: Number, 'default': 0 },
@@ -62,7 +70,11 @@ module.exports = function (N, collectionName) {
     params_ref:   Schema.ObjectId,
     imports:      [ String ],
     import_users: [ Schema.ObjectId ],
-    tail:         [ AttachmentInfo ]
+    tail:         [ AttachmentInfo ],
+
+    // Cache
+    cache,
+    cache_hb: cache
   }, {
     versionKey : false
   });
@@ -81,6 +93,11 @@ module.exports = function (N, collectionName) {
 
   // get a list of blog entries by tag
   BlogEntry.index({ tag_hids: 1, _id: -1, st: 1 });
+
+  // get entries changed in last month (for Marker.gc),
+  // sparse to avoid indexing blog entries with no comments
+  BlogEntry.index({ user: 1, 'cache.last_comment': -1 }, { sparse: true });
+  BlogEntry.index({ user: 1, 'cache_hb.last_comment': -1 }, { sparse: true });
 
   // Export statuses
   //
@@ -148,11 +165,47 @@ module.exports = function (N, collectionName) {
   });
 
 
-  // Update comment counters
+  // Update cache
   //
-  BlogEntry.statics.updateCounters = async function (entry_id) {
+  BlogEntry.statics.updateCache = async function (entry_id) {
     let statuses = N.models.blogs.BlogEntry.statuses;
-    let updateData = {};
+    let updateData = { $set: {} };
+
+    // Find last comment
+    let comment = await N.models.blogs.BlogComment.findOne()
+                            .where('entry').equals(entry_id)
+                            .or([ { st: statuses.VISIBLE }, { st: statuses.HB } ])
+                            .sort('-hid')
+                            .lean(true);
+
+    if (!comment) comment = {};
+
+    updateData.$set['cache_hb.last_comment']     = comment._id;
+    updateData.$set['cache_hb.last_comment_hid'] = comment.hid;
+    updateData.$set['cache_hb.last_user']        = comment.user;
+    updateData.$set['cache_hb.last_ts']          = comment.ts;
+
+    updateData.$set['cache.last_comment']     = comment._id;
+    updateData.$set['cache.last_comment_hid'] = comment.hid;
+    updateData.$set['cache.last_user']        = comment.user;
+    updateData.$set['cache.last_ts']          = comment.ts;
+
+    // If last comment hellbanned - find visible one
+    if (comment.st === statuses.HB) {
+      // Find last visible comment
+      let comment_visible = await N.models.blogs.BlogComment.findOne()
+                                  .where('entry').equals(entry_id)
+                                  .where('st').equals(statuses.VISIBLE)
+                                  .sort('-hid')
+                                  .lean(true);
+
+      if (!comment_visible) comment_visible = {};
+
+      updateData.$set['cache.last_comment']     = comment_visible._id;
+      updateData.$set['cache.last_comment_hid'] = comment_visible.hid;
+      updateData.$set['cache.last_user']        = comment_visible.user;
+      updateData.$set['cache.last_ts']          = comment_visible.ts;
+    }
 
     let count = await Promise.all(
                         [ statuses.VISIBLE, statuses.HB ].map(st =>
@@ -164,12 +217,22 @@ module.exports = function (N, collectionName) {
                       );
 
     // Visible comment count
-    updateData.comments = count[0];
+    updateData.$set['cache.comment_count'] = count[0];
 
     // Hellbanned comment count
-    updateData.comments_hb = count[0] + count[1];
+    updateData.$set['cache_hb.comment_count'] = count[0] + count[1];
 
-    await N.models.blogs.BlogEntry.update({ _id: entry_id }, { $set: updateData });
+    // { updateData.$set[x]: undefined } => { updateData.$unset[x]: true }
+    for (let key of Object.keys(updateData.$set)) {
+      if (typeof updateData.$set[key] === 'undefined') {
+        delete updateData.$set[key];
+
+        updateData.$unset = updateData.$unset || {};
+        updateData.$unset[key] = true;
+      }
+    }
+
+    await N.models.blogs.BlogEntry.update({ _id: entry_id }, updateData);
   };
 
 

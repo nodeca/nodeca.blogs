@@ -61,8 +61,9 @@ module.exports = function (N, collectionName) {
   // Indexes
   /////////////////////////////////////////////////////////////////////////////
 
-  // get all comments for a blog entry
-  BlogComment.index({ entry: 1 });
+  // get all comments for a blog entry,
+  // get last comment in a blog entry (rebuild entry cache)
+  BlogComment.index({ entry: 1, st: 1, hid: 1 });
 
   // Export statuses
   //

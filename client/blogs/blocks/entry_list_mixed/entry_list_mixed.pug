@@ -108,7 +108,7 @@ each entry in self.entries
             - var href = self.link_to('blogs.entry', { user_hid: user.hid, entry_hid: entry.hid, $anchor: 'comments' });
             a.btn.blog-entry__action.blog-entry__comments(href=href)
               span.icon.icon-comment.icon-space-after
-              = self.t('comments', entry.comments)
+              = self.t('comments', entry.cache.comment_count)
 
           - var showDropdown = false
           - showDropdown = showDropdown || self.settings.blogs_mod_can_delete

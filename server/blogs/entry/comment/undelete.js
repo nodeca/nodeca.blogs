@@ -115,7 +115,7 @@ module.exports = function (N, apiPath) {
   // Update comment counters
   //
   N.wire.after(apiPath, function update_counters(env) {
-    return N.models.blogs.BlogEntry.updateCounters(env.data.entry._id);
+    return N.models.blogs.BlogEntry.updateCache(env.data.entry._id);
   });
 
 

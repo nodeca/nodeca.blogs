@@ -47,6 +47,11 @@ module.exports = function (N) {
     // Sanitize entries
     entries = await sanitize_entry(N, entries, env.user_info);
 
+    // avoid sending large attributes to the client that won't be used
+    entries = entries.map(e =>
+      _.omit(e, [ 'html', 'tail' ])
+    );
+
     let entries_by_id = _.keyBy(entries, '_id');
 
     env.res.blog_entries = entries_by_id;

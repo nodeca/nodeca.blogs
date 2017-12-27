@@ -263,6 +263,30 @@ module.exports = function (N, apiPath) {
   });
 
 
+  // Mark entry as read
+  //
+  N.wire.after(apiPath, function mark_entry_read(env) {
+    if (!env.user_info.is_member) return;
+
+    // Don't need wait for callback, just log error if needed
+    N.models.users.Marker.mark(
+      env.user_info.user_id,
+      env.data.entry._id,
+      env.data.user._id,
+      'blog_entry'
+    ).then(() =>
+      N.models.users.Marker.setPos(
+        env.user_info.user_id,
+        env.data.entry._id,
+        env.data.entry.last_comment_counter,
+        env.data.entry.last_comment_counter,
+        env.data.entry.user,
+        'blog_entry'
+      )
+    ).catch(err => N.logger.error(`Marker cannot mark blog entry as read: ${err}`));
+  });
+
+
   // Fetch and fill bookmarks
   //
   N.wire.after(apiPath, async function fetch_and_fill_bookmarks(env) {

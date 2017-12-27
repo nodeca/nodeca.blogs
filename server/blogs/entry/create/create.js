@@ -215,6 +215,8 @@ module.exports = function (N, apiPath) {
     entry.tags       = env.data.tags;
     entry.tag_hids   = env.data.tag_hids;
     entry.ts         = Date.now();
+    entry.cache      = { comment_count: 0 };
+    entry.cache_hb   = { comment_count: 0 };
 
     entry.attach       = env.params.attach;
     entry.params       = env.data.parse_options;
