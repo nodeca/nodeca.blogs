@@ -1,0 +1,25 @@
+- var entry = self.blog_entries[self.item.id];
+- var blog_owner = self.users[entry.user];
+- var last_user = self.users[entry.cache.last_user || entry.user];
+- var mark = self.read_marks[entry._id];
+- var href;
+
+li.user-tracker-item.user-tracker-item__m-blog-entry(
+  class=mark.isNew ? 'user-tracker-item__m-new' : ''
+  class=mark.next !== -1 ? 'user-tracker-item__m-unread' : ''
+)
+  .row
+    .col-sm-9
+      h2.user-tracker-item__title
+        a.user-tracker-item__title-link(href=self.link_to('blogs.entry', { user_hid: blog_owner.hid, entry_hid: entry.hid }))=entry.title
+      .user-tracker-item__desc
+        if blog_owner
+          a.user-tracker-item__desc-link(href=self.link_to('blogs.sole', { user_hid: blog_owner.hid }))=blog_owner.name
+    .col-sm-3.d-none.d-sm-block
+      .user-tracker-item__updated
+        != self.timetag(entry.cache.last_ts || entry.ts, 'relative')
+      if last_user
+        a.user-tracker-item__author._ucard-popover(
+          href=self.link_to('users.member', { user_hid: last_user.hid })
+          data-user-id=last_user._id
+        )=last_user.name
