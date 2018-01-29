@@ -1,6 +1,7 @@
 en-US:
   vote:
     err_perm_expired: You cannot vote for this entry anymore
+    auto_abuse_report_text: This blog entry received too many downvotes.
 
   ip_info:
     err_no_ip: IP address for this entry is not specified
