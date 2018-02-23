@@ -33,3 +33,4 @@ packages:
     entries:
       - client/users
       - internal/users
+      - server/users

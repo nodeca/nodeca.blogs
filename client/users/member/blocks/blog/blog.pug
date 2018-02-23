@@ -1,0 +1,25 @@
+- var entryStatuses = '$$ JSON.stringify(N.models.blogs.BlogEntry.statuses) $$'
+
+.member-block
+
+  .member-block__header
+    - var blogLink = self.link_to('blogs.sole', { user_hid: self.user.hid })
+    .member-block__header-title
+      a.member-block__header-collapser(href='#member-blog-info', data-toggle='collapse')
+        .icon.icon-collapse
+        .icon.icon-expand
+
+      a.member-block__header-link(href=blogLink)
+        = self.t('title')
+        span.member-block__header-arrow.icon.icon-right-open
+        small.member-block__header-counter= self.blocks.blog.count
+
+  #member-blog-info.member-block__inner.collapse.show
+    ul.member-block__blog-info
+      each entry in self.blocks.blog.list
+        li.member-block__blog-info-item(
+          class=(entry.st === entryStatuses.DELETED) ? 'member-block__blog-info-item-deleted' : ''
+          class=(entry.st === entryStatuses.DELETED_HARD) ? 'member-block__blog-info-item-deleted-hard' : ''
+        )
+          span.member-block__blog-info-item-time!= self.timetag(entry.ts, 'relative')
+          a.member-block__blog-info-item-title(href=self.link_to('blogs.entry', { user_hid: self.user.hid, entry_hid: entry.hid }))= entry.title
