@@ -3,8 +3,3 @@ menus:
     navbar:
       blogs:
         to: blogs.index
-
-  admin:
-    navbar:
-      blogs:
-        to: admin.blogs.index

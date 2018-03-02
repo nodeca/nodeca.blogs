@@ -35,6 +35,3 @@ router:
 
     search.blogs_sole:
       "/search_blogs_sole": ~
-
-    admin.blogs.index:
-      "/blogs": ~
