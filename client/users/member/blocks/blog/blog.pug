@@ -21,5 +21,5 @@
           class=(entry.st === entryStatuses.DELETED) ? 'member-block__blog-info-item-deleted' : ''
           class=(entry.st === entryStatuses.DELETED_HARD) ? 'member-block__blog-info-item-deleted-hard' : ''
         )
-          span.member-block__blog-info-item-time!= self.timetag(entry.ts, 'relative')
+          span.member-block__blog-info-item-time!= self.timetag(entry.ts, 'date_numeric')
           a.member-block__blog-info-item-title(href=self.link_to('blogs.entry', { user_hid: self.user.hid, entry_hid: entry.hid }))= entry.title

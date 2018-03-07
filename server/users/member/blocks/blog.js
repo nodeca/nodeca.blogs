@@ -57,6 +57,9 @@ module.exports = function (N) {
       _.omit(e, [ 'html', 'tail' ])
     );
 
+    // hide blog widget if no blog entries were created
+    if (env.user_info.user_hid !== env.data.user.hid && entries.length === 0) return;
+
     env.res.blocks = env.res.blocks || {};
     _.set(env.res, 'blocks.blog', { list: entries });
   });
