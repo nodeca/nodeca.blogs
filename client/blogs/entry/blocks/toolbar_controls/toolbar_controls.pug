@@ -4,9 +4,6 @@
 
 - var items = []
 
-if self.settings.blogs_can_create
-  - items.push('add_comment')
-
 if self.runtime.is_member
   - items.push('subscription')
 
@@ -44,19 +41,6 @@ if items.length > 0 && items[items.length - 1].indexOf('mod_') === 0
 
 
 .page-actions.blogs-entry__toolbar-controls
-  if self.settings.blogs_can_create
-    button.hidden-nav-alt.btn.btn-primary.btn-square.d-none.d-sm-inline-block.icon.icon-plus(
-      type='button'
-      data-on-click='blogs.entry:reply'
-      title=self.t('add_comment')
-    )
-
-    button.hidden-page-head.btn.btn-secondary.btn-square.d-none.d-sm-inline-block.icon.icon-plus(
-      type='button'
-      data-on-click='blogs.entry:reply'
-      title=self.t('add_comment')
-    )
-
   - var subscriptionIcon = 'icon-track-normal'
   - var subscriptionTitle = self.t('subs_normal')
 
@@ -106,12 +90,6 @@ if items.length > 0 && items[items.length - 1].indexOf('mod_') === 0
               button.dropdown-item.disabled(
                 type='button'
               )= self.t('history')
-
-            when 'add_comment'
-              button.dropdown-item.d-sm-none(
-                type='button'
-                data-on-click='blogs.entry:reply'
-              )= self.t('add_comment')
 
             when 'subscription'
               button.dropdown-item(

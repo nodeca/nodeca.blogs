@@ -5,7 +5,6 @@ en-US:
   add_infraction: Add infraction
   delete: Delete
   undelete: Undelete
-  add_comment: Add comment
   subscription: Subscription
 
   subs_muted: Muted. You will never be notified of anything in this blog entry.
