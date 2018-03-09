@@ -1,0 +1,5 @@
+users:
+  profile_page:
+    blocks:
+      blog:
+        priority: 30
