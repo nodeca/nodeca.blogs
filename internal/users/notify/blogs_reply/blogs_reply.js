@@ -94,7 +94,7 @@ module.exports = function (N) {
         entry_hid: entry.hid
       });
 
-      let text = render(N, 'users.notify.blogs_new_comment', { html: comment.html, link: url }, helpers);
+      let text = render(N, 'users.notify.blogs_reply', { html: comment.html, link: url }, helpers);
 
       local_env.messages[user_id] = { subject, text, url, unsubscribe };
     });
