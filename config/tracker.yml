@@ -1,4 +1,9 @@
 users:
+  tracker:
+    menu:
+      blog_entry:
+        priority: 30
+
   subscriptions:
     blogs_entry:
       to_type: BLOG_ENTRY

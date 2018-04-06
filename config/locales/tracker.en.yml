@@ -1,6 +1,10 @@
 i18n:
   en-US:
     users:
+      tracker:
+        menu:
+          blog_entry: Blogs
+
       subscriptions:
         blogs_sole: Blogs
         blogs_entry: Blog entries
