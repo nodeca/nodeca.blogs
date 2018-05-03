@@ -72,7 +72,7 @@ module.exports = function (N, collectionName) {
 
   // Remove empty "imports" and "import_users" fields
   //
-  BlogComment.pre('save', function (callback) {
+  BlogComment.pre('save', function () {
     if (this.imports && this.imports.length === 0) {
       /*eslint-disable no-undefined*/
       this.imports = undefined;
@@ -82,51 +82,34 @@ module.exports = function (N, collectionName) {
       /*eslint-disable no-undefined*/
       this.import_users = undefined;
     }
-
-    callback();
   });
 
 
   // Store parser options separately and save reference to them
   //
-  BlogComment.pre('save', function (callback) {
-    if (!this.params) {
-      callback();
-      return;
-    }
+  BlogComment.pre('save', async function () {
+    if (!this.params) return;
 
-    N.models.core.MessageParams.setParams(this.params)
-      .then(id => {
-        this.params = undefined;
-        this.params_ref = id;
-      })
-      .asCallback(callback);
+    let id = await N.models.core.MessageParams.setParams(this.params);
+
+    /*eslint-disable no-undefined*/
+    this.params = undefined;
+    this.params_ref = id;
   });
 
 
   // Set 'hid' for the new comment.
   // This hook should always be the last one to avoid counter increment on error
-  BlogComment.pre('save', function (callback) {
-    if (!this.isNew) {
-      callback();
-      return;
-    }
+  BlogComment.pre('save', async function () {
+    if (!this.isNew) return;
 
-    N.models.blogs.BlogEntry.findByIdAndUpdate(
+    let entry = await N.models.blogs.BlogEntry.findByIdAndUpdate(
       this.entry,
       { $inc: { last_comment_counter: 1 } },
-      { 'new': true },
-      (err, entry) => {
-        if (err) {
-          callback(err);
-          return;
-        }
-
-        this.hid = entry.last_comment_counter;
-
-        callback();
-      }
+      { 'new': true }
     );
+
+    this.hid = entry.last_comment_counter;
   });
 
 
