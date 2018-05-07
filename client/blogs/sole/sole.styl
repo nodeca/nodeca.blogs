@@ -1,29 +1,36 @@
 @import "nodeca.core/client/common/_variables"
 
-$aside-size = '$$ N.config.users.avatars.resize.sm.height $$'px
-
 .blogs-sole__head
   display flex
-  padding-bottom 1rem
-  margin-bottom 1.5rem
+  padding-bottom .75rem
   border-bottom 1px solid $decorator-color
-  line-height 1.25em
 
-.blogs-sole__meta
-  flex 1 1 0%
+.blogs-sole__head-content
+  flex 1 1 100%
 
-.blogs-sole__avatar
-  flex 0 0 $aside-size + 10px
+.blogs-sole__meta .blogs-tag-list
+  font-size $font-size-sm
+
+$userpic-size = 30px
 
 .blogs-sole__userpic
-  width $aside-size
-  height $aside-size
+  width $userpic-size
+  height $userpic-size
+  margin-right .7rem
+  margin-top 4px
   border-radius 3px
   box-shadow 0 0 1px $body-color-secondary
 
+.blogs-sole__head-m-tagged
+  .blogs-sole__userpic
+    width 50px
+    height 50px
+    margin-top 2px
+  .page-head__title
+    font-size $h4-font-size
+
 .blogs-sole__author-link
   color $body-color-secondary
-  font-size $font-size-lg
 
 .blogs-sole__loading-prev
 .blogs-sole__loading-next

@@ -70,21 +70,29 @@ article#content.blogs-sole(
   .layout__container.container-fluid
     != self.partial('@users.blocks.announces')
 
-    header.page-head.blogs-sole__head
-      if self.current_tag
+    if self.current_tag
+      header.page-head.blogs-sole__head
         h1.blogs-index__title.page-head__title(itemprop='name')= self.t('title_tag', { tag: self.current_tag })
-      else
+
+        != self.partial('@blogs.sole.blocks.toolbar_controls')
+
+    else
+      header.page-head.blogs-sole__head(
+        class = self.categories.length ? 'blogs-sole__head-m-tagged' : ''
+      )
         a.blogs-sole__avatar(href=self.link_to('users.member', { user_hid: user.hid }))
-          img.blogs-sole__userpic(alt=user.name)&attributes(self.avatar(user, 'sm'))
+          img.blogs-sole__userpic(alt=user.name)&attributes(self.avatar(user, 'md'))
 
-        .blogs-sole__meta
-          a.blogs-sole__author-link(
-            href=self.link_to('users.member', { user_hid: user.hid })
-          )= user.name
+        .blogs-sole__head-content
+          h1.page-head__title
+            a.blogs-sole__author-link(
+              href=self.link_to('users.member', { user_hid: user.hid })
+            )= user.name
 
-          != self.partial('@blogs.blocks.tag_list', { tags: self.categories })
+          .blogs-sole__meta
+            != self.partial('@blogs.blocks.tag_list', { tags: self.categories })
 
-      != self.partial('@blogs.sole.blocks.toolbar_controls')
+        != self.partial('@blogs.sole.blocks.toolbar_controls')
 
     if self.entries && self.entries.length
       .blogs-sole__loading-prev.nojs-hide(
