@@ -36,6 +36,9 @@ module.exports = function (N, apiPath) {
       N.models.blogs.BlogTag.normalize
     );
 
+    // Fix list for empty input
+    if (categories.length === 1 && !categories[0]) categories = [];
+
     let store = N.settings.getStore('user');
 
     await store.set({
