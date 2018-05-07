@@ -10,3 +10,4 @@ en-US:
   del_reason: "(#{text})"
   del_by: "Deleted by:"
   infraction_title: "#{points} ((point|points)):points, added at #{date}"
+  views: Views

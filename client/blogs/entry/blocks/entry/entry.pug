@@ -45,8 +45,6 @@
         else
           .blog-entry__avatar.av-anon
 
-      span.blog-entry__meta-item.blog-entry__ts!= self.timetag(entry.ts, 'relative')
-
       if entry.del_by
         span.blog-entry__meta-item.blog-entry__del-by
           = self.t('del_by')
@@ -72,16 +70,9 @@
 
   footer.blog-entry__controls
     ul.blog-entry__controls-blk
-      - var infraction = self.infractions[entry._id];
-      if infraction
-        li.blog-entry__control-item.blog-entry__infraction(
-          class=infraction.points === 0 ? 'blog-entry__infraction-m-warning' : ''
-        )
-          a.btn.blog-entry__action(
-            title=self.t('infraction_title', { points: infraction.points, date: self.date(infraction.ts, 'datetime') })
-            href=self.link_to('users.member', { user_hid: user && user.hid }) + '#infraction' + infraction._id
-          )
-            span.icon.icon-infraction
+
+      li.blog-entry__control-item.blog-entry__ts
+        != self.timetag(entry.ts, 'relative')
 
       li.blog-entry__control-item.blog-entry__votes
         - var votes = entry.votes || 0;
@@ -92,15 +83,6 @@
           title=self.t('vote_details')
           data-votes-count=(votes > 0 ? '+' : '') + votes
         )
-
-      if entry.edit_count
-        li.blog-entry__control-item.blog-entry__history
-          button.btn.blog-entry__action(
-            title=self.t('last_edited', { date: self.date(entry.last_edit_ts, 'datetime') })
-            data-on-click='blogs.blocks.blog_entry:history'
-            data-entry-id=entry._id
-          )
-            span.icon.icon-history.icon-space-after= entry.edit_count
 
       if self.runtime.is_member && self.runtime.user_id !== entry.user
 
@@ -122,6 +104,17 @@
               data-value=self.own_votes[entry._id] === -1 ? '0' : '-1'
             )
               span.icon.icon-vote-down
+
+      - var infraction = self.infractions[entry._id];
+      if infraction
+        li.blog-entry__control-item.blog-entry__infraction(
+          class=infraction.points === 0 ? 'blog-entry__infraction-m-warning' : ''
+        )
+          a.btn.blog-entry__action(
+            title=self.t('infraction_title', { points: infraction.points, date: self.date(infraction.ts, 'datetime') })
+            href=self.link_to('users.member', { user_hid: user && user.hid }) + '#infraction' + infraction._id
+          )
+            span.icon.icon-infraction
 
       if self.settings.can_report_abuse
         li.blog-entry__control-item
@@ -150,7 +143,19 @@
             span.icon.icon-bookmark
             span.blog-entry__bookmarks-count(data-bm-count=entry.bookmarks)
 
-      li.blog-entry__control-item
-        span.icon.icon-views.icon-space-after= entry.views
+      if entry.edit_count
+        li.blog-entry__control-item.blog-entry__history
+          button.btn.blog-entry__action(
+            title=self.t('last_edited', { date: self.date(entry.last_edit_ts, 'datetime') })
+            data-on-click='blogs.blocks.blog_entry:history'
+            data-entry-id=entry._id
+          )
+            span.icon.icon-history.icon-space-after= entry.edit_count
+
+      li.blog-entry__control-item.blog-entry__views
+        span.icon.icon-views.icon-space-after(
+          title=self.t('views')
+        )
+          = entry.views
 
   != self.partial('@blogs.blocks.tag_list', { tags: self.entry_tags })

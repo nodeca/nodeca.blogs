@@ -1,6 +1,6 @@
 en-US:
   read_more: Read more
-  comments: "#{count} ((comment|comments))"
+  comments: "Comments"
   multiselect_hint: "Click with shift to start range selection"
 
   report: Report to moderator

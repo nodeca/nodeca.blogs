@@ -47,6 +47,10 @@ each entry in self.entries
             = self.t('read_more')
 
         ul.blog-entry__controls-blk
+
+          li.blog-entry__control-item.blog-entry__ts
+            != self.timetag(entry.ts, 'relative')
+
           - var infraction = self.infractions[entry._id];
           if infraction
             li.blog-entry__control-item.blog-entry__infraction(
@@ -57,9 +61,6 @@ each entry in self.entries
                 href=self.link_to('users.member', { user_hid: user && user.hid }) + '#infraction' + infraction._id
               )
                 span.icon.icon-infraction
-
-          li.blog-entry__control-item
-            != self.timetag(entry.ts, 'relative')
 
           if self.settings.can_report_abuse
             li.blog-entry__control-item
@@ -91,8 +92,10 @@ each entry in self.entries
           li.blog-entry__control-item
             - var href = self.link_to('blogs.entry', { user_hid: user.hid, entry_hid: entry.hid, $anchor: 'comments' });
             a.btn.blog-entry__action.blog-entry__comments(href=href)
-              span.icon.icon-comment.icon-space-after
-              = self.t('comments', entry.cache.comment_count)
+              span.icon.icon-comment.icon-space-after(
+                title=self.t('comments')
+              )
+                = entry.cache.comment_count
 
           - var showDropdown = false
           - showDropdown = showDropdown || self.settings.blogs_mod_can_delete
