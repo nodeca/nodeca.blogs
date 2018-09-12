@@ -38,6 +38,7 @@ if self.runtime.is_member
             when 'new_entry'
               button.dropdown-item.d-sm-none(
                 type='button'
+                data-on-click='blogs.blocks.blog_entry.create:begin'
               )= self.t('new_entry')
 
             when 'my_blog'
