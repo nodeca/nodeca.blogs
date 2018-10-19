@@ -30,13 +30,11 @@ function get_source(post) {
     result += '\n';
   }
 
-  // add tags
-  if (post.tags.length) {
-    result += '\n';
-    result += t('tags') + post.tags.join(', ') + '\n';
-  }
-
   return result;
+}
+
+function get_tags(post) {
+  return post.tags.join(', ');
 }
 
 
@@ -52,9 +50,16 @@ function build_diff(history) {
   let initial_src = get_source(history[0]);
   let text_diff = diff(initial_src, initial_src);
   let title_diff;
+  let attr_diffs = [];
 
   if (typeof history[0].title !== 'undefined') {
     title_diff = diff_line(history[0].title, history[0].title);
+  }
+
+  let tags = get_tags(history[0]);
+
+  if (tags) {
+    attr_diffs.push([ 'tags', diff_line(tags, tags) ]);
   }
 
   // Get first version for this post (no actual diff)
@@ -62,7 +67,8 @@ function build_diff(history) {
     user:       history[0].user,
     ts:         history[0].ts,
     text_diff,
-    title_diff
+    title_diff,
+    attr_diffs
   });
 
   for (let revision = 0; revision < history.length - 1; revision++) {
@@ -81,14 +87,24 @@ function build_diff(history) {
     let text_diff;
 
     if (old_src !== new_src) {
-      text_diff = diff(get_source(old_post), get_source(new_post));
+      text_diff = diff(old_src, new_src);
+    }
+
+    let attr_diffs = [];
+
+    let old_tags = get_tags(old_post);
+    let new_tags = get_tags(new_post);
+
+    if (old_tags !== new_tags) {
+      attr_diffs.push([ 'tags', diff_line(old_tags, new_tags) ]);
     }
 
     result.push({
       user:       new_post.user,
       ts:         new_post.ts,
       text_diff,
-      title_diff
+      title_diff,
+      attr_diffs
     });
   }
 

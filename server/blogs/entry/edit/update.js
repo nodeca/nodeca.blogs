@@ -249,7 +249,8 @@ module.exports = function (N, apiPath) {
         tags:        orig_entry.tags,
         tail:        orig_entry.tail,
         title:       orig_entry.title,
-        params_ref:  orig_entry.params_ref
+        params_ref:  orig_entry.params_ref,
+        ip:          env.req.ip
       }).save();
     }
 

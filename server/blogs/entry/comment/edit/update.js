@@ -178,7 +178,8 @@ module.exports = function (N, apiPath) {
         md:          orig_comment.md,
         tail:        orig_comment.tail,
         //title:       orig_comment.title,
-        params_ref:  orig_comment.params_ref
+        params_ref:  orig_comment.params_ref,
+        ip:          env.req.ip
       }).save();
     }
 

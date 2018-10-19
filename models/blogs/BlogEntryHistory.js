@@ -28,13 +28,18 @@ module.exports = function (N, collectionName) {
 
     // parser options before changes (not currently used anywhere;
     // could be useful for tracking turning smilies/media on/off)
-    params_ref: Schema.ObjectId,
+    params_ref:   Schema.ObjectId,
+    imports:      [ String ],
+    import_users: [ Schema.ObjectId ],
 
     // topic title before changes (only for 1st post in a given topic)
     title:      String,
 
     // change time
-    ts:         { type: Date, 'default': Date.now }
+    ts:         { type: Date, 'default': Date.now },
+
+    // ip where this change was made from
+    ip:         String
   }, {
     versionKey: false
   });

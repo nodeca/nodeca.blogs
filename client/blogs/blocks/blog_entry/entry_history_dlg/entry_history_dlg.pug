@@ -23,3 +23,10 @@
             if entry.text_diff
               .entry-history-dlg__diff
                 != entry.text_diff
+
+            .entry-history-dlg__details
+              each kv in entry.attr_diffs
+                - var key = kv[0], value = kv[1];
+                .entry-history-dlg__details-item
+                  .entry-history-dlg__details-key= self.t(key)
+                  .entry-history-dlg__details-value!= value
