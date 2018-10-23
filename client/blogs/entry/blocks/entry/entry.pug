@@ -143,7 +143,7 @@
             span.icon.icon-bookmark
             span.blog-entry__bookmarks-count(data-bm-count=entry.bookmarks)
 
-      if entry.edit_count
+      if self.settings.can_see_history && entry.edit_count
         li.blog-entry__control-item.blog-entry__history
           button.btn.blog-entry__action(
             title=self.t('last_edited', { date: self.date(entry.last_edit_ts, 'datetime') })

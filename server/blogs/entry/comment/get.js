@@ -180,6 +180,7 @@ module.exports = function (N, apiPath) {
       'can_report_abuse',
       'can_vote',
       'can_see_ip',
+      'can_see_history',
       'votes_add_max_time',
       'blogs_edit_comments_max_time'
     ]));
