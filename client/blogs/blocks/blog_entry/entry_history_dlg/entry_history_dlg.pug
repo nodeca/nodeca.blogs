@@ -1,32 +1,70 @@
+- var roles = '$$ JSON.stringify(N.models.blogs.BlogEntryHistory.roles) $$'
+
 .modal.fade(tabindex='-1', role='dialog', aria-hidden='true')
   .modal-dialog.modal-lg
     .modal-content
       .modal-header
         h4.modal-title= self.t('title')
         button.close(type='button', tabindex='-1', data-dismiss='modal') &times;
-      .modal-body.entry-history-dlg__content
+      .modal-body.blog-entry-history-dlg__content
         each entry in self.entries.reverse()
           - var user = self.users[entry.user];
 
-          .entry-history-dlg__entry
-            .entry-history-dlg__meta
-              .entry-history-dlg__meta-author
+          .blog-entry-history-entry(
+            class=entry.role === roles.USER ? 'blog-entry-history-entry__m-user' : ''
+            class=entry.role === roles.MODERATOR ? 'blog-entry-history-entry__m-moderator' : ''
+            class=entry.role === roles.TASK ? 'blog-entry-history-entry__m-task' : ''
+          )
+            .blog-entry-history-entry__meta
+              .blog-entry-history-entry__meta-author
+                span.blog-entry-history-entry__icon-task(
+                  title=self.t('role_task')
+                )= '*'
+                span.blog-entry-history-entry__icon-moderator(
+                  title=self.t('role_moderator')
+                )= '*'
                 if user
-                  a.entry-history-dlg__meta-author-link(href=self.link_to('users.member', { user_hid: user.hid }))
+                  a.blog-entry-history-entry__meta-author-link(href=self.link_to('users.member', { user_hid: user.hid }))
                     = user.nick
-              .entry-history-dlg__meta-ts!= self.timetag(entry.ts, 'relative')
+              .blog-entry-history-entry__meta-ts!= self.timetag(entry.ts, 'relative')
 
             if entry.title_diff
-              .entry-history-dlg__title
+              .blog-entry-history-entry__title
                 != entry.title_diff
 
             if entry.text_diff
-              .entry-history-dlg__diff
+              .blog-entry-history-entry__diff
                 != entry.text_diff
 
-            .entry-history-dlg__details
-              each kv in entry.attr_diffs
-                - var key = kv[0], value = kv[1];
-                .entry-history-dlg__details-item
-                  .entry-history-dlg__details-key= self.t(key)
-                  .entry-history-dlg__details-value!= value
+            if entry.actions && entry.actions.length > 0
+              .blog-entry-history-entry__actions
+                each d in entry.actions
+                  - var key = d[0], value = d[1], new_value = d[2];
+                  .blog-entry-history-entry__action-item
+                    case key
+                      when 'delete'
+                      when 'hard_delete'
+                        .diff-line
+                          = self.t('action_' + key)
+                          if value
+                            = ' ' + self.t('del_reason', { text: value })
+                      default
+                        .diff-line= self.t('action_' + key)
+
+            if entry.attr_diffs && entry.attr_diffs.length > 0
+              .blog-entry-history-entry__details
+                each d in entry.attr_diffs
+                  - var key = d[0], value = d[1], new_value = d[2];
+                  .blog-entry-history-entry__details-item
+                    .blog-entry-history-entry__details-key= self.t(key)
+                    .blog-entry-history-entry__details-value
+                      if new_value
+                        if new_value !== value
+                          .diff-line
+                            del= value
+                            = ' '
+                            ins= new_value
+                        else
+                          .diff-line= value
+                      else
+                        != value

@@ -1,9 +1,10 @@
 @import "nodeca.core/client/common/_variables"
 
-.comment-history-dlg__comment
+.blog-comment-history-entry
+  overflow-wrap break-word
   margin-bottom 2rem
 
-.comment-history-dlg__meta
+.blog-comment-history-entry__meta
   display flex
   padding .375rem .75rem
   margin-bottom .5rem
@@ -12,18 +13,35 @@
   border-radius 3px
   line-height 1.1em
 
-.comment-history-dlg__meta-author
+.blog-comment-history-entry__icon-task
+.blog-comment-history-entry__icon-moderator
+  font-weight bold
+  color #c97971
+  margin-right .375rem
+  display none
+
+.blog-comment-history-entry__m-task .blog-comment-history-entry__icon-task
+.blog-comment-history-entry__m-moderator .blog-comment-history-entry__icon-moderator
+  display inline
+
+.blog-comment-history-entry__meta-author
   flex 1 1 0%
 
-.comment-history-dlg__meta-author-link
+.blog-comment-history-entry__meta-author-link
   color inherit
 
-.comment-history-dlg__meta-ts
+.blog-comment-history-entry__meta-ts
   white-space nowrap
   font-size $font-size-xs
   align-self flex-end
   padding-left 1rem
 
-.comment-history-dlg__title
+.blog-comment-history-entry__title
   font-size $font-size-lg
   margin-bottom .5rem
+
+.blog-comment-history-entry__diff
+  margin-bottom .5rem
+
+.blog-comment-history-entry__actions
+  color $body-color-secondary

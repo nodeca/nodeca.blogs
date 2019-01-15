@@ -3,6 +3,8 @@
 'use strict';
 
 
+const entryStatuses  = '$$ JSON.stringify(N.models.blogs.BlogEntry.statuses) $$';
+
 let $dialog;
 
 
@@ -33,6 +35,77 @@ function get_source(post) {
   return result;
 }
 
+
+function has_status(status_set, st) {
+  return status_set.st === st || status_set.ste === st;
+}
+
+
+// Detect changes in topic statuses
+//
+// Input:
+//  - old_topic - topic object before changes
+//  - new_topic - topic object after changes
+//
+// Output: an array of actions that turn old_topic into new_topic
+//
+// Example: if old_topic={st:OPEN}, new_topic={st:CLOSED}
+// means user has closed this topic
+//
+// Because subsequent changes are merged, it may output multiple actions,
+// e.g. if old_topic={st:OPEN}, new_topic={st:PINNED,ste:CLOSED},
+// actions should be pin and close
+//
+// If either old or new state is deleted, we also need to check prev_st
+// for that state to account for merges, e.g.
+// old_topic={st:OPEN}, new_topic={st:DELETED,prev_st:{st:CLOSED}} means
+// that topic was first closed than deleted
+//
+// In some cases only prev_st may be changed, e.g.
+// old_topic={st:DELETED,prev_st:{st:OPEN}}, new_topic={st:DELETED,prev_st:{st:CLOSED}},
+// so we assume that user restored, closed, then deleted topic
+//
+// It is also possible that st, ste and prev_st are all the same,
+// but del_reason is changed (so topic was restored then deleted with a different reason).
+//
+function get_status_actions(new_entry, old_entry = {}) {
+  let old_st = { st: old_entry.st, ste: old_entry.ste };
+  let new_st = { st: new_entry.st, ste: new_entry.ste };
+  let old_is_deleted = false;
+  let new_is_deleted = false;
+  let result = [];
+
+  if (has_status(old_st, entryStatuses.DELETED) || has_status(old_st, entryStatuses.DELETED_HARD)) {
+    old_st = old_entry.prev_st;
+    old_is_deleted = true;
+  }
+
+  if (has_status(new_st, entryStatuses.DELETED) || has_status(new_st, entryStatuses.DELETED_HARD)) {
+    new_st = new_entry.prev_st;
+    new_is_deleted = true;
+  }
+
+  if (old_is_deleted || new_is_deleted) {
+    if (old_entry.st !== new_entry.st || old_entry.del_reason !== new_entry.del_reason || result.length > 0) {
+      if (old_is_deleted) {
+        result.unshift([ 'undelete' ]);
+      }
+
+      /* eslint-disable max-depth */
+      if (new_is_deleted) {
+        if (new_entry.st === entryStatuses.DELETED_HARD) {
+          result.push([ 'hard_delete', new_entry.del_reason ]);
+        } else {
+          result.push([ 'delete', new_entry.del_reason ]);
+        }
+      }
+    }
+  }
+
+  return result;
+}
+
+
 function get_tags(post) {
   return post.tags.join(', ');
 }
@@ -47,16 +120,21 @@ function build_diff(history) {
 
   let result = [];
 
-  let initial_src = get_source(history[0]);
+  let initial_src = get_source(history[0].entry);
   let text_diff = diff(initial_src, initial_src);
-  let title_diff;
+  let title_diff = diff_line(history[0].entry.title, history[0].entry.title);
+
+  //
+  // Detect changes in topic or post statuses squashed with first changeset
+  // (e.g. topic deleted by author immediately after it's created)
+  //
+  let actions = [];
+
+  actions = actions.concat(get_status_actions(history[0].entry));
+
   let attr_diffs = [];
 
-  if (typeof history[0].title !== 'undefined') {
-    title_diff = diff_line(history[0].title, history[0].title);
-  }
-
-  let tags = get_tags(history[0]);
+  let tags = get_tags(history[0].entry);
 
   if (tags) {
     attr_diffs.push([ 'tags', diff_line(tags, tags) ]);
@@ -64,46 +142,52 @@ function build_diff(history) {
 
   // Get first version for this post (no actual diff)
   result.push({
-    user:       history[0].user,
-    ts:         history[0].ts,
+    user:       history[0].meta.user,
+    ts:         history[0].meta.ts,
+    role:       history[0].meta.role,
     text_diff,
     title_diff,
+    actions,
     attr_diffs
   });
 
   for (let revision = 0; revision < history.length - 1; revision++) {
-    let old_post = history[revision];
-    let new_post = history[revision + 1];
+    let old_revision = history[revision];
+    let new_revision = history[revision + 1];
     let title_diff;
 
-    if (typeof old_post.title !== 'undefined' || typeof new_post.title !== 'undefined') {
-      if (old_post.title !== new_post.title) {
-        title_diff = diff_line(old_post.title, new_post.title);
-      }
+    if (old_revision.entry.title !== new_revision.entry.title) {
+      title_diff = diff_line(old_revision.entry.title, new_revision.entry.title);
     }
 
-    let old_src = get_source(old_post);
-    let new_src = get_source(new_post);
+    let old_src = get_source(old_revision.entry);
+    let new_src = get_source(new_revision.entry);
     let text_diff;
 
     if (old_src !== new_src) {
       text_diff = diff(old_src, new_src);
     }
 
+    let actions = [];
+
+    actions = actions.concat(get_status_actions(new_revision.entry, old_revision.entry));
+
     let attr_diffs = [];
 
-    let old_tags = get_tags(old_post);
-    let new_tags = get_tags(new_post);
+    let old_tags = get_tags(old_revision.entry);
+    let new_tags = get_tags(new_revision.entry);
 
     if (old_tags !== new_tags) {
       attr_diffs.push([ 'tags', diff_line(old_tags, new_tags) ]);
     }
 
     result.push({
-      user:       new_post.user,
-      ts:         new_post.ts,
+      user:       new_revision.meta.user,
+      ts:         new_revision.meta.ts,
+      role:       new_revision.meta.role,
       text_diff,
       title_diff,
+      actions,
       attr_diffs
     });
   }
@@ -114,7 +198,7 @@ function build_diff(history) {
 
 // Init dialog
 //
-N.wire.on(module.apiPath, function show_post_history_dlg(params) {
+N.wire.on(module.apiPath, function show_entry_history_dlg(params) {
   params.entries = build_diff(params.history);
 
   $dialog = $(N.runtime.render(module.apiPath, params));

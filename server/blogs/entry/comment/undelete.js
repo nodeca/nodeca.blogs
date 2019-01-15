@@ -89,14 +89,35 @@ module.exports = function (N, apiPath) {
 
   // Restore comment
   //
-  N.wire.on(apiPath, function restore_comment(env) {
+  N.wire.on(apiPath, async function restore_comment(env) {
     let update = {
       $unset: { del_reason: 1, prev_st: 1, del_by: 1 }
     };
 
     _.assign(update, env.data.comment.prev_st);
 
-    return N.models.blogs.BlogComment.update({ _id: env.data.comment._id }, update);
+    env.data.new_comment = await N.models.blogs.BlogComment.findOneAndUpdate(
+      { _id: env.data.comment._id },
+      update,
+      { 'new': true }
+    );
+  });
+
+
+  // Save old version in history
+  //
+  N.wire.after(apiPath, function save_history(env) {
+    return N.models.blogs.BlogCommentHistory.add(
+      {
+        old_comment: env.data.comment,
+        new_comment: env.data.new_comment
+      },
+      {
+        user: env.user_info.user_id,
+        role: N.models.blogs.BlogCommentHistory.roles.MODERATOR,
+        ip:   env.req.ip
+      }
+    );
   });
 
 
@@ -125,6 +146,4 @@ module.exports = function (N, apiPath) {
     await N.queue.blog_entries_search_update_by_ids([ env.data.entry._id ]).postpone();
     await N.queue.blog_comments_search_update_by_ids([ env.data.comment._id ]).postpone();
   });
-
-  // TODO: log moderator actions
 };

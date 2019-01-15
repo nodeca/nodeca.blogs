@@ -5,10 +5,6 @@
 
 const $ = require('nodeca.core/lib/parser/cheequery');
 
-// If same user edits the same post within 5 minutes, all changes
-// made within that period will be squashed into one diff.
-const HISTORY_GRACE_PERIOD = 5 * 60 * 1000;
-
 
 module.exports = function (N, apiPath) {
 
@@ -153,69 +149,17 @@ module.exports = function (N, apiPath) {
 
   // Save old version in history
   //
-  N.wire.after(apiPath, async function save_comment_history(env) {
-    let orig_comment = env.data.comment;
-    let new_comment  = env.data.new_comment;
-
-    let last_record = await N.models.blogs.BlogCommentHistory.findOne()
-                                .where('comment').equals(orig_comment._id)
-                                .sort('-_id')
-                                .lean(true);
-
-    let last_update_time = last_record ? last_record.ts   : orig_comment.ts;
-    let last_update_user = last_record ? last_record.user : orig_comment.user;
-    let now = new Date();
-
-    // if the same user edits the same post within grace period, history won't be changed
-    if (!(last_update_time > now - HISTORY_GRACE_PERIOD &&
-          last_update_time < now &&
-          String(last_update_user) === String(env.user_info.user_id))) {
-
-      /* eslint-disable no-undefined */
-      last_record = await new N.models.blogs.BlogCommentHistory({
-        comment:     orig_comment._id,
-        user:        env.user_info.user_id,
-        md:          orig_comment.md,
-        tail:        orig_comment.tail,
-        //title:       orig_comment.title,
-        params_ref:  orig_comment.params_ref,
-        ip:          env.req.ip
-      }).save();
-    }
-
-    // if the next history entry would be the same as the last one
-    // (e.g. user saves post without changes or reverts change within 5 min),
-    // remove redundant history entry
-    if (last_record) {
-      let last_comment_str = JSON.stringify({
-        comment:    last_record.comment,
-        user:       last_record.user,
-        md:         last_record.md,
-        tail:       last_record.tail,
-        //title:      last_record.title,
-        params_ref: last_record.params_ref
-      });
-
-      let next_comment_str = JSON.stringify({
-        comment:    new_comment._id,
-        user:       env.user_info.user_id,
-        md:         new_comment.md,
-        tail:       new_comment.tail,
-        //title:      new_comment.title,
-        params_ref: new_comment.params_ref
-      });
-
-      if (last_comment_str === next_comment_str) {
-        await N.models.blogs.BlogCommentHistory.remove({ _id: last_record._id });
+  N.wire.after(apiPath, function save_history(env) {
+    return N.models.blogs.BlogCommentHistory.add(
+      {
+        old_comment:  env.data.comment,
+        new_comment:  env.data.new_comment
+      },
+      {
+        user: env.user_info.user_id,
+        role: N.models.blogs.BlogCommentHistory.roles.USER,
+        ip:   env.req.ip
       }
-    }
-
-    await N.models.blogs.BlogComment.update(
-      { _id: orig_comment._id },
-      { $set: {
-        last_edit_ts: new Date(),
-        edit_count: await N.models.blogs.BlogCommentHistory.count({ comment: orig_comment._id })
-      } }
     );
   });
 

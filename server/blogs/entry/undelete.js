@@ -60,14 +60,35 @@ module.exports = function (N, apiPath) {
 
   // Restore entry
   //
-  N.wire.on(apiPath, function restore_entry(env) {
+  N.wire.on(apiPath, async function restore_entry(env) {
     let update = {
       $unset: { del_reason: 1, prev_st: 1, del_by: 1 }
     };
 
     _.assign(update, env.data.entry.prev_st);
 
-    return N.models.blogs.BlogEntry.update({ _id: env.data.entry._id }, update);
+    env.data.new_entry = await N.models.blogs.BlogEntry.findOneAndUpdate(
+      { _id: env.data.entry._id },
+      update,
+      { 'new': true }
+    );
+  });
+
+
+  // Save old version in history
+  //
+  N.wire.after(apiPath, function save_history(env) {
+    return N.models.blogs.BlogEntryHistory.add(
+      {
+        old_entry: env.data.entry,
+        new_entry: env.data.new_entry
+      },
+      {
+        user: env.user_info.user_id,
+        role: N.models.blogs.BlogEntryHistory.roles.MODERATOR,
+        ip:   env.req.ip
+      }
+    );
   });
 
 
@@ -103,6 +124,4 @@ module.exports = function (N, apiPath) {
   N.wire.after(apiPath, async function add_search_index(env) {
     await N.queue.blog_entries_search_update_with_comments([ env.data.entry._id ]).postpone();
   });
-
-  // TODO: log moderator actions
 };

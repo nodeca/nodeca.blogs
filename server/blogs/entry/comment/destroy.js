@@ -6,6 +6,30 @@
 const _ = require('lodash');
 
 
+// apply $set and $unset operations on an object
+function mongo_apply(object, ops) {
+  let result = Object.assign({}, object);
+
+  for (let [ k, v ]  of Object.entries(ops)) {
+    if (k === '$set') {
+      Object.assign(result, v);
+      continue;
+    }
+
+    if (k === '$unset') {
+      for (let delete_key of Object.keys(v)) {
+        delete result[delete_key];
+      }
+      continue;
+    }
+
+    result[k] = v;
+  }
+
+  return result;
+}
+
+
 module.exports = function (N, apiPath) {
 
   N.validate(apiPath, {
@@ -88,6 +112,8 @@ module.exports = function (N, apiPath) {
   // Remove comment
   //
   N.wire.on(apiPath, function delete_comment(env) {
+    env.data.changes = env.data.changes || [];
+
     let statuses = N.models.blogs.BlogComment.statuses;
     let update = {
       $set: {
@@ -102,7 +128,10 @@ module.exports = function (N, apiPath) {
       update.del_reason = env.params.reason;
     }
 
-    env.data.removed_comment_ids = [ env.data.comment._id ];
+    env.data.changes.push({
+      old_comment: env.data.comment,
+      new_comment: mongo_apply(env.data.comment, update)
+    });
 
     return N.models.blogs.BlogComment.update({ _id: env.data.comment._id }, update);
   });
@@ -111,6 +140,8 @@ module.exports = function (N, apiPath) {
   // Remove replies
   //
   N.wire.on(apiPath, async function delete_replies(env) {
+    env.data.changes = env.data.changes || [];
+
     let comments = await N.models.blogs.BlogComment.find()
                              .where('entry').equals(env.data.entry._id)
                              .where('path').all(env.data.comment.path.concat([ env.data.comment._id ]))
@@ -139,7 +170,10 @@ module.exports = function (N, apiPath) {
         $unset: { ste: 1, del_reason: 1 }
       };
 
-      env.data.removed_comment_ids.push(comment._id);
+      env.data.changes.push({
+        old_comment: comment,
+        new_comment: mongo_apply(comment, update)
+      });
 
       bulk.find({ _id: comment._id }).update(update);
     }
@@ -148,11 +182,25 @@ module.exports = function (N, apiPath) {
   });
 
 
+  // Save old version in history
+  //
+  N.wire.after(apiPath, function save_history(env) {
+    return N.models.blogs.BlogCommentHistory.add(
+      env.data.changes,
+      {
+        user: env.user_info.user_id,
+        role: N.models.blogs.BlogEntryHistory.roles[env.params.as_moderator ? 'MODERATOR' : 'USER'],
+        ip:   env.req.ip
+      }
+    );
+  });
+
+
   // Remove votes
   //
   N.wire.after(apiPath, async function remove_votes(env) {
     await N.models.users.Vote.collection.update(
-      { 'for': { $in: env.data.removed_comment_ids } },
+      { 'for': { $in: env.data.changes.map(({ old_comment }) => old_comment._id) } },
       // Just move vote `value` field to `backup` field
       { $rename: { value: 'backup' } },
       { multi: true }
@@ -170,15 +218,15 @@ module.exports = function (N, apiPath) {
   //
   N.wire.after(apiPath, async function add_search_index(env) {
     await N.queue.blog_entries_search_update_by_ids([ env.data.entry._id ]).postpone();
-    await N.queue.blog_comments_search_update_by_ids(env.data.removed_comment_ids).postpone();
+    await N.queue.blog_comments_search_update_by_ids(
+      env.data.changes.map(({ old_comment }) => old_comment._id)
+    ).postpone();
   });
 
-
-  // TODO: log moderator actions
 
   // Send removed comment ids to client
   //
   N.wire.after(apiPath, function fill_removed_ids(env) {
-    env.res.removed_comment_ids = env.data.removed_comment_ids;
+    env.res.removed_comment_ids = env.data.changes.map(({ old_comment }) => old_comment._id);
   });
 };

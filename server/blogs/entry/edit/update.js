@@ -7,10 +7,6 @@ const _         = require('lodash');
 const $         = require('nodeca.core/lib/parser/cheequery');
 const charcount = require('charcount');
 
-// If same user edits the same post within 5 minutes, all changes
-// made within that period will be squashed into one diff.
-const HISTORY_GRACE_PERIOD = 5 * 60 * 1000;
-
 
 module.exports = function (N, apiPath) {
 
@@ -223,72 +219,17 @@ module.exports = function (N, apiPath) {
 
   // Save old version in history
   //
-  N.wire.after(apiPath, async function save_entry_history(env) {
-    let orig_entry = env.data.entry;
-    let new_entry  = env.data.new_entry;
-
-    let last_record = await N.models.blogs.BlogEntryHistory.findOne()
-                                .where('entry').equals(orig_entry._id)
-                                .sort('-_id')
-                                .lean(true);
-
-    let last_update_time = last_record ? last_record.ts   : orig_entry.ts;
-    let last_update_user = last_record ? last_record.user : orig_entry.user;
-    let now = new Date();
-
-    // if the same user edits the same post within grace period, history won't be changed
-    if (!(last_update_time > now - HISTORY_GRACE_PERIOD &&
-          last_update_time < now &&
-          String(last_update_user) === String(env.user_info.user_id))) {
-
-      /* eslint-disable no-undefined */
-      last_record = await new N.models.blogs.BlogEntryHistory({
-        entry:       orig_entry._id,
-        user:        env.user_info.user_id,
-        md:          orig_entry.md,
-        tags:        orig_entry.tags,
-        tail:        orig_entry.tail,
-        title:       orig_entry.title,
-        params_ref:  orig_entry.params_ref,
-        ip:          env.req.ip
-      }).save();
-    }
-
-    // if the next history entry would be the same as the last one
-    // (e.g. user saves post without changes or reverts change within 5 min),
-    // remove redundant history entry
-    if (last_record) {
-      let last_entry_str = JSON.stringify({
-        entry:      last_record.entry,
-        user:       last_record.user,
-        md:         last_record.md,
-        tags:       last_record.tags,
-        tail:       last_record.tail,
-        title:      last_record.title,
-        params_ref: last_record.params_ref
-      });
-
-      let next_entry_str = JSON.stringify({
-        entry:      new_entry._id,
-        user:       env.user_info.user_id,
-        md:         new_entry.md,
-        tags:       new_entry.tags,
-        tail:       new_entry.tail,
-        title:      new_entry.title,
-        params_ref: new_entry.params_ref
-      });
-
-      if (last_entry_str === next_entry_str) {
-        await N.models.blogs.BlogEntryHistory.remove({ _id: last_record._id });
+  N.wire.after(apiPath, function save_history(env) {
+    return N.models.blogs.BlogEntryHistory.add(
+      {
+        old_entry:  env.data.entry,
+        new_entry:  env.data.new_entry
+      },
+      {
+        user: env.user_info.user_id,
+        role: N.models.blogs.BlogEntryHistory.roles.USER,
+        ip:   env.req.ip
       }
-    }
-
-    await N.models.blogs.BlogEntry.update(
-      { _id: orig_entry._id },
-      { $set: {
-        last_edit_ts: new Date(),
-        edit_count: await N.models.blogs.BlogEntryHistory.count({ entry: orig_entry._id })
-      } }
     );
   });
 

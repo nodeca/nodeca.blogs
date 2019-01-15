@@ -1,9 +1,10 @@
 @import "nodeca.core/client/common/_variables"
 
-.entry-history-dlg__entry
+.blog-entry-history-entry
+  overflow-wrap break-word
   margin-bottom 2rem
 
-.entry-history-dlg__meta
+.blog-entry-history-entry__meta
   display flex
   padding .375rem .75rem
   margin-bottom .5rem
@@ -12,35 +13,52 @@
   border-radius 3px
   line-height 1.1em
 
-.entry-history-dlg__meta-author
+.blog-entry-history-entry__icon-task
+.blog-entry-history-entry__icon-moderator
+  font-weight bold
+  color #c97971
+  margin-right .375rem
+  display none
+
+.blog-entry-history-entry__m-task .blog-entry-history-entry__icon-task
+.blog-entry-history-entry__m-moderator .blog-entry-history-entry__icon-moderator
+  display inline
+
+.blog-entry-history-entry__meta-author
   flex 1 1 0%
 
-.entry-history-dlg__meta-author-link
+.blog-entry-history-entry__meta-author-link
   color inherit
 
-.entry-history-dlg__meta-ts
+.blog-entry-history-entry__meta-ts
   white-space nowrap
   font-size $font-size-xs
   align-self flex-end
   padding-left 1rem
 
-.entry-history-dlg__title
+.blog-entry-history-entry__title
   font-size $font-size-lg
   margin-bottom .5rem
 
-.entry-history-dlg__details
+.blog-entry-history-entry__diff
+  margin-bottom .5rem
+
+.blog-entry-history-entry__actions
+  color $body-color-secondary
+
+.blog-entry-history-entry__details
   display table
 
-.entry-history-dlg__details-item
+.blog-entry-history-entry__details-item
   display table-row
 
-.entry-history-dlg__details-key
+.blog-entry-history-entry__details-key
   display table-cell
   color $body-color-secondary
   text-align right
   vertical-align middle
-  padding-right 0.5rem
+  padding-right .5rem
 
-.entry-history-dlg__details-value
+.blog-entry-history-entry__details-value
   display table-cell
   vertical-align middle

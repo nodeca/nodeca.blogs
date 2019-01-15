@@ -1,3 +1,9 @@
 en-US:
   title: History
+  role_task: This action was performed automatically
+  role_moderator: This action was performed by a moderator
   tags: 'Tags:'
+  action_delete: Blog entry deleted
+  action_hard_delete: Blog entry hard deleted
+  action_undelete: Blog entry restored
+  del_reason: "(#{text})"

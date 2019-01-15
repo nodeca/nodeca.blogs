@@ -1,25 +1,48 @@
+- var roles = '$$ JSON.stringify(N.models.blogs.BlogCommentHistory.roles) $$'
+
 .modal.fade(tabindex='-1', role='dialog', aria-hidden='true')
   .modal-dialog.modal-lg
     .modal-content
       .modal-header
         h4.modal-title= self.t('title')
         button.close(type='button', tabindex='-1', data-dismiss='modal') &times;
-      .modal-body.comment-history-dlg__content
-        each comment in self.entries.reverse()
-          - var user = self.users[comment.user];
+      .modal-body.blog-comment-history-dlg__content
+        each entry in self.entries.reverse()
+          - var user = self.users[entry.user];
 
-          .comment-history-dlg__comment
-            .comment-history-dlg__meta
-              .comment-history-dlg__meta-author
+          .blog-comment-history-entry(
+            class=entry.role === roles.USER ? 'blog-comment-history-entry__m-user' : ''
+            class=entry.role === roles.MODERATOR ? 'blog-comment-history-entry__m-moderator' : ''
+            class=entry.role === roles.TASK ? 'blog-comment-history-entry__m-task' : ''
+          )
+            .blog-comment-history-entry__meta
+              .blog-comment-history-entry__meta-author
+                span.blog-comment-history-entry__icon-task(
+                  title=self.t('role_task')
+                )= '*'
+                span.blog-comment-history-entry__icon-moderator(
+                  title=self.t('role_moderator')
+                )= '*'
                 if user
-                  a.comment-history-dlg__meta-author-link(href=self.link_to('users.member', { user_hid: user.hid }))
+                  a.blog-comment-history-entry__meta-author-link(href=self.link_to('users.member', { user_hid: user.hid }))
                     = user.nick
-              .comment-history-dlg__meta-ts!= self.timetag(comment.ts, 'relative')
+              .blog-comment-history-entry__meta-ts!= self.timetag(entry.ts, 'relative')
 
-            if comment.title_diff
-              .comment-history-dlg__title
-                != comment.title_diff
+            if entry.text_diff
+              .blog-comment-history-entry__diff
+                != entry.text_diff
 
-            if comment.text_diff
-              .comment-history-dlg__diff
-                != comment.text_diff
+            if entry.actions && entry.actions.length > 0
+              .blog-comment-history-entry__actions
+                each d in entry.actions
+                  - var key = d[0], value = d[1], new_value = d[2];
+                  .blog-comment-history-entry__action-item
+                    case key
+                      when 'delete'
+                      when 'hard_delete'
+                        .diff-line
+                          = self.t('action_' + key)
+                          if value
+                            = ' ' + self.t('del_reason', { text: value })
+                      default
+                        .diff-line= self.t('action_' + key)
