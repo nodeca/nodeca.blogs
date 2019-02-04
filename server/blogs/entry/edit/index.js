@@ -99,6 +99,7 @@ module.exports = function (N, apiPath) {
       env.data.users = env.data.users.concat(env.data.entry.import_users);
     }
 
+    env.res.user_id = env.data.entry.user;
     env.res.md = env.data.entry.md;
     env.res.title = env.data.entry.title;
     env.res.tags = env.data.entry.tags;

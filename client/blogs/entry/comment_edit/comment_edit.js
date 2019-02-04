@@ -57,6 +57,7 @@ N.wire.before(module.apiPath + ':begin', function fetch_options(data) {
       };
 
       comment = {
+        user_id:     commentData.user_id,
         md:          commentData.md,
         title:       commentData.title,
         attachments: commentData.attachments
@@ -70,6 +71,9 @@ N.wire.before(module.apiPath + ':begin', function fetch_options(data) {
 N.wire.on(module.apiPath + ':begin', function show_editor(data) {
   let $editor = N.MDEdit.show({
     text: comment.md,
+    // hide attachment button when moderators edit posts created by others
+    // (note: editing their own posts as moderators will still show normal toolbar)
+    toolbar: comment.user_id !== N.runtime.user_id ? 'as_moderator' : 'default',
     attachments: comment.attachments
   });
 
