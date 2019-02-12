@@ -71,7 +71,7 @@ module.exports = function (N) {
 
     if (!_.get(env.res, 'blocks.blog')) return;
 
-    env.res.blocks.blog.count = await N.models.blogs.BlogEntry.count()
+    env.res.blocks.blog.count = await N.models.blogs.BlogEntry.countDocuments()
                                           .where('user').equals(env.data.user._id)
                                           .where('st').in(env.data.blog_entries_visible_statuses)
                                           .sort('-_id')

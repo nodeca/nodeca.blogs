@@ -119,11 +119,10 @@ module.exports = function (N, apiPath) {
   // Remove votes
   //
   N.wire.after(apiPath, async function remove_votes(env) {
-    await N.models.users.Vote.collection.update(
+    await N.models.users.Vote.updateMany(
       { 'for': env.data.entry._id },
       // Just move vote `value` field to `backup` field
-      { $rename: { value: 'backup' } },
-      { multi: true }
+      { $rename: { value: 'backup' } }
     );
 
     let st = N.models.blogs.BlogComment.statuses;
@@ -134,11 +133,10 @@ module.exports = function (N, apiPath) {
                              .select('_id')
                              .lean(true);
 
-    await N.models.users.Vote.collection.update(
+    await N.models.users.Vote.updateMany(
       { 'for': { $in: _.map(comments, '_id') } },
       // Just move vote `value` field to `backup` field
-      { $rename: { value: 'backup' } },
-      { multi: true }
+      { $rename: { value: 'backup' } }
     );
   });
 

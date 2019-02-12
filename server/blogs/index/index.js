@@ -75,7 +75,7 @@ module.exports = function (N, apiPath) {
       env.data.blog_entries_visible_statuses.map(st =>
         N.models.blogs.BlogEntry
             .where('st').equals(st)
-            .count()
+            .countDocuments()
       )
     );
 
@@ -92,7 +92,7 @@ module.exports = function (N, apiPath) {
           N.models.blogs.BlogEntry
               .where('st').equals(st)
               .where('_id').gt(env.data.entries[0]._id)
-              .count()
+              .countDocuments()
         )
       );
 

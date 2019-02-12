@@ -228,7 +228,7 @@ module.exports = function (N, apiPath) {
           query = query.where('tag_hids').equals(env.data.current_tag.hid);
         }
 
-        return query.count();
+        return query.countDocuments();
       })
     );
 
@@ -251,7 +251,7 @@ module.exports = function (N, apiPath) {
             query = query.where('tag_hids').equals(env.data.current_tag.hid);
           }
 
-          return query.count();
+          return query.countDocuments();
         })
       );
 

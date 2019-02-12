@@ -255,7 +255,7 @@ module.exports = function (N, apiPath) {
                             .lean(true);
 
       if (!entry) {
-        await N.models.blogs.BlogTag.remove({ hid });
+        await N.models.blogs.BlogTag.deleteOne({ hid });
       }
     }
   });

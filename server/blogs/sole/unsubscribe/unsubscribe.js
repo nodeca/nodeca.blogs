@@ -62,7 +62,7 @@ module.exports = function (N, apiPath) {
     env.res.subscription = updatedType;
 
     // Update with `upsert` to avoid duplicates
-    await Subscription.update(
+    await Subscription.updateOne(
       { user: env.user_info.user_id, to: env.data.user._id },
       { type: updatedType, to_type: N.shared.content_type.BLOG_SOLE },
       { upsert: true }

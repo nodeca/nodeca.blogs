@@ -62,7 +62,7 @@ module.exports = function (N, apiPath) {
 
     // If `env.params.remove` - remove bookmark
     if (env.params.remove) {
-      await N.models.blogs.BlogCommentBookmark.remove(
+      await N.models.blogs.BlogCommentBookmark.deleteOne(
         { user: env.user_info.user_id, comment: env.data.comment._id }
       );
       return;
@@ -83,11 +83,11 @@ module.exports = function (N, apiPath) {
   // Update entry, fill count
   //
   N.wire.after(apiPath, async function update_entry(env) {
-    let count = await N.models.blogs.BlogCommentBookmark.count({ comment: env.data.comment._id });
+    let count = await N.models.blogs.BlogCommentBookmark.countDocuments({ comment: env.data.comment._id });
 
     env.res.count = count;
 
-    await N.models.blogs.BlogComment.update(
+    await N.models.blogs.BlogComment.updateOne(
       { _id: env.data.comment._id },
       { bookmarks: count }
     );

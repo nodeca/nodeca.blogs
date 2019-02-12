@@ -192,7 +192,7 @@ module.exports = function (N, collectionName) {
                           N.models.blogs.BlogComment
                               .where('entry').equals(entry_id)
                               .where('st').equals(st)
-                              .count()
+                              .countDocuments()
                         )
                       );
 
@@ -212,7 +212,7 @@ module.exports = function (N, collectionName) {
       }
     }
 
-    await N.models.blogs.BlogEntry.update({ _id: entry_id }, updateData);
+    await N.models.blogs.BlogEntry.updateOne({ _id: entry_id }, updateData);
   };
 
 

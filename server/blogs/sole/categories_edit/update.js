@@ -45,16 +45,14 @@ module.exports = function (N, apiPath) {
       blogs_categories: { value: JSON.stringify(categories) }
     }, { user_id: env.user_info.user_id });
 
-    await N.models.blogs.BlogTag.update(
+    await N.models.blogs.BlogTag.updateMany(
       { user: env.user_info.user_id },
-      { $set: { is_category: false } },
-      { multi: true }
+      { $set: { is_category: false } }
     );
 
-    await N.models.blogs.BlogTag.update(
+    await N.models.blogs.BlogTag.updateMany(
       { user: env.user_info.user_id, name_lc: { $in: categories.map(N.models.blogs.BlogTag.normalize) } },
-      { $set: { is_category: true } },
-      { multi: true }
+      { $set: { is_category: true } }
     );
   });
 };

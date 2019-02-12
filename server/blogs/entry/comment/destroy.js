@@ -133,7 +133,7 @@ module.exports = function (N, apiPath) {
       new_comment: mongo_apply(env.data.comment, update)
     });
 
-    return N.models.blogs.BlogComment.update({ _id: env.data.comment._id }, update);
+    return N.models.blogs.BlogComment.updateOne({ _id: env.data.comment._id }, update);
   });
 
 
@@ -199,11 +199,10 @@ module.exports = function (N, apiPath) {
   // Remove votes
   //
   N.wire.after(apiPath, async function remove_votes(env) {
-    await N.models.users.Vote.collection.update(
+    await N.models.users.Vote.updateMany(
       { 'for': { $in: env.data.changes.map(({ old_comment }) => old_comment._id) } },
       // Just move vote `value` field to `backup` field
-      { $rename: { value: 'backup' } },
-      { multi: true }
+      { $rename: { value: 'backup' } }
     );
   });
 
