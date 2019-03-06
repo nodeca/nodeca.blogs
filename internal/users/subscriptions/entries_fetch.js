@@ -49,7 +49,7 @@ module.exports = function (N) {
 
     // avoid sending large attributes to the client that won't be used
     entries = entries.map(e =>
-      _.omit(e, [ 'html', 'tail' ])
+      _.omit(e, [ 'html' ])
     );
 
     let entries_by_id = _.keyBy(entries, '_id');

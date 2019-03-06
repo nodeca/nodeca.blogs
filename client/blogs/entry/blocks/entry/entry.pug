@@ -64,10 +64,6 @@
   .blog-entry__content
     .blog-entry__message.markup!= entry.html
 
-    if entry.tail && entry.tail.length
-      .blog-entry__tail.markup-tail
-        != self.partial('@users.blocks.attachments', { message: entry })
-
   footer.blog-entry__controls
     ul.blog-entry__controls-blk
 

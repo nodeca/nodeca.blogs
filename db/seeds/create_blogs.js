@@ -134,7 +134,6 @@ async function createComments(entry) {
 
     let result = await parser.md2html({
       text: md,
-      attachments: [],
       options
     });
 
@@ -183,7 +182,6 @@ async function createEntries() {
 
     let result = await parser.md2html({
       text: md,
-      attachments: [],
       options
     });
 

@@ -74,8 +74,7 @@ module.exports = function (N, apiPath) {
       'tags',
       'del_reason',
       'del_by',
-      'prev_st',
-      'tail'
+      'prev_st'
     ]);
   }
 

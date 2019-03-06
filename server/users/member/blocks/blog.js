@@ -54,7 +54,7 @@ module.exports = function (N) {
 
     // avoid sending large attributes to the client that won't be used
     entries = entries.map(e =>
-      _.omit(e, [ 'html', 'tail' ])
+      _.omit(e, [ 'html' ])
     );
 
     // hide blog widget if no blog entries were created

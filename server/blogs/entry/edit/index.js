@@ -62,31 +62,6 @@ module.exports = function (N, apiPath) {
   });
 
 
-  // Fetch attachments info
-  //
-  N.wire.before(apiPath, async function fetch_attachments(env) {
-    if (!env.data.entry.attach || !env.data.entry.attach.length) {
-      env.data.attachments = [];
-      return;
-    }
-
-    let attachments = await N.models.users.MediaInfo.find()
-                                .where('media_id').in(env.data.entry.attach)
-                                .select('media_id file_name type')
-                                .lean(true);
-
-    // Sort in the same order as it was in post
-    env.data.attachments = env.data.entry.attach.reduce((acc, media_id) => {
-      let attach = attachments.find(attachment => String(attachment.media_id) === String(media_id));
-
-      if (attach) {
-        acc.push(attach);
-      }
-      return acc;
-    }, []);
-  });
-
-
   // Fill entry data
   //
   N.wire.on(apiPath, function fill_data(env) {
@@ -103,7 +78,6 @@ module.exports = function (N, apiPath) {
     env.res.md = env.data.entry.md;
     env.res.title = env.data.entry.title;
     env.res.tags = env.data.entry.tags;
-    env.res.attachments = env.data.attachments;
     env.res.params = env.data.parser_params;
   });
 };

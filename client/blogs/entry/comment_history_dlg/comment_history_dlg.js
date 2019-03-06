@@ -15,24 +15,13 @@ N.wire.before(module.apiPath, function load_deps() {
 });
 
 
-// Concatenate post and attachment info into diffable string
+// Make post info into diffable string
 //
 function get_source(post) {
   let result = post.md;
 
   // make sure source ends with newline
-  result = result.replace(/\n?$/, '\n');
-
-  // add attachments
-  if (post.tail.length) {
-    result += '\n';
-    result += post.tail.map(function (item) {
-      return '![](' + N.router.linkTo('core.gridfs', { bucket: item.media_id }) + ')';
-    }).join('\n');
-    result += '\n';
-  }
-
-  return result;
+  return result.replace(/\n?$/, '\n');
 }
 
 
@@ -106,9 +95,9 @@ function get_status_actions(new_comment, old_comment = {}) {
 }
 
 
-// Input: array of last post states (text, attachments, author, timestamp)
+// Input: array of last post states (text, author, timestamp, etc.)
 //
-// Output: array of diff descriptions (user, timestamp, html diff)
+// Output: array of diff descriptions (user, timestamp, html diff, etc.)
 //
 function build_diff(history) {
   const { diff } = require('nodeca.core/client/vendor/diff/diff');

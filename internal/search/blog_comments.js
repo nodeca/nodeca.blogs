@@ -147,7 +147,7 @@ module.exports = function (N, apiPath) {
 
     // avoid sending large attributes to the client that won't be used
     locals.sandbox.entries = locals.sandbox.entries.map(e =>
-      _.omit(e, [ 'html', 'tail' ])
+      _.omit(e, [ 'html' ])
     );
   });
 

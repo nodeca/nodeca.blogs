@@ -3,7 +3,6 @@
 
 const _              = require('lodash');
 const Mongoose       = require('mongoose');
-const AttachmentInfo = require('./_AttachmentInfo');
 const Schema         = Mongoose.Schema;
 
 
@@ -66,11 +65,9 @@ module.exports = function (N, collectionName) {
     // used to determine hid of a new comment
     last_comment_counter: { type: Number, 'default': 0 },
 
-    attach:       [ Schema.Types.ObjectId ],
     params_ref:   Schema.ObjectId,
     imports:      [ String ],
     import_users: [ Schema.ObjectId ],
-    tail:         [ AttachmentInfo ],
 
     // Cache
     cache,

@@ -11,12 +11,6 @@ module.exports = function (N, apiPath) {
   N.validate(apiPath, {
     comment_id:               { format: 'mongo', required: true },
     txt:                      { type: 'string', required: true },
-    attach:                   {
-      type: 'array',
-      required: true,
-      uniqueItems: true,
-      items: { format: 'mongo', required: true }
-    },
     option_no_mlinks:         { type: 'boolean', required: true },
     option_no_emojis:         { type: 'boolean', required: true },
     option_no_quote_collapse: { type: 'boolean', required: true }
@@ -27,16 +21,6 @@ module.exports = function (N, apiPath) {
   //
   N.wire.before(apiPath, function fetch_comment_data(env) {
     return N.wire.emit('server:blogs.entry.comment.edit.index', env);
-  });
-
-
-  // Check attachments owner
-  //
-  N.wire.before(apiPath, function attachments_check_owner(env) {
-    return N.wire.emit('internal:users.attachments_check_owner', {
-      attachments: env.params.attach,
-      user_id: env.data.comment.user
-    });
   });
 
 
@@ -70,7 +54,6 @@ module.exports = function (N, apiPath) {
   N.wire.on(apiPath, async function parse_text(env) {
     env.data.parse_result = await N.parser.md2html({
       text: env.params.txt,
-      attachments: env.params.attach,
       options: env.data.parse_options,
       user_info: env.user_info
     });
@@ -101,9 +84,8 @@ module.exports = function (N, apiPath) {
     let ast         = $.parse(env.data.parse_result.html);
     let images      = ast.find('.image').length;
     let attachments = ast.find('.attach').length;
-    let tail        = env.data.parse_result.tail.length;
 
-    if (images + attachments + tail > max_images) {
+    if (images + attachments > max_images) {
       throw {
         code: N.io.CLIENT_ERROR,
         message: env.t('err_too_many_images', max_images)
@@ -140,11 +122,9 @@ module.exports = function (N, apiPath) {
     comment.md         = env.params.txt;
     comment.html       = env.data.parse_result.html;
 
-    comment.attach       = env.params.attach;
     comment.params       = env.data.parse_options;
     comment.imports      = env.data.parse_result.imports;
     comment.import_users = env.data.parse_result.import_users;
-    comment.tail         = env.data.parse_result.tail;
 
     env.data.new_comment = await comment.save();
   });

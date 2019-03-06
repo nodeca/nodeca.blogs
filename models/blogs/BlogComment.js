@@ -3,7 +3,6 @@
 
 const _              = require('lodash');
 const Mongoose       = require('mongoose');
-const AttachmentInfo = require('./_AttachmentInfo');
 const Schema         = Mongoose.Schema;
 
 
@@ -49,11 +48,9 @@ module.exports = function (N, collectionName) {
     edit_count:   Number,
     last_edit_ts: Date,
 
-    attach:       [ Schema.Types.ObjectId ],
     params_ref:   Schema.ObjectId,
     imports:      [ String ],
-    import_users: [ Schema.ObjectId ],
-    tail:         [ AttachmentInfo ]
+    import_users: [ Schema.ObjectId ]
   }, {
     versionKey : false
   });
