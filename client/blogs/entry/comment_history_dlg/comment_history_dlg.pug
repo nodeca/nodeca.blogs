@@ -16,17 +16,16 @@
             class=entry.role === roles.TASK ? 'blog-comment-history-entry__m-task' : ''
           )
             .blog-comment-history-entry__meta
-              .blog-comment-history-entry__meta-author
-                span.blog-comment-history-entry__icon-task(
-                  title=self.t('role_task')
-                )= '*'
-                span.blog-comment-history-entry__icon-moderator(
-                  title=self.t('role_moderator')
-                )= '*'
-                if user
-                  a.blog-comment-history-entry__meta-author-link(href=self.link_to('users.member', { user_hid: user.hid }))
-                    = user.nick
-              .blog-comment-history-entry__meta-ts!= self.timetag(entry.ts, 'relative')
+              span.blog-comment-history-entry__meta-ts!= self.timetag(entry.ts, 'relative')
+              if user
+                a.blog-comment-history-entry__meta-author-link(href=self.link_to('users.member', { user_hid: user.hid }))
+                  = user.nick
+              span.blog-comment-history-entry__icon-task(
+                title=self.t('role_task')
+              )= '*'
+              span.blog-comment-history-entry__icon-moderator(
+                title=self.t('role_moderator')
+              )= '*'
 
             if entry.text_diff
               .blog-comment-history-entry__diff

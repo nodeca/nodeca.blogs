@@ -4,37 +4,32 @@
   overflow-wrap break-word
   margin-bottom 2rem
 
+.blog-comment-history-entry + .blog-comment-history-entry
+  border-top 1px solid $decorator-color
+  padding-top .5rem
+
 .blog-comment-history-entry__meta
-  display flex
-  padding .375rem .75rem
-  margin-bottom .5rem
-  color $body-color-secondary - 10%
-  background-color $body-bg-secondary - 1%
-  border-radius 3px
-  line-height 1.1em
+  padding 0 .2rem
+  margin .5rem 0
+  font-size $font-size-sm
+  color $body-color-secondary + 20%
 
 .blog-comment-history-entry__icon-task
 .blog-comment-history-entry__icon-moderator
   font-weight bold
   color #c97971
-  margin-right .375rem
+  margin-left .375rem
   display none
 
 .blog-comment-history-entry__m-task .blog-comment-history-entry__icon-task
 .blog-comment-history-entry__m-moderator .blog-comment-history-entry__icon-moderator
   display inline
 
-.blog-comment-history-entry__meta-author
-  flex 1 1 0%
+.blog-comment-history-entry__meta-ts:after
+  content ', '
 
 .blog-comment-history-entry__meta-author-link
   color inherit
-
-.blog-comment-history-entry__meta-ts
-  white-space nowrap
-  font-size $font-size-xs
-  align-self flex-end
-  padding-left 1rem
 
 .blog-comment-history-entry__title
   font-size $font-size-lg
@@ -44,4 +39,4 @@
   margin-bottom .5rem
 
 .blog-comment-history-entry__actions
-  color $body-color-secondary
+  color $body-color + 50%
