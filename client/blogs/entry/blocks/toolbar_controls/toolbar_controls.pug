@@ -36,9 +36,6 @@ if items.length > 0 && items[items.length - 1] === 'header'
 if items.length > 0 && items[items.length - 1] === 'divider'
   - items.pop()
 
-if items.length > 0 && items[items.length - 1].indexOf('mod_') === 0
-  - items.push('mod_history')
-
 
 .page-actions.blogs-entry__toolbar-controls
   - var subscriptionIcon = 'icon-track-normal'
@@ -84,12 +81,6 @@ if items.length > 0 && items[items.length - 1].indexOf('mod_') === 0
 
             when 'header'
               .dropdown-header= self.t('mod_actions')
-
-            when 'mod_history'
-              //- TODO
-              button.dropdown-item.disabled(
-                type='button'
-              )= self.t('history')
 
             when 'subscription'
               button.dropdown-item(

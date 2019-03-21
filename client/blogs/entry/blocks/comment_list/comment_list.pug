@@ -48,7 +48,7 @@ each comment in self.comments
         .blog-comment__meta
           span.blog-comment__meta-item.blog-comment__ts!= self.timetag(comment.ts, 'relative')
 
-          if self.settings.can_see_history && comment.edit_count
+          if comment.edit_count
             a.blog-comment__meta-item.blog-comment__history.icon.icon-history.icon-space-after(
               href='#'
               title=self.t('last_edited', { date: self.date(comment.last_edit_ts, 'datetime') })
@@ -243,7 +243,7 @@ each comment in self.comments
         .blog-comment__meta
           span.blog-comment__meta-item.blog-comment__ts!= self.timetag(comment.ts, 'relative')
 
-          if self.settings.can_see_history && comment.edit_count
+          if comment.edit_count
             a.blog-comment__meta-item.blog-comment__history.icon.icon-history.icon-space-after(
               href='#'
               title=self.t('last_edited', { date: self.date(comment.last_edit_ts, 'datetime') })
