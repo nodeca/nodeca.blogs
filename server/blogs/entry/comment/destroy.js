@@ -206,10 +206,20 @@ module.exports = function (N, apiPath) {
     );
   });
 
+
   // Update comment counters
   //
   N.wire.after(apiPath, function update_counters(env) {
     return N.models.blogs.BlogEntry.updateCache(env.data.entry._id);
+  });
+
+
+  // Update user counters
+  //
+  N.wire.after(apiPath, async function update_user(env) {
+    let users = env.data.changes.map(({ old_comment }) => old_comment.user);
+
+    await N.models.blogs.UserBlogCommentCount.recount(_.uniq(users.map(String)));
   });
 
 

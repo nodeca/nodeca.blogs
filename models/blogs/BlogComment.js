@@ -36,6 +36,12 @@ module.exports = function (N, collectionName) {
     html:         String,
     st:           Number,
     ste:          Number, // real state if user is hellbanned
+
+    // Flag set if entry state isn't deleted or hard deleted;
+    // used in counting user's activity to quickly determine if comment
+    // should be counted (i.e. in a visible entry) or not
+    entry_exists: { type: Boolean, 'default': true },
+
     ip:           String,
     ts:           { type: Date, 'default': Date.now },
 
@@ -61,6 +67,13 @@ module.exports = function (N, collectionName) {
   // get all comments for a blog entry,
   // get last comment in a blog entry (rebuild entry cache)
   BlogComment.index({ entry: 1, st: 1, hid: 1 });
+
+  // count all comments from a user
+  BlogComment.index({
+    user: 1,
+    st: 1,
+    entry_exists: 1
+  });
 
   // Export statuses
   //

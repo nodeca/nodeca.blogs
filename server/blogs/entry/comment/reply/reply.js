@@ -315,6 +315,15 @@ module.exports = function (N, apiPath) {
   });
 
 
+  // Update user counters
+  //
+  N.wire.after(apiPath, async function update_user(env) {
+    await N.models.blogs.UserBlogCommentCount.inc(env.user_info.user_id, {
+      is_hb: env.user_info.hb
+    });
+  });
+
+
   // Schedule search index update
   //
   N.wire.after(apiPath, async function add_search_index(env) {

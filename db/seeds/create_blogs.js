@@ -219,6 +219,12 @@ async function createEntries() {
 }
 
 
+async function updateUserCounters() {
+  await models.blogs.UserBlogEntryCount.recount(_.map(users, '_id'));
+  await models.blogs.UserBlogCommentCount.recount(_.map(users, '_id'));
+}
+
+
 module.exports = async function (N) {
   models   = N.models;
   settings = N.settings;
@@ -228,4 +234,5 @@ module.exports = async function (N) {
   await createUsers();
   await createTags();
   await createEntries();
+  await updateUserCounters();
 };

@@ -234,6 +234,15 @@ module.exports = function (N, apiPath) {
   });
 
 
+  // Update user counters
+  //
+  N.wire.after(apiPath, async function update_user(env) {
+    await N.models.blogs.UserBlogEntryCount.inc(env.user_info.user_id, {
+      is_hb: env.user_info.hb
+    });
+  });
+
+
   // Add new entry notification for subscribers
   //
   N.wire.after(apiPath, async function add_new_entry_notification(env) {

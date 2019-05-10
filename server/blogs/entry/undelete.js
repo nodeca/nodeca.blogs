@@ -92,6 +92,16 @@ module.exports = function (N, apiPath) {
   });
 
 
+  // Change entry status in all comments
+  //
+  N.wire.after(apiPath, function change_entry_status_in_comments(env) {
+    return N.models.blogs.BlogComment.updateMany(
+      { entry: env.data.entry._id },
+      { $set: { entry_exists: true } }
+    );
+  });
+
+
   // Restore votes
   //
   N.wire.after(apiPath, async function restore_votes(env) {
@@ -121,5 +131,22 @@ module.exports = function (N, apiPath) {
   //
   N.wire.after(apiPath, async function add_search_index(env) {
     await N.queue.blog_entries_search_update_with_comments([ env.data.entry._id ]).postpone();
+  });
+
+
+  // Update user counters
+  //
+  N.wire.after(apiPath, async function update_user(env) {
+    await N.models.blogs.UserBlogEntryCount.recount(env.data.entry.user);
+
+    let users = _.map(
+      await N.models.blogs.BlogComment.find()
+                .where('entry').equals(env.data.entry._id)
+                .select('user')
+                .lean(true),
+      'user'
+    );
+
+    await N.models.blogs.UserBlogCommentCount.recount(_.uniq(users.map(String)));
   });
 };

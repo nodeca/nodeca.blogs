@@ -139,6 +139,13 @@ module.exports = function (N, apiPath) {
   });
 
 
+  // Update user counters
+  //
+  N.wire.after(apiPath, async function update_user(env) {
+    await N.models.blogs.UserBlogCommentCount.recount(env.data.comment.user);
+  });
+
+
   // Schedule search index update
   //
   N.wire.after(apiPath, async function add_search_index(env) {
