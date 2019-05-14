@@ -4,6 +4,7 @@
 'use strict';
 
 
+const _        = require('lodash');
 const Mongoose = require('mongoose');
 const Schema   = Mongoose.Schema;
 
@@ -30,7 +31,7 @@ module.exports = function (N, collectionName) {
    *
    * Params:
    *
-   *  - user_id (ObjectId)
+   *  - user_id (ObjectId or Array)
    *  - current_user_info (Object) - same as env.user_info
    *
    * Returns a Number (number of blog comments made by a user,
@@ -40,16 +41,39 @@ module.exports = function (N, collectionName) {
    * background recount.
    */
   UserBlogCommentCount.statics.get = async function get(user_id, current_user_info) {
-    let data = await N.models.blogs.UserBlogCommentCount.findOne()
-                         .where('user').equals(user_id)
-                         .lean(true);
+    let is_bulk = true;
 
-    if (!data) {
-      await N.wire.emit('internal:users.activity.recount', [ [ 'blog_comments', { user_id } ] ]);
-      return 0;
+    if (!Array.isArray(user_id)) {
+      is_bulk = false;
+      user_id = [ user_id ];
     }
 
-    return data[current_user_info.hb ? 'value_hb' : 'value'] || 0;
+    let data = _.keyBy(
+      await N.models.blogs.UserBlogCommentCount.find()
+                .where('user').in(user_id)
+                .lean(true),
+      'user'
+    );
+
+    let users_need_recount = [];
+    let result = user_id.map(u => {
+      let d = data[u];
+
+      if (!d) {
+        users_need_recount.push(u);
+        return 0;
+      }
+
+      return d[current_user_info.hb ? 'value_hb' : 'value'] || 0;
+    });
+
+    if (users_need_recount.length > 0) {
+      await N.wire.emit('internal:users.activity.recount',
+        users_need_recount.map(u => [ 'blog_comments', { user_id: u } ])
+      );
+    }
+
+    return is_bulk ? result : result[0];
   };
 
 
