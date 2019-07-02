@@ -13,11 +13,6 @@ let pageState = {};
 
 let $window = $(window);
 
-const navbarHeight = parseInt($('body').css('margin-top'), 10) + parseInt($('body').css('padding-top'), 10);
-
-// height of a space between text content of a post and the next post header
-const TOP_OFFSET = 50;
-
 
 /////////////////////////////////////////////////////////////////////
 // init on page load
@@ -25,6 +20,11 @@ const TOP_OFFSET = 50;
 N.wire.on('navigate.done:' + module.apiPath, function page_setup(data) {
   pageState.user_hid  = data.params.user_hid;
   pageState.entry_hid = data.params.entry_hid;
+
+  let navbar_height = parseInt($('body').css('margin-top'), 10) + parseInt($('body').css('padding-top'), 10);
+
+  // account for some spacing between posts
+  navbar_height += 50;
 
   let anchor = data.anchor || '';
 
@@ -35,7 +35,7 @@ N.wire.on('navigate.done:' + module.apiPath, function page_setup(data) {
       // override automatic scroll to an anchor in the navigator
       data.no_scroll = true;
 
-      $window.scrollTop(el.offset().top - navbarHeight - TOP_OFFSET);
+      $window.scrollTop(el.offset().top - navbar_height);
       el.addClass('blog-comment__m-flash');
 
       return;
@@ -48,48 +48,6 @@ N.wire.on('navigate.done:' + module.apiPath, function page_setup(data) {
 //
 N.wire.on('navigate.done:' + module.apiPath, function setup_blog_entry_handlers() {
   return N.wire.emit('blogs.blocks.blog_entry');
-});
-
-
-/////////////////////////////////////////////////////////////////////
-// When user scrolls the page:
-//
-//  1. show/hide navbar
-//
-// Unlike on the other pages, this handler does not update progress bar
-// (because there isn't one).
-//
-let progressScrollHandler = null;
-
-
-N.wire.on('navigate.done:' + module.apiPath, function progress_updater_init() {
-  progressScrollHandler = _.debounce(function update_progress_on_scroll() {
-    // If we scroll below page head, show the secondary navbar
-    //
-    let head = document.getElementsByClassName('page-head');
-
-    if (head.length && head[0].getBoundingClientRect().bottom > navbarHeight) {
-      $('.navbar').removeClass('navbar__m-secondary');
-    } else {
-      $('.navbar').addClass('navbar__m-secondary');
-    }
-  }, 100, { maxWait: 100 });
-
-  // avoid executing it on first tick because of initial scrollTop()
-  setTimeout(() => {
-    $window.on('scroll', progressScrollHandler);
-  });
-
-  // execute it once on page load
-  progressScrollHandler();
-});
-
-
-N.wire.on('navigate.exit:' + module.apiPath, function progress_updater_teardown() {
-  if (!progressScrollHandler) return;
-  progressScrollHandler.cancel();
-  $window.off('scroll', progressScrollHandler);
-  progressScrollHandler = null;
 });
 
 

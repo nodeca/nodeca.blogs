@@ -9,8 +9,6 @@ article#content.blogs-index(
     'end':  'blogs.index:nav_to_end'
   }
   data-last-entry-hid= self.last_entry_hid
-  data-top-marker=     self.entries && self.entries.length > 0 ? self.entries[0]._id : null
-  data-bottom-marker=  self.entries && self.entries.length > 0 ? self.entries[self.entries.length - 1]._id : null
 )
 
   -
@@ -47,18 +45,8 @@ article#content.blogs-index(
       )
         span.icon.icon-loading-placeholder
 
-      .blogs-index__entry-list._affix(
-        data-affix-top={
-          offset:     500,
-          wire_above: 'blogs.index:load_prev',
-          throttle:   100
-        }
-        data-affix-bottom={
-          offset:     500,
-          wire_below: 'blogs.index:load_next',
-          throttle:   100
-        }
-      )!= self.partial('@blogs.blocks.entry_list_mixed')
+      .blogs-index__entry-list
+        != self.partial('@blogs.blocks.entry_list_mixed')
 
       .blogs-index__loading-next.nojs-hide(
         class=(self.entries && self.entries.length > 0 && self.entries[self.entries.length - 1].hid === self.last_entry_hid ? 'd-none' : '')

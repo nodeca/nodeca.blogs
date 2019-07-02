@@ -1,9 +1,9 @@
 if self.results.length
 
-  each result in self.results
+  each result, idx in self.results
     - var user = self.users[result.comment.user];
 
-    article.search-result.search-result__m-with-content
+    article.search-result.search-result__m-with-content(data-offset=idx + self.skip)
       header.search-result__header
         a.search-result__title(
           href=self.link_to('blogs.entry', { user_hid: user && user.hid, entry_hid: result.entry.hid, $anchor: 'comment' + result.comment.hid })

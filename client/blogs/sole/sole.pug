@@ -13,8 +13,6 @@ article#content.blogs-sole(
     'end':  'blogs.sole:nav_to_end'
   }
   data-last-entry-hid= self.last_entry_hid
-  data-top-marker=     self.entries && self.entries.length > 0 ? self.entries[0]._id : null
-  data-bottom-marker=  self.entries && self.entries.length > 0 ? self.entries[self.entries.length - 1]._id : null
 )
 
   -
@@ -100,18 +98,8 @@ article#content.blogs-sole(
       )
         span.icon.icon-loading-placeholder
 
-      .blogs-sole__entry-list._affix(
-        data-affix-top={
-          offset:     500,
-          wire_above: 'blogs.sole:load_prev',
-          throttle:   100
-        }
-        data-affix-bottom={
-          offset:     500,
-          wire_below: 'blogs.sole:load_next',
-          throttle:   100
-        }
-      )!= self.partial('@blogs.blocks.entry_list_sole')
+      .blogs-sole__entry-list._affix
+        != self.partial('@blogs.blocks.entry_list_sole')
 
       .blogs-sole__loading-next.nojs-hide(
         class=(self.entries && self.entries.length > 0 && self.entries[self.entries.length - 1].hid === self.last_entry_hid ? 'd-none' : '')
