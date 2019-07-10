@@ -97,7 +97,7 @@ module.exports = function (N, collectionName) {
           value: is_hb ? 0 : 1,
           value_hb: 1
         }
-      },
+      }
     );
 
     if (!data) {
