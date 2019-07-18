@@ -1,0 +1,3 @@
+en-US:
+  blog_entries:
+    comments: "#{count} ((comment|comments))"

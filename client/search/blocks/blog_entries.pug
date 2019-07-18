@@ -1,12 +1,12 @@
 if self.results.length
 
   each result, idx in self.results
-    - var user = self.users[result.entry.user];
+    - var blog_user = self.users[result.entry.user];
 
     article.search-result.search-result__m-with-content(data-offset=idx + self.skip)
       header.search-result__header
         a.search-result__title(
-          href=self.link_to('blogs.entry', { user_hid: user && user.hid, entry_hid: result.entry.hid })
+          href=self.link_to('blogs.entry', { user_hid: blog_user && blog_user.hid, entry_hid: result.entry.hid })
         )
           != result.entry.title_html
 
@@ -15,11 +15,11 @@ if self.results.length
             != self.timetag(result.entry.ts, 'relative')
 
           li.search-result__stat-item
-            if user
+            if blog_user
               a.search-result__stat-link._ucard-popover(
-                href=self.link_to('users.member', { user_hid: user.hid })
+                href=self.link_to('users.member', { user_hid: blog_user.hid })
                 data-user-id=result.entry.user
-              )= user.nick
+              )= blog_user.nick
 
       .search-result__content
         .markup!= result.entry.html

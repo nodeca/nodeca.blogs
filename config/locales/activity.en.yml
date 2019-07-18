@@ -1,0 +1,7 @@
+i18n:
+  en-US:
+    users:
+      activity:
+        menu:
+          blog_entries: 'Blog entries'
+          blog_comments: 'Blog comments'

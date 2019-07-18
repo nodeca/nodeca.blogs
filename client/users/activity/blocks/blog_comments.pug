@@ -1,0 +1,18 @@
+each result in self.results
+  - var blog_user = self.users[result.entry.user];
+
+  .users-activity-item(
+    id='item' + result.comment._id
+    data-item-id=result.comment._id
+  )
+    header.users-activity-item__header
+      a.users-activity-item__title(
+        href=self.link_to('blogs.entry', { user_hid: blog_user && blog_user.hid, entry_hid: result.entry.hid, $anchor: 'comment' + result.comment.hid })
+      )= result.entry.title
+
+      ul.users-activity-item__stat
+        li.users-activity-item__stat-item
+          != self.timetag(result.comment.ts, 'relative')
+
+    .users-activity-item__content
+      .markup!= result.comment.html

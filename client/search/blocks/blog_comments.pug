@@ -1,12 +1,13 @@
 if self.results.length
 
   each result, idx in self.results
-    - var user = self.users[result.comment.user];
+    - var blog_user    = self.users[result.entry.user];
+    - var comment_user = self.users[result.comment.user];
 
     article.search-result.search-result__m-with-content(data-offset=idx + self.skip)
       header.search-result__header
         a.search-result__title(
-          href=self.link_to('blogs.entry', { user_hid: user && user.hid, entry_hid: result.entry.hid, $anchor: 'comment' + result.comment.hid })
+          href=self.link_to('blogs.entry', { user_hid: blog_user && blog_user.hid, entry_hid: result.entry.hid, $anchor: 'comment' + result.comment.hid })
         )= result.entry.title
 
         ul.search-result__stat
@@ -14,11 +15,11 @@ if self.results.length
             != self.timetag(result.comment.ts, 'relative')
 
           li.search-result__stat-item
-            if user
+            if comment_user
               a.search-result__stat-link._ucard-popover(
-                href=self.link_to('users.member', { user_hid: user.hid })
+                href=self.link_to('users.member', { user_hid: comment_user.hid })
                 data-user-id=result.comment.user
-              )= user.nick
+              )= comment_user.nick
 
       .search-result__content
         .markup!= result.comment.html
