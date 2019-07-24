@@ -1,17 +1,21 @@
-if !self.auto_reported
-  - var profile_name = self.author.user_name;
-  - var profile_url = self.link_to('users.member', { user_hid: self.author.user_hid });
-  =self.t('header', { url: '[' + profile_name + '](' + profile_url + ')' })
-else
-  =self.t('header_auto')
+- var profile_name = self.author.user_name;
+- var profile_url = self.link_to('users.member', { user_hid: self.author.user_hid });
+=self.t('header', { url: '[' + profile_name + '](' + profile_url + ')' })
 = '\n'
 
 -
+  function escape_md(text) {
+    return text.replace(/([!#$%&*+\-:<=>@[\\\]^_`{}~])/g, '\\$1');
+  }
+
+-
+  var title_escaped = escape_md(self.entry_title);
+
   // calculate minimum backtick length for ````quote, so it would encapsulate
   // original content (longest backtick sequence plus 1, but at least 3)
   var backtick_seq_len = Math.max.apply(
     null,
-    ('`` ' + self.report_text + ' ' + self.src_text)
+    ('`` ' + self.report_text + ' ' + title_escaped + ' ' + self.src_text)
       .match(/`+/g)
       .map(s => s.length)
   ) + 1;
@@ -25,6 +29,8 @@ else
 = self.t('to', { url: self.src_url }) + '\n'
 = '\n'
 = backticks + 'quote\n'
+= title_escaped + '\n'
+= '\n'
 = self.src_text + '\n'
 = backticks + '\n'
 = '\n'

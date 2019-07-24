@@ -112,6 +112,7 @@ module.exports = function (N, apiPath) {
       user_hid:  params.data.user.hid,
       entry_hid: params.data.entry.hid
     });
+    locals.entry_title = params.data.entry.title;
     locals.src_text = params.data.entry.md;
     locals.src_html = params.data.entry.html;
     locals.recipients = _.values(params.recipients);
