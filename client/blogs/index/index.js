@@ -34,47 +34,48 @@ function load(start, direction) {
 }
 
 
-// Use a separate debouncer that only fires when user stops scrolling,
-// so it's executed a lot less frequently.
-//
-// The reason is that `history.replaceState` is very slow in FF
-// on large pages: https://bugzilla.mozilla.org/show_bug.cgi?id=1250972
-//
-let update_url = _.debounce((item, index, item_offset) => {
-  let href, state;
-
-  if (item) {
-    state = {
-      hid:    $(item).data('entry-hid'),
-      offset: item_offset
-    };
-  }
-
-  // save current offset, and only update url if current_item is different
-  if (pageState.current_offset !== index) {
-    let $query = {};
-
-    if (item) $query.from = $(item).data('entry-hid');
-
-    href = N.router.linkTo('blogs.index', { $query });
-
-    if ((pageState.current_offset >= 0) !== (index >= 0)) {
-      $('meta[name="robots"]').remove();
-
-      if (index >= 0) {
-        $('head').append($('<meta name="robots" content="noindex,follow">'));
-      }
-    }
-
-    pageState.current_offset = index;
-  }
-
-  N.wire.emit('navigate.replace', { href, state })
-        .catch(err => N.wire.emit('error', err));
-}, 500);
-
+let update_url;
 
 function on_list_scroll(item, index, item_offset) {
+  // Use a separate debouncer that only fires when user stops scrolling,
+  // so it's executed a lot less frequently.
+  //
+  // The reason is that `history.replaceState` is very slow in FF
+  // on large pages: https://bugzilla.mozilla.org/show_bug.cgi?id=1250972
+  //
+  update_url = update_url || _.debounce((item, index, item_offset) => {
+    let href, state;
+
+    if (item) {
+      state = {
+        hid:    $(item).data('entry-hid'),
+        offset: item_offset
+      };
+    }
+
+    // save current offset, and only update url if current_item is different
+    if (pageState.current_offset !== index) {
+      let $query = {};
+
+      if (item) $query.from = $(item).data('entry-hid');
+
+      href = N.router.linkTo('blogs.index', { $query });
+
+      if ((pageState.current_offset >= 0) !== (index >= 0)) {
+        $('meta[name="robots"]').remove();
+
+        if (index >= 0) {
+          $('head').append($('<meta name="robots" content="noindex,follow">'));
+        }
+      }
+
+      pageState.current_offset = index;
+    }
+
+    N.wire.emit('navigate.replace', { href, state })
+          .catch(err => N.wire.emit('error', err));
+  }, 500);
+
   update_url(item, index, item_offset);
 }
 
@@ -153,7 +154,9 @@ N.wire.on('navigate.done:' + module.apiPath, function page_setup(data) {
 N.wire.on('navigate.exit:' + module.apiPath, function page_teardown() {
   scrollable_list.destroy();
   scrollable_list = null;
-  update_url.cancel();
+
+  if (update_url) update_url.cancel();
+
   pageState = {};
 });
 
