@@ -168,7 +168,7 @@ module.exports = function (N, apiPath) {
       //
       locals.users = locals.users || [];
       locals.users = locals.users.concat(_.map(entries, 'user'));
-      locals.users = locals.users.concat(_.map(entries, cache + '.last_user').filter(Boolean));
+      locals.users = locals.users.concat(_.map(entries, 'cache.last_user').filter(Boolean));
 
       locals.res.read_marks = {};
       for (let id of entry_ids) locals.res.read_marks[id] = read_marks[id];
