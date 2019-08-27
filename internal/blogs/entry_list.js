@@ -98,14 +98,14 @@ module.exports = function (N, apiPath) {
   // Fetch and fill bookmarks
   //
   N.wire.after(apiPath, async function fetch_and_fill_bookmarks(env) {
-    let bookmarks = await N.models.blogs.BlogEntryBookmark.find()
+    let bookmarks = await N.models.users.Bookmark.find()
                               .where('user').equals(env.user_info.user_id)
-                              .where('entry').in(env.data.entry_ids)
+                              .where('src').in(env.data.entry_ids)
                               .lean(true);
 
     if (!bookmarks.length) return;
 
-    env.res.own_bookmarks = _.map(bookmarks, 'entry');
+    env.res.own_bookmarks = _.map(bookmarks, 'src');
   });
 
 

@@ -1,0 +1,52 @@
+- var blog_user = self.users[self.entry.user];
+
+article.users-bookmarks-item.users-bookmarks-item__m-with-content(
+  data-bookmark-id=self._id
+  id='item' + self._id
+)
+  header.users-bookmarks-item__header
+    .users-bookmarks-item__meta
+      a.users-bookmarks-item__title(
+        href=self.url
+      )= self.entry.title
+
+      .users-bookmarks-item__stat-narrow.d-sm-none
+        a.users-bookmarks-item__stat-link.users-bookmarks-item__m-stat-parent(
+          href=self.link_to('blogs.sole', { user_hid: blog_user.hid })
+        )= self.t('blog_owner', { nick: blog_user.nick })
+
+      ul.users-bookmarks-item__stat
+        li.users-bookmarks-item__stat-item
+          = self.t('blog_entry')
+
+        li.users-bookmarks-item__stat-item
+          != self.timetag(self.entry.ts, 'relative')
+
+        li.users-bookmarks-item__stat-item.users-bookmarks-item__m-stat-parent.d-none.d-sm-inline-block
+          a.users-bookmarks-item__stat-link(
+            href=self.link_to('blogs.sole', { user_hid: blog_user.hid })
+          )= self.t('blog_owner', { nick: blog_user.nick })
+
+        li.users-bookmarks-item__stat-item
+          a.users-bookmarks-item__stat-link._ucard-popover(
+            href=self.link_to('users.member', { user_hid: blog_user.hid })
+            data-user-id=blog_user._id
+          )= blog_user.nick
+
+    if self.runtime.user_hid === self.user_hid
+      .users-bookmarks-item__controls
+        a.users-bookmarks-item__btn-delete.icon.icon-x(
+          href='#'
+          title=self.t('delete_bookmark')
+          data-on-click='users.bookmarks:delete'
+          data-item-id=self._id
+        )
+
+  .users-bookmarks-item__content
+    .markup!= self.entry.html
+
+  .users-bookmarks-item__expand
+    a.users-bookmarks-item__expand-btn(
+      href=self.url
+      data-on-click='users.bookmarks:expand'
+    )= self.t('expand')

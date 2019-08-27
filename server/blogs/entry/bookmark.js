@@ -30,17 +30,37 @@ module.exports = function (N, apiPath) {
   });
 
 
-  // Check if user can see this entry
+  // Only allow to bookmark public posts
   //
   N.wire.before(apiPath, async function check_access(env) {
     let access_env = { params: {
       entries: env.data.entry,
-      user_info: env.user_info
+      user_info: '000000000000000000000000' // guest
     } };
 
     await N.wire.emit('internal:blogs.access.entry', access_env);
 
-    if (!access_env.data.access_read) throw N.io.NOT_FOUND;
+    if (!access_env.data.access_read) {
+
+      // Allow hellbanned users to bookmark their own posts
+      //
+      if (env.user_info.hb && env.data.post.st === N.models.clubs.Post.statuses.HB) {
+        let access_env = { params: {
+          entries: env.data.entry,
+          user_info: env.user_info
+        } };
+
+        await N.wire.emit('internal:blogs.access.entry', access_env);
+
+        if (!access_env.data.access_read) {
+          throw N.io.NOT_FOUND;
+        }
+
+        return;
+      }
+
+      throw N.io.NOT_FOUND;
+    }
   });
 
 
@@ -50,19 +70,23 @@ module.exports = function (N, apiPath) {
 
     // If `env.params.remove` - remove bookmark
     if (env.params.remove) {
-      await N.models.blogs.BlogEntryBookmark.deleteOne(
-        { user: env.user_info.user_id, entry: env.data.entry._id }
-      );
+      await N.models.users.Bookmark.deleteOne({
+        user: env.user_info.user_id,
+        src:  env.data.entry._id
+      });
       return;
     }
 
-    // Add bookmark
-    let data = { user: env.user_info.user_id, entry: env.data.entry._id };
-
     // Use `findOneAndUpdate` with `upsert` to avoid duplicates in case of multi click
-    await N.models.blogs.BlogEntryBookmark.findOneAndUpdate(
-      data,
-      { $set: data },
+    await N.models.users.Bookmark.findOneAndUpdate(
+      {
+        user: env.user_info.user_id,
+        src:  env.params.entry_id
+      },
+      { $set: {
+        src_type: N.shared.content_type.BLOG_ENTRY,
+        'public': true
+      } },
       { upsert: true }
     );
   });
@@ -71,7 +95,7 @@ module.exports = function (N, apiPath) {
   // Update entry, fill count
   //
   N.wire.after(apiPath, async function update_entry(env) {
-    let count = await N.models.blogs.BlogEntryBookmark.countDocuments({ entry: env.data.entry._id });
+    let count = await N.models.users.Bookmark.countDocuments({ src: env.data.entry._id });
 
     env.res.count = count;
 

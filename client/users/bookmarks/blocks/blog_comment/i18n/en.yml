@@ -1,0 +1,5 @@
+en-US:
+  blog_comment: Blog comment
+  blog_owner: "#{nick}'s blog"
+  delete_bookmark: Delete bookmark
+  expand: Read more
