@@ -56,7 +56,7 @@ module.exports = function (N, apiPath) {
 
       // Allow hellbanned users to bookmark their own posts
       //
-      if (env.user_info.hb && env.data.post.st === N.models.clubs.Post.statuses.HB) {
+      if (env.user_info.hb && env.data.comment.st === N.models.blogs.BlogComment.statuses.HB) {
         let access_env = { params: {
           comments: env.data.comment,
           user_info: env.user_info,
@@ -94,7 +94,7 @@ module.exports = function (N, apiPath) {
     await N.models.users.Bookmark.findOneAndUpdate(
       {
         user: env.user_info.user_id,
-        src:  env.params.comment_id
+        src:  env.data.comment._id
       },
       { $set: {
         src_type: N.shared.content_type.BLOG_COMMENT,
