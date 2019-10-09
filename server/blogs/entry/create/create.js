@@ -3,9 +3,10 @@
 'use strict';
 
 
-const _         = require('lodash');
-const $         = require('nodeca.core/lib/parser/cheequery');
-const charcount = require('charcount');
+const _              = require('lodash');
+const $              = require('nodeca.core/lib/parser/cheequery');
+const charcount      = require('charcount');
+const create_preview = require('nodeca.blogs/lib/create_preview');
 
 
 module.exports = function (N, apiPath) {
@@ -195,7 +196,7 @@ module.exports = function (N, apiPath) {
     entry.title      = env.params.title.trim();
     entry.user       = env.user_info.user_id;
     entry.md         = env.params.txt;
-    entry.html       = env.data.parse_result.html;
+    entry.html       = create_preview(env.data.parse_result.html);
     entry.ip         = env.req.ip;
     entry.tags       = env.data.tags;
     entry.tag_hids   = env.data.tag_hids;

@@ -79,9 +79,22 @@
   .blog-entry__bookmark
     display none
 
+@keyframes blog-entry-under-cut-fade-in {
+  from  { opacity: 0; }
+  to    { opacity: 1; }
+}
+
+.blog-entry__under-cut
+  animation blog-entry-under-cut-fade-in 1s
+
 .blog-entry__read-more
-  font-size $font-size-sm
-  margin-bottom 1rem
+  display none
+
+.blog-entry__m-can-read-more
+  .blog-entry__read-more
+    display block
+    font-size $font-size-sm
+    margin-bottom 1rem
 
 .blog-entry__controls-blk
   margin 0 0 .5rem 0

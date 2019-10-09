@@ -3,9 +3,10 @@
 'use strict';
 
 
-const _         = require('lodash');
-const charlatan = require('charlatan');
-const ObjectId  = require('mongoose').Types.ObjectId;
+const _              = require('lodash');
+const charlatan      = require('charlatan');
+const ObjectId       = require('mongoose').Types.ObjectId;
+const create_preview = require('nodeca.blogs/lib/create_preview');
 
 
 const USER_COUNT        = 10;
@@ -198,7 +199,7 @@ async function createEntries() {
       ts:          date,
       views:       charlatan.Helpers.rand(1000),
       md,
-      html:        result.html,
+      html:        create_preview(result.html),
       /*eslint-disable new-cap*/
       ip:          charlatan.Internet.IPv4(),
       tag_hids:    tags.map(tag => tag.hid),

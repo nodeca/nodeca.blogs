@@ -14,6 +14,10 @@ each entry in self.entries
 
   if !collapsed
 
+    - var html_parts = entry.html.split('<!--cut-->');
+    - var html_before_cut = html_parts.shift();
+    - var html_after_cut = html_parts.join('');
+
     .blog-entry(
       id='entry' + entry.hid
       class=(entry.st === entryStatuses.DELETED) ? 'blog-entry__m-deleted' : ''
@@ -21,6 +25,7 @@ each entry in self.entries
       class=(entry.st === entryStatuses.HB) ? 'blog-entry__m-hb' : ''
       class=(self.own_bookmarks.indexOf(entry._id) !== -1) ? 'blog-entry__m-bookmarked' : ''
       class=(self.ignored_users[entry.user]) ? 'blog-entry__m-ignored' : ''
+      class=html_after_cut.length ? 'blog-entry__m-can-read-more' : ''
       data-user-hid=user.hid
       data-entry-hid=entry.hid
       data-entry-id=entry._id
@@ -39,11 +44,15 @@ each entry in self.entries
             )
 
       .blog-entry__content
-        .blog-entry__message.markup!= entry.html
+        .blog-entry__message.markup!= html_before_cut
 
       footer.blog-entry__controls
         .blog-entry__read-more
-          a(href=self.link_to('blogs.entry', { user_hid: user.hid, entry_hid: entry.hid }))
+          a(
+            href=self.link_to('blogs.entry', { user_hid: user.hid, entry_hid: entry.hid })
+            data-on-click='blogs.blocks.entry_list_sole:entry_expand_preview'
+            data-entry-id=entry._id
+          )
             = self.t('read_more')
 
         ul.blog-entry__controls-blk

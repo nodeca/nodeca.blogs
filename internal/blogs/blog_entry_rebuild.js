@@ -3,7 +3,8 @@
 'use strict';
 
 
-const _ = require('lodash');
+const _              = require('lodash');
+const create_preview = require('nodeca.blogs/lib/create_preview');
 
 
 module.exports = function (N, apiPath) {
@@ -26,13 +27,15 @@ module.exports = function (N, apiPath) {
         import_users: post.import_users
       });
 
+      let preview = create_preview(result.html);
+
       let updateData = {
         $set: {
-          html: result.html
+          html: preview
         }
       };
 
-      let needsUpdate = !_.isEqual(result.html, post.html);
+      let needsUpdate = !_.isEqual(preview, post.html);
 
       for (let field of [ 'imports', 'import_users' ]) {
         if (!_.isEmpty(result[field])) {

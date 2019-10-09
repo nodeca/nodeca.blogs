@@ -6,6 +6,41 @@ const _  = require('lodash');
 
 N.wire.once(module.apiPath, function entry_list_sole_setup_handlers() {
 
+  // Expand preview when user clicks on "read more" button
+  //
+  N.wire.on(module.apiPath + ':entry_read_more', function expand_preview(data) {
+    let entry_id = data.$this.data('entry-id');
+
+    return Promise.resolve()
+      .then(() => N.io.rpc('blogs.entry.get', { entry_id }))
+      .then(res => {
+        let old_content = data.$this.closest('.blog-entry').find('.blog-entry__message');
+
+        data.$this.closest('.blog-entry').removeClass('blog-entry__m-can-read-more');
+
+        let html_parts = res.entry.html.split('<!--cut-->');
+        let $html_before_cut = $(html_parts.shift());
+        let $html_after_cut = $(html_parts.join(''));
+
+        let new_content = $('<div class="blog-entry__message markup"></div>');
+
+        // replace old content with expanded blog post (that's assembled
+        // from 2 parts: before and after cut), part after cut has 0 opacity
+        // initially and animates to 1 later
+        new_content.append($html_before_cut);
+        new_content.append($html_after_cut);
+
+        $html_after_cut.each((idx, el) => $(el).addClass('blog-entry__under-cut'));
+
+        return N.wire.emit('navigate.content_update', {
+          $: new_content,
+          locals: res,
+          $replace: old_content
+        });
+      });
+  });
+
+
   // Expand deleted or hellbanned blog entry
   //
   N.wire.on(module.apiPath + ':entry_expand', function expand(data) {
