@@ -144,7 +144,7 @@ N.wire.once('navigate.done:' + module.apiPath, function page_once() {
       .then(res => {
         let $result = $(N.runtime.render('blogs.entry.blocks.comment_list', _.assign(res, { expand: true })));
 
-        return N.wire.emit('navigate.update', {
+        return N.wire.emit('navigate.content_update', {
           $: $result,
           locals: res,
           $replace: data.$this.closest('.blog-comment')
@@ -167,7 +167,7 @@ N.wire.once('navigate.done:' + module.apiPath, function page_once() {
       .then(res => {
         let $result = $(N.runtime.render('blogs.entry.blocks.entry', res));
 
-        return N.wire.emit('navigate.update', {
+        return N.wire.emit('navigate.content_update', {
           $: $result,
           locals: res,
           $replace: $entry
@@ -194,7 +194,7 @@ N.wire.once('navigate.done:' + module.apiPath, function page_once() {
       .then(res => {
         let $result = $(N.runtime.render('blogs.entry.blocks.comment_list', res));
 
-        return N.wire.emit('navigate.update', {
+        return N.wire.emit('navigate.content_update', {
           $: $result,
           locals: res,
           $replace: $comment
@@ -218,7 +218,7 @@ N.wire.once('navigate.done:' + module.apiPath, function page_once() {
       .then(res => {
         let $result = $(N.runtime.render('blogs.entry.blocks.entry', res));
 
-        return N.wire.emit('navigate.update', {
+        return N.wire.emit('navigate.content_update', {
           $: $result,
           locals: res,
           $replace: $entry
@@ -268,7 +268,7 @@ N.wire.once('navigate.done:' + module.apiPath, function page_once() {
       .then(res => {
         let $result = $(N.runtime.render('blogs.entry.blocks.entry', res));
 
-        return N.wire.emit('navigate.update', {
+        return N.wire.emit('navigate.content_update', {
           $: $result,
           locals: res,
           $replace: $entry
@@ -292,7 +292,7 @@ N.wire.once('navigate.done:' + module.apiPath, function page_once() {
       .then(res => {
         let $result = $(N.runtime.render('blogs.entry.blocks.comment_list', res));
 
-        return N.wire.emit('navigate.update', {
+        return N.wire.emit('navigate.content_update', {
           $: $result,
           locals: res,
           $replace: $comment
@@ -380,7 +380,7 @@ N.wire.once('navigate.done:' + module.apiPath, function page_once() {
               $comment.remove();
             });
 
-            return N.wire.emit('navigate.update', {
+            return N.wire.emit('navigate.content_update', {
               $: $result,
               locals: res,
               $replace: $comment
@@ -404,7 +404,7 @@ N.wire.once('navigate.done:' + module.apiPath, function page_once() {
 
         $('#content').removeClass('blogs-entry-page__m-deleted blogs-entry-page__m-deleted-hard');
 
-        return N.wire.emit('navigate.update', {
+        return N.wire.emit('navigate.content_update', {
           $: $result,
           locals: res,
           $replace: $entry
@@ -432,7 +432,7 @@ N.wire.once('navigate.done:' + module.apiPath, function page_once() {
 
         let $result = $(N.runtime.render('blogs.entry.blocks.comment_list', res));
 
-        return N.wire.emit('navigate.update', {
+        return N.wire.emit('navigate.content_update', {
           $: $result,
           locals: res,
           $replace: $comment
@@ -531,7 +531,7 @@ N.wire.on('navigate.done:' + module.apiPath, function set_quote_modifiers_on_ini
 });
 
 
-N.wire.on('navigate.update', function set_quote_modifiers_on_update(data) {
+N.wire.on('navigate.content_update', function set_quote_modifiers_on_update(data) {
   set_quote_modifiers(data.$);
 });
 

@@ -18,7 +18,7 @@ N.wire.once(module.apiPath, function entry_list_sole_setup_handlers() {
 
         // TODO: reset selection state, toggle checkbox manually if needed
 
-        return N.wire.emit('navigate.update', {
+        return N.wire.emit('navigate.content_update', {
           $: $result,
           locals: res,
           $replace: data.$this.closest('.blog-entry')
@@ -41,7 +41,7 @@ N.wire.once(module.apiPath, function entry_list_sole_setup_handlers() {
       .then(res => {
         let $result = $(N.runtime.render('blogs.blocks.entry_list_sole', res));
 
-        return N.wire.emit('navigate.update', {
+        return N.wire.emit('navigate.content_update', {
           $: $result,
           locals: res,
           $replace: $entry
@@ -66,7 +66,7 @@ N.wire.once(module.apiPath, function entry_list_sole_setup_handlers() {
       .then(res => {
         let $result = $(N.runtime.render('blogs.blocks.entry_list_sole', res));
 
-        return N.wire.emit('navigate.update', {
+        return N.wire.emit('navigate.content_update', {
           $: $result,
           locals: res,
           $replace: $entry
@@ -108,7 +108,7 @@ N.wire.once(module.apiPath, function entry_list_sole_setup_handlers() {
 
         let $result = $(N.runtime.render('blogs.blocks.entry_list_sole', res));
 
-        return N.wire.emit('navigate.update', {
+        return N.wire.emit('navigate.content_update', {
           $: $result,
           locals: res,
           $replace: $entry
@@ -129,7 +129,7 @@ N.wire.once(module.apiPath, function entry_list_sole_setup_handlers() {
       .then(res => {
         let $result = $(N.runtime.render('blogs.blocks.entry_list_sole', res));
 
-        return N.wire.emit('navigate.update', {
+        return N.wire.emit('navigate.content_update', {
           $: $result,
           locals: res,
           $replace: $entry

@@ -115,7 +115,7 @@ N.wire.on(module.apiPath + ':begin', function show_editor(data) {
 
           let $result = $(N.runtime.render('blogs.entry.blocks.comment_list', res));
 
-          return N.wire.emit('navigate.update', {
+          return N.wire.emit('navigate.content_update', {
             $: $result,
             locals: res,
             $replace: $comment
