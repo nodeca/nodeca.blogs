@@ -30,54 +30,57 @@ describe('create_preview', function () {
     `);
   });
 
-  it('should put a cut after code block', function () {
-    add_test(`
-      <code>
-      ${'q\n'.repeat(15)}
-      </code><!--cut-->
-      <p>${text(120 * 5)}</p>
-    `);
-  });
-
-  it('should avoid placing only 2 lines under a cut', function () {
-    add_test(`
-      <p>${text(120 * 20)}</p>
-      <p>${text(10)}</p>
-    `);
-  });
-
   it('should put cut close to 15 lines', function () {
     // paragraph is 4 lines each
     add_test(`
       <p>${text(400)}</p>
       <p>${text(400)}</p>
-      <p>${text(400)}</p>
       <p>${text(400)}</p><!--cut-->
       <p>${text(400)}</p>
       <p>${text(400)}</p>
+      <p>${text(400)}</p>
     `);
   });
 
-  it('should put cut after 1 picture', function () {
+  it('should put cut after single long paragraph', function () {
     add_test(`
+      <p>${text(20 * 120)}</p><!--cut-->
+      <p>${text(120)}</p>
+      <p>${text(120)}</p>
+    `);
+  });
+
+  it('should count lines in code blocks correctly', function () {
+    add_test(`
+      <code>
+      ${'q\n'.repeat(10)}
+      </code><!--cut-->
+      <code>
+      ${'q\n'.repeat(10)}
+      </code>
+    `);
+  });
+
+  it('should put cut after 2 pictures', function () {
+    add_test(`
+      <img class="image">
       <img class="image"><!--cut-->
       <img class="image">
-      <img class="image">
     `);
   });
 
-  it('should put cut after 1 video', function () {
+  it('should put cut after 2 videos', function () {
     add_test(`
+      <div class="ez-player ez-block"></div>
       <div class="ez-player ez-block"></div><!--cut-->
       <div class="ez-player ez-block"></div>
-      <div class="ez-player ez-block"></div>
     `);
   });
 
-  it('should put cut after 1 attach', function () {
+  it('should put cut after 2 attaches', function () {
     add_test(`
-      <a class="attach"></a><!--cut-->
       <a class="attach"></a>
+      <a class="attach"></a><!--cut-->
       <a class="attach"></a>
     `);
   });
