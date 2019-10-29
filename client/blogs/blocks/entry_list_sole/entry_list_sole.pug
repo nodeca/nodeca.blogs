@@ -50,7 +50,7 @@ each entry in self.entries
         .blog-entry__read-more
           a(
             href=self.link_to('blogs.entry', { user_hid: user.hid, entry_hid: entry.hid })
-            data-on-click='blogs.blocks.entry_list_sole:entry_expand_preview'
+            data-on-click='blogs.blocks.entry_list_sole:entry_read_more'
             data-entry-id=entry._id
           )
             = self.t('read_more')
