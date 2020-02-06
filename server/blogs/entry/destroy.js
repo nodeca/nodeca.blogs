@@ -11,7 +11,7 @@ module.exports = function (N, apiPath) {
   N.validate(apiPath, {
     entry_id:     { format: 'mongo', required: true },
     reason:       { type: 'string' },
-    method:       { type: 'string', 'enum': [ 'hard', 'soft' ], required: true },
+    method:       { type: 'string', enum: [ 'hard', 'soft' ], required: true },
     as_moderator: { type: 'boolean', required: true }
   });
 
@@ -94,7 +94,7 @@ module.exports = function (N, apiPath) {
     env.data.new_entry = await N.models.blogs.BlogEntry.findOneAndUpdate(
       { _id: env.data.entry._id },
       update,
-      { 'new': true }
+      { new: true }
     );
   });
 
@@ -130,7 +130,7 @@ module.exports = function (N, apiPath) {
   //
   N.wire.after(apiPath, async function remove_votes(env) {
     await N.models.users.Vote.updateMany(
-      { 'for': env.data.entry._id },
+      { for: env.data.entry._id },
       // Just move vote `value` field to `backup` field
       { $rename: { value: 'backup' } }
     );
@@ -144,7 +144,7 @@ module.exports = function (N, apiPath) {
                              .lean(true);
 
     await N.models.users.Vote.updateMany(
-      { 'for': { $in: _.map(comments, '_id') } },
+      { for: { $in: _.map(comments, '_id') } },
       // Just move vote `value` field to `backup` field
       { $rename: { value: 'backup' } }
     );

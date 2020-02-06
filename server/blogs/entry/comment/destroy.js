@@ -35,7 +35,7 @@ module.exports = function (N, apiPath) {
   N.validate(apiPath, {
     comment_id:   { format: 'mongo', required: true },
     reason:       { type: 'string' },
-    method:       { type: 'string', 'enum': [ 'hard', 'soft' ], required: true },
+    method:       { type: 'string', enum: [ 'hard', 'soft' ], required: true },
     as_moderator: { type: 'boolean', required: true }
   });
 
@@ -200,7 +200,7 @@ module.exports = function (N, apiPath) {
   //
   N.wire.after(apiPath, async function remove_votes(env) {
     await N.models.users.Vote.updateMany(
-      { 'for': { $in: env.data.changes.map(({ old_comment }) => old_comment._id) } },
+      { for: { $in: env.data.changes.map(({ old_comment }) => old_comment._id) } },
       // Just move vote `value` field to `backup` field
       { $rename: { value: 'backup' } }
     );

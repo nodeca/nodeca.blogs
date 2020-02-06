@@ -85,7 +85,7 @@ module.exports = function (N, apiPath) {
       },
       { $set: {
         src_type: N.shared.content_type.BLOG_ENTRY,
-        'public': true
+        public: true
       } },
       { upsert: true }
     );

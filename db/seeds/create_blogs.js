@@ -105,7 +105,7 @@ async function addVotes(post, content_type) {
     let vote = new models.users.Vote({
       to:     post.user,
       from:   user._id,
-      'for':  post._id,
+      for:  post._id,
       type:   content_type,
       value
     });

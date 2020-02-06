@@ -40,14 +40,14 @@ module.exports = function (N, collectionName) {
     // Flag set if entry state isn't deleted or hard deleted;
     // used in counting user's activity to quickly determine if comment
     // should be counted (i.e. in a visible entry) or not
-    entry_exists: { type: Boolean, 'default': true },
+    entry_exists: { type: Boolean, default: true },
 
     ip:           String,
-    ts:           { type: Date, 'default': Date.now },
+    ts:           { type: Date, default: Date.now },
 
-    votes:        { type: Number, 'default': 0 },
-    votes_hb:     { type: Number, 'default': 0 },
-    bookmarks:    { type: Number, 'default': 0 },
+    votes:        { type: Number, default: 0 },
+    votes_hb:     { type: Number, default: 0 },
+    bookmarks:    { type: Number, default: 0 },
     del_reason:   String,
     del_by:       Schema.ObjectId,
     prev_st:      { st: Number, ste: Number },
@@ -116,7 +116,7 @@ module.exports = function (N, collectionName) {
     let entry = await N.models.blogs.BlogEntry.findByIdAndUpdate(
       this.entry,
       { $inc: { last_comment_counter: 1 } },
-      { 'new': true }
+      { new: true }
     );
 
     this.hid = entry.last_comment_counter;

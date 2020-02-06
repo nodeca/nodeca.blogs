@@ -70,7 +70,7 @@ module.exports = function (N, apiPath) {
     env.data.new_entry = await N.models.blogs.BlogEntry.findOneAndUpdate(
       { _id: env.data.entry._id },
       update,
-      { 'new': true }
+      { new: true }
     );
   });
 
@@ -106,7 +106,7 @@ module.exports = function (N, apiPath) {
   //
   N.wire.after(apiPath, async function restore_votes(env) {
     await N.models.users.Vote.updateMany(
-      { 'for': env.data.entry._id },
+      { for: env.data.entry._id },
       // Just move vote `backup` field back to `value` field
       { $rename: { backup: 'value' } }
     );
@@ -120,7 +120,7 @@ module.exports = function (N, apiPath) {
                              .lean(true);
 
     await N.models.users.Vote.updateMany(
-      { 'for': { $in: _.map(comments, '_id') } },
+      { for: { $in: _.map(comments, '_id') } },
       // Just move vote `backup` field back to `value` field
       { $rename: { backup: 'value' } }
     );

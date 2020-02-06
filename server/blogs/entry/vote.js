@@ -81,7 +81,7 @@ module.exports = function (N, apiPath) {
   //
   N.wire.before(apiPath, function remove_votes(env) {
     return N.models.users.Vote.deleteOne(
-      { 'for': env.params.entry_id, from: env.user_info.user_id }
+      { for: env.params.entry_id, from: env.user_info.user_id }
     );
   });
 
@@ -92,7 +92,7 @@ module.exports = function (N, apiPath) {
     if (env.params.value === 0) return;
 
     return N.models.users.Vote.updateOne(
-      { 'for': env.params.entry_id, from: env.user_info.user_id },
+      { for: env.params.entry_id, from: env.user_info.user_id },
       {
         to: env.data.entry.user,
         type: N.shared.content_type.BLOG_ENTRY,
@@ -108,11 +108,11 @@ module.exports = function (N, apiPath) {
   //
   N.wire.after(apiPath, async function update_entry(env) {
     let result = await N.models.users.Vote.aggregate([
-      { $match: { 'for': env.data.entry._id } },
+      { $match: { for: env.data.entry._id } },
       {
         $group: {
           _id: null,
-          votes: { $sum: { $cond: { 'if': '$hb', then: 0, 'else': '$value' } } },
+          votes: { $sum: { $cond: { if: '$hb', then: 0, else: '$value' } } },
           votes_hb: { $sum: '$value' }
         }
       },

@@ -88,7 +88,7 @@ module.exports = function (N, apiPath) {
         _id: bookmark._id
       }).update({
         $set: {
-          'public': !!is_comment_public[bookmark.src]
+          public: !!is_comment_public[bookmark.src]
         }
       });
     });

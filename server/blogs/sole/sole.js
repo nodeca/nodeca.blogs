@@ -16,8 +16,8 @@ module.exports = function (N, apiPath) {
       properties: {
         tag:  { type: 'string' },
         from: { type: 'string' },
-        prev: { 'enum': [ '' ] },
-        next: { 'enum': [ '' ] }
+        prev: { enum: [ '' ] },
+        next: { enum: [ '' ] }
       },
       additionalProperties: false
     }

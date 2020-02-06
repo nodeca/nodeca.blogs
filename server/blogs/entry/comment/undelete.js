@@ -99,7 +99,7 @@ module.exports = function (N, apiPath) {
     env.data.new_comment = await N.models.blogs.BlogComment.findOneAndUpdate(
       { _id: env.data.comment._id },
       update,
-      { 'new': true }
+      { new: true }
     );
   });
 
@@ -125,7 +125,7 @@ module.exports = function (N, apiPath) {
   //
   N.wire.after(apiPath, async function restore_votes(env) {
     await N.models.users.Vote.updateMany(
-      { 'for': env.data.comment._id },
+      { for: env.data.comment._id },
       // Just move vote `backup` field back to `value` field
       { $rename: { backup: 'value' } }
     );

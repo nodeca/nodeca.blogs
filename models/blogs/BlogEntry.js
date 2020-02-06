@@ -29,7 +29,7 @@ module.exports = function (N, collectionName) {
   };
 
   let cache = {
-    comment_count:    { type: Number, 'default': 0 },
+    comment_count:    { type: Number, default: 0 },
 
     // used to display last comment author in tracker
     last_comment:     Schema.ObjectId,
@@ -49,12 +49,12 @@ module.exports = function (N, collectionName) {
     ip:           String,
     tag_hids:     [ Number ],
     tags:         [ String ],
-    ts:           { type: Date, 'default': Date.now },
+    ts:           { type: Date, default: Date.now },
 
-    views:        { type: Number, 'default': 0 },
-    votes:        { type: Number, 'default': 0 },
-    votes_hb:     { type: Number, 'default': 0 },
-    bookmarks:    { type: Number, 'default': 0 },
+    views:        { type: Number, default: 0 },
+    votes:        { type: Number, default: 0 },
+    votes_hb:     { type: Number, default: 0 },
+    bookmarks:    { type: Number, default: 0 },
     del_reason:   String,
     del_by:       Schema.ObjectId,
     prev_st:      { st: Number, ste: Number },
@@ -63,7 +63,7 @@ module.exports = function (N, collectionName) {
 
     // Last assigned hid to the comments to this entry,
     // used to determine hid of a new comment
-    last_comment_counter: { type: Number, 'default': 0 },
+    last_comment_counter: { type: Number, default: 0 },
 
     params_ref:   Schema.ObjectId,
     imports:      [ String ],
