@@ -1,4 +1,4 @@
-.modal.fade(tabindex='-1' role='dialog' aria-hidden='true')
+.modal.fade.blogs-tag-edit(tabindex='-1' role='dialog' aria-hidden='true')
   .modal-dialog(role='document')
     .modal-content
       form(data-on-submit=self.apiPath + ':submit')
@@ -8,7 +8,7 @@
 
         .modal-body
           .form-group
-            textarea.form-control(name='tags')= self.tags.join(', ')
+            textarea.form-control.blogs-tag-edit__tags(name='tags')= self.tags.join(', ')
             small.form-text.text-muted= self.t('help')
 
         .modal-footer
