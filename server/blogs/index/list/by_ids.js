@@ -3,9 +3,6 @@
 'use strict';
 
 
-const Promise = require('bluebird');
-
-
 // Max entries to fetch
 const LIMIT = 100;
 

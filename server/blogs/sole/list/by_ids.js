@@ -6,7 +6,6 @@
 
 
 const _       = require('lodash');
-const Promise = require('bluebird');
 
 
 // Max entries to fetch
