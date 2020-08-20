@@ -3,10 +3,8 @@
 
 'use strict';
 
-const from2    = require('from2');
+const stream   = require('stream');
 const multi    = require('multistream');
-const pumpify  = require('pumpify');
-const through2 = require('through2');
 
 
 module.exports = function (N, apiPath) {
@@ -38,15 +36,11 @@ module.exports = function (N, apiPath) {
 
     users = null;
 
-    let entry_stream = pumpify.obj(
-      N.models.blogs.BlogEntry.find()
-          .where('st').equals(N.models.blogs.BlogEntry.statuses.VISIBLE)
-          .select('hid user')
-          .sort('hid')
-          .lean(true)
-          .cursor(),
+    let blog_stream = stream.Readable.from(buffer);
 
-      through2.obj(function (entry, encoding, callback) {
+    let entry_stream = new stream.Transform({
+      objectMode: true,
+      transform(entry, encoding, callback) {
         let hid = user_id_to_hid[entry.user];
 
         if (hid) {
@@ -59,12 +53,24 @@ module.exports = function (N, apiPath) {
         }
 
         callback();
-      })
+      }
+    });
+
+    stream.pipeline(
+      N.models.blogs.BlogEntry.find()
+          .where('st').equals(N.models.blogs.BlogEntry.statuses.VISIBLE)
+          .select('hid user')
+          .sort('hid')
+          .lean(true)
+          .stream(),
+
+      entry_stream,
+      () => {}
     );
 
     data.streams.push({
       name: 'blogs',
-      stream: multi.obj([ from2.obj(buffer), entry_stream ])
+      stream: multi.obj([ blog_stream, entry_stream ])
     });
   });
 };
