@@ -8,17 +8,5 @@
   ],
   "homepage": "https://github.com/nodeca/nodeca.blogs",
   "license": "MIT",
-  "repository": "nodeca/nodeca.blogs",
-  "browserify": {
-    "transform": [
-      [
-        "babelify",
-        {
-          "presets": [
-            "@babel/preset-env"
-          ]
-        }
-      ]
-    ]
-  }
+  "repository": "nodeca/nodeca.blogs"
 }
