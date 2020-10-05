@@ -1,0 +1,5 @@
+ru-RU:
+  edit_comment: "Редактировать <a href='#{comment_url}'>##{comment_hid}</a> in &quot;#{entry_title}&quot;"
+
+  options_btn:
+    options: Опции

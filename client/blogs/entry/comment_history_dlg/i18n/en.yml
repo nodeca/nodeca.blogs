@@ -3,6 +3,6 @@ en-US:
   role_task: This action was performed automatically
   role_moderator: This action was performed by a moderator
   action_delete: Comment deleted
-  action_hard_delete: Comment deleted
+  action_hard_delete: Comment hard deleted
   action_undelete: Comment restored
   del_reason: "(#{text})"

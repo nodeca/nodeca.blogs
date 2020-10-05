@@ -4,7 +4,7 @@ en-US:
     auto_abuse_report_text: This comment received too many downvotes.
 
   ip_info:
-    err_no_ip: IP address for this entry is not specified
+    err_no_ip: IP address for this comment is not specified
 
   add_infraction:
     err_perm_receive: You can't add infractions to this user

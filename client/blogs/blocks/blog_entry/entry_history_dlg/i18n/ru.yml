@@ -1,0 +1,9 @@
+ru-RU:
+  title: История
+  role_task: Это действие было выполнено автоматически
+  role_moderator: Это действие было выполнено модератором
+  tags: 'Теги:'
+  action_delete: Блогозапись удалена
+  action_hard_delete: Блогозапись жёстко удалена
+  action_undelete: Блогозапись восстановлена
+  del_reason: "(#{text})"

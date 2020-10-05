@@ -1,0 +1,8 @@
+ru-RU:
+  title_tag: 'Тег: #{tag}'
+  user_no_entries: У этого пользователя нет блогозаписей.
+  tag_no_entries: Блогозаписей с этим тегом нет.
+  next_page: Раньше
+  prev_page: Позже
+
+  search_sole: в этом блоге

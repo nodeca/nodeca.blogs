@@ -1,0 +1,5 @@
+ru-RU:
+  blog_comment: Комментарий в блоге
+  blog_owner: "Блог #{nick}"
+  delete_bookmark: Удалить закладку
+  expand: Читать далее

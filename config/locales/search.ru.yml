@@ -1,0 +1,12 @@
+i18n:
+  ru-RU:
+    search:
+      general:
+        menu:
+          blog_entries: Блогозаписи
+          blog_comments: Комментарии в блогах
+
+      blogs_sole:
+        menu:
+          blog_entries: Блогозаписи
+          blog_comments: Комментарии в блогах

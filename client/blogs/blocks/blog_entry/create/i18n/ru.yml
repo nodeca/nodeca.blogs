@@ -1,0 +1,8 @@
+ru-RU:
+  create_blog_entry: Новая блогозапись
+
+  options_btn:
+    options: Опции
+
+  title_input:
+    blog_entry_title: Название

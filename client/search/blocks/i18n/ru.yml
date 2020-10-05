@@ -1,0 +1,6 @@
+ru-RU:
+  blog_entries:
+    comments: "#{count} ((комментарий|комментария|комментариев))"
+    not_found: Блогозаписи не найдены.
+  blog_comments:
+    not_found: Комментарии не найдены.

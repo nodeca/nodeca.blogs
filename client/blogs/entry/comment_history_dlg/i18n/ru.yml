@@ -1,0 +1,8 @@
+ru-RU:
+  title: История
+  role_task: Это действие было выполнено автоматически
+  role_moderator: Это действие было выполнено модератором
+  action_delete: Комментарий удалён
+  action_hard_delete: Комментарий жёстко удалён
+  action_undelete: Комментарий восстановлен
+  del_reason: "(#{text})"

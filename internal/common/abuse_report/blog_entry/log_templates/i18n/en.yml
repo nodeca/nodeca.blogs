@@ -4,4 +4,4 @@ en-US:
   body:
     header: "Report from user #{url}:"
     to: "About [blog entry](#{url}):"
-    message_sent_to: "This message sent to: "
+    message_sent_to: "This report was also sent to: "

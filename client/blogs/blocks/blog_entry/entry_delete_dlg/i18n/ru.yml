@@ -1,0 +1,9 @@
+ru-RU:
+  title: Удалить блогозапись
+  title_moderator: 'Модерация: удалить блогозапись'
+  confirmation_text: Вы уверены, что хотите удалить эту блогозапись?
+  reason_input_help: Причина удаления
+  ok: OK
+  cancel: Отмена
+  delete_soft: Мягкое удаление
+  delete_hard: Жёсткое удаление

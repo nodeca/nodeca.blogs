@@ -1,0 +1,8 @@
+ru-RU:
+  edit_entry: "Редактировать &quot;<a href='#{entry_url}'>#{entry_title}</a>&quot;"
+
+  options_btn:
+    options: Опции
+
+  title_input:
+    blog_entry_title: Название

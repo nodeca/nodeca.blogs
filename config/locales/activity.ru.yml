@@ -1,0 +1,7 @@
+i18n:
+  ru-RU:
+    users:
+      activity:
+        menu:
+          blog_entries: Блогозаписи
+          blog_comments: Комментарии в блогах

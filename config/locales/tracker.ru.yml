@@ -1,0 +1,10 @@
+i18n:
+  ru-RU:
+    users:
+      tracker:
+        menu:
+          blog_entry: Блоги
+
+      subscriptions:
+        blogs_sole: Блоги
+        blogs_entry: Блогозаписи

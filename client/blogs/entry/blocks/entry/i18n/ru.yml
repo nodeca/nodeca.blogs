@@ -1,0 +1,13 @@
+ru-RU:
+  report: Сообщить модератору
+  bookmark_add: Добавить в закладки
+  bookmark_remove: Убрать из закладок
+  vote_up: Голосовать за
+  vote_down: Голосовать против
+  vote_details: Нажмите, чтоб посмотреть подробности
+  edit: Редактировать блогозапись
+  last_edited: "Последний раз отредактировано #{date}"
+  del_reason: "(#{text})"
+  del_by: "Удалил:"
+  infraction_title: "#{points} ((очко|очка|очков)):points, добавлено #{date}"
+  views: Просмотры
