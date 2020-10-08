@@ -19,6 +19,6 @@ ru-RU:
   expand: Раскрыть
 
   ip_info: Информация об IP
-  add_infraction: Добавить нарушение
+  add_infraction: Выдать нарушение
 
   infraction_title: "#{points} ((очко|очка|очков)):points, добавлено #{date}"

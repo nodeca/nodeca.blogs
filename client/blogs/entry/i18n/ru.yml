@@ -5,7 +5,7 @@ ru-RU:
   entry_undelete_done: Блогозапись восстановлена
 
   abuse_reported: Жалоба отправлена
-  infraction_added: Нарушение добавлено
+  infraction_added: Нарушение выдано
 
   old_entry_reply_confirm: |
     md:**Эта блогозапись очень старая!** Она была написана #{count} ((день|дня|дней)):count назад,

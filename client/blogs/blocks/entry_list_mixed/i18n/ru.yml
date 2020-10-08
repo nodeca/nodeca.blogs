@@ -9,7 +9,7 @@ ru-RU:
   edit: Редактировать
 
   ip_info: Информация об IP
-  add_infraction: Добавить нарушение
+  add_infraction: Выдать нарушение
   delete: Удалить
   undelete: Восстановить
 
@@ -20,5 +20,5 @@ ru-RU:
   hb_entry_text: Hellbanned
   expand: Раскрыть
 
-  infraction_added: Нарушение добавлено
+  infraction_added: Нарушение выдано
   infraction_title: "#{points} ((очко|очка|очков)):points, добавлено #{date}"

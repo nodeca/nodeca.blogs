@@ -2,7 +2,7 @@ ru-RU:
   mod_actions: Модерация
   history: История
   ip_info: Информация об IP
-  add_infraction: Добавить нарушение
+  add_infraction: Выдать нарушение
   delete: Удалить
   undelete: Восстановить
   subscription: Подписка
