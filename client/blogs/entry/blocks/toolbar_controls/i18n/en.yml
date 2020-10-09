@@ -4,7 +4,7 @@ en-US:
   ip_info: IP info
   add_infraction: Add infraction
   delete: Delete
-  undelete: Undelete
+  undelete: Restore
   subscription: Subscription
 
   subs_muted: Muted. You will never be notified of anything in this blog entry.

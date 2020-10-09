@@ -11,7 +11,7 @@ en-US:
   ip_info: IP info
   add_infraction: Add infraction
   delete: Delete
-  undelete: Undelete
+  undelete: Restore
 
   del_reason: "Deletion reason: #{text}"
   del_by: "Deleted by:"

@@ -9,5 +9,5 @@ ru-RU:
   last_edited: "Последний раз отредактировано #{date}"
   del_reason: "(#{text})"
   del_by: "Удалил:"
-  infraction_title: "#{points} ((очко|очка|очков)):points, добавлено #{date}"
+  infraction_title: "#{points} ((балл|балла|баллов)):points, добавлено #{date}"
   views: Просмотры

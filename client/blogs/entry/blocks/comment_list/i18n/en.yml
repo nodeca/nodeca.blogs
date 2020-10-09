@@ -8,7 +8,7 @@ en-US:
   reply: Reply
   edit: Edit
   delete: Delete
-  undelete: Undelete
+  undelete: Restore
   last_edited: "Last edited on #{date}"
 
   del_reason: "Deletion reason: #{text}"
