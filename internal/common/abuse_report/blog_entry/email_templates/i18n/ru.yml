@@ -1,8 +1,0 @@
-ru-RU:
-  subject:
-    subject: "жалоба от #{user} (блогозапись)"
-  body:
-    header: "Жалоба от пользователя #{url}:"
-    to: "На блогозапись:"
-    message_sent_to: "Эта жалоба также отправлена: "
-    report_topic: Тема с жалобой.

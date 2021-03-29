@@ -1,7 +1,0 @@
-en-US:
-  subject:
-    subject: "Report from #{user} (blog comment)"
-  body:
-    header: "Report from user #{url}:"
-    to: "About [blog comment](#{url}):"
-    message_sent_to: "This report was also sent to: "
