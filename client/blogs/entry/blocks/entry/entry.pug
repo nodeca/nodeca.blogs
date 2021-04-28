@@ -35,12 +35,15 @@
     .blog-entry__meta
       span.blog-entry__meta-item.blog-entry__author
         if user
-          a.blog-entry__author-link._ucard-popover(
+          a.blog-entry__author-avatar._ucard-popover(
             href=self.link_to('users.member', { user_hid: user.hid })
             data-user-id=entry.user
             data-user-ref='blog_entry:'+user.hid+':'+entry.hid
           )
             img.blog-entry__avatar(alt=user.name)&attributes(self.avatar(user, 'sm'))
+          a.blog-entry__author-link(
+            href=self.link_to('blogs.sole', { user_hid: user.hid })
+          )
             = user.name
         else
           .blog-entry__avatar.av-anon

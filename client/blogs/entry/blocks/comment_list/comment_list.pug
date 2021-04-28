@@ -26,7 +26,7 @@ each comment in self.comments
     )
       .blog-comment__aside
         if user
-          a.blog-comment__author-link._ucard-popover(
+          a.blog-comment__author-avatar._ucard-popover(
             href=self.link_to('users.member', { user_hid: user.hid })
             data-user-id=entry.user
             data-user-ref='blog_comment:'+user.hid+':'+entry.hid+':'+comment.hid
@@ -38,10 +38,8 @@ each comment in self.comments
       footer.blog-comment__head
         if user
           .blog-comment__author
-            a.blog-comment__author-link._ucard-popover(
-              href=self.link_to('users.member', { user_hid: user.hid })
-              data-user-id=entry.user
-              data-user-ref='blog_comment:'+user.hid+':'+entry.hid+':'+comment.hid
+            a.blog-comment__author-link(
+              href=self.link_to('blogs.sole', { user_hid: user.hid })
             )
               = user.name
 
@@ -221,7 +219,7 @@ each comment in self.comments
     )
       .blog-comment__aside
         if user
-          a.blog-comment__author-link._ucard-popover(
+          a.blog-comment__author-avatar._ucard-popover(
             href=self.link_to('users.member', { user_hid: user.hid })
             data-user-id=entry.user
             data-user-ref='blog_comment:'+user.hid+':'+entry.hid+':'+comment.hid
@@ -233,10 +231,8 @@ each comment in self.comments
       footer.blog-comment__head
         if user
           .blog-comment__author
-            a.blog-comment__author-link._ucard-popover(
-              href=self.link_to('users.member', { user_hid: user.hid })
-              data-user-id=entry.user
-              data-user-ref='blog_comment:'+user.hid+':'+entry.hid+':'+comment.hid
+            a.blog-comment__author-link(
+              href=self.link_to('blogs.sole', { user_hid: user.hid })
             )
               = user.name
 
