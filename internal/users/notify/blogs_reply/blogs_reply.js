@@ -9,7 +9,7 @@ const user_info = require('nodeca.users/lib/user_info');
 
 
 module.exports = function (N) {
-  N.wire.on('internal:users.notify.deliver', async function notify_deliver_froum_reply(local_env) {
+  N.wire.on('internal:users.notify.deliver', async function notify_deliver_blogs_reply(local_env) {
     if (local_env.type !== 'BLOGS_REPLY') return;
 
     let comment = await N.models.blogs.BlogComment.findById(local_env.src).lean(true);
@@ -80,7 +80,7 @@ module.exports = function (N) {
 
       let subject = N.i18n.t(locale, 'users.notify.blogs_reply.subject', {
         project_name: general_project_name,
-        user_name: comment_user.name
+        user: comment_user.nick
       });
 
       let url = N.router.linkTo('blogs.entry', {
