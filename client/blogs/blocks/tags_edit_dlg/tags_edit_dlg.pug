@@ -7,7 +7,7 @@
           button.btn-close(type='button' tabindex='-1' data-bs-dismiss='modal')
 
         .modal-body
-          .form-group
+          .mb-3
             textarea.form-control.blogs-tag-edit__tags(name='tags')= self.tags.join(', ')
             small.form-text.text-muted= self.t('help')
 
