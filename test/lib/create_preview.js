@@ -69,6 +69,23 @@ describe('create_preview', function () {
     `);
   });
 
+  it('should put cut after 2 wrapped pictures', function () {
+    add_test(`
+      <span class="image" style="width: 100px" data-nd-orig="http://example.com/image.png">
+        <img src="http://example.com/image.png">
+        <span class="image__spacer" style="padding-bottom: 50%"></span>
+      </span>
+      <span class="image" style="width: 100px" data-nd-orig="http://example.com/image.png">
+        <img src="http://example.com/image.png">
+        <span class="image__spacer" style="padding-bottom: 50%"></span>
+      </span><!--cut-->
+      <span class="image" style="width: 100px" data-nd-orig="http://example.com/image.png">
+        <img src="http://example.com/image.png">
+        <span class="image__spacer" style="padding-bottom: 50%"></span>
+      </span>
+    `);
+  });
+
   it('should put cut after 2 videos', function () {
     add_test(`
       <div class="ez-player ez-block"></div>
