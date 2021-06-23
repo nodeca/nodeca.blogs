@@ -4,3 +4,5 @@ en-US:
     err_title_too_short: "Title should have at least #{count} ((character|characters))"
     err_too_many_images: "Blog entry can't have more than #{count} ((image|images))"
     err_too_many_emojis: "Blog entry can't have more than #{count} ((emoticon|emoticons))"
+    err_too_many_images_in_preview: "More than 2 images in the first paragraph, please split"
+    warn_preview_too_large: "--cut-- is too far, preview has been reduced automatically"

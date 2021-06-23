@@ -94,6 +94,7 @@ N.wire.on(module.apiPath + ':begin', function show_editor() {
       };
 
       N.io.rpc('blogs.entry.create', params).then(response => {
+        if (response.warning) N.wire.emit('notify.info', response.warning);
         $footer = null;
         N.MDEdit.hide({ removeDraft: true });
         N.wire.emit('navigate.to', {

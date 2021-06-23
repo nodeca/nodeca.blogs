@@ -27,7 +27,7 @@ module.exports = function (N, apiPath) {
         import_users: post.import_users
       });
 
-      let preview = create_preview(result.html);
+      let preview = create_preview(result.html).html;
 
       let updateData = {
         $set: {

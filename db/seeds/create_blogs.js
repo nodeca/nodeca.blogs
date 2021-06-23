@@ -199,7 +199,7 @@ async function createEntries() {
       ts:          date,
       views:       charlatan.Helpers.rand(1000),
       md,
-      html:        create_preview(result.html),
+      html:        create_preview(result.html).html,
       /*eslint-disable new-cap*/
       ip:          charlatan.Internet.IPv4(),
       tag_hids:    tags.map(tag => tag.hid),

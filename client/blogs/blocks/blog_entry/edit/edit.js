@@ -124,7 +124,8 @@ N.wire.on(module.apiPath + ':begin', function show_editor(data) {
       };
 
       N.io.rpc('blogs.entry.edit.update', params)
-        .then(() => {
+        .then(response => {
+          if (response.warning) N.wire.emit('notify.info', response.warning);
           N.MDEdit.hide();
           resolve();
         }, err => {
