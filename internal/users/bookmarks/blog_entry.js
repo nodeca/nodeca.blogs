@@ -26,7 +26,7 @@ module.exports = function (N, apiPath) {
     locals.sandbox = {};
 
     locals.sandbox.entries = await N.models.blogs.BlogEntry.find()
-                                       .where('_id').in(_.map(locals.params.bookmarks, 'src'))
+                                       .where('_id').in(locals.params.bookmarks.map(x => x.src))
                                        .lean(true);
 
     locals.sandbox.blog_users = await N.models.users.User.find()

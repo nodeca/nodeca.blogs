@@ -38,6 +38,6 @@ module.exports = function (N, apiPath) {
                          .select('-_id name_lc')
                          .lean(true);
 
-    env.res = _.map(tags, 'name_lc');
+    env.res = tags.map(x => x.name_lc);
   });
 };

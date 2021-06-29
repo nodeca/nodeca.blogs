@@ -1,8 +1,6 @@
 
 'use strict';
 
-const _  = require('lodash');
-
 
 N.wire.once(module.apiPath, function entry_list_sole_setup_handlers() {
 
@@ -49,7 +47,7 @@ N.wire.once(module.apiPath, function entry_list_sole_setup_handlers() {
     return Promise.resolve()
       .then(() => N.io.rpc('blogs.sole.list.by_ids', { entry_ids: [ entryId ] }))
       .then(res => {
-        let $result = $(N.runtime.render('blogs.blocks.entry_list_sole', _.assign(res, { expand: true })));
+        let $result = $(N.runtime.render('blogs.blocks.entry_list_sole', Object.assign(res, { expand: true })));
 
         // TODO: reset selection state, toggle checkbox manually if needed
 

@@ -114,12 +114,12 @@ module.exports = function (N, apiPath) {
   N.wire.after(apiPath, async function fetch_and_fill_bookmarks(env) {
     let bookmarks = await N.models.users.Bookmark.find()
                               .where('user').equals(env.user_info.user_id)
-                              .where('src').in(_.map(env.data.comments, '_id'))
+                              .where('src').in(env.data.comments.map(x => x._id))
                               .lean(true);
 
     if (!bookmarks.length) return;
 
-    env.res.own_bookmarks = _.map(bookmarks, 'src');
+    env.res.own_bookmarks = bookmarks.map(x => x.src);
   });
 
 
@@ -128,7 +128,7 @@ module.exports = function (N, apiPath) {
   N.wire.after(apiPath, async function fetch_votes(env) {
     let votes = await N.models.users.Vote.find()
                           .where('from').equals(env.user_info.user_id)
-                          .where('for').in(_.map(env.data.comments, '_id'))
+                          .where('for').in(env.data.comments.map(x => x._id))
                           .where('value').in([ 1, -1 ])
                           .lean(true);
 
@@ -155,7 +155,7 @@ module.exports = function (N, apiPath) {
     if (!settings.can_see_infractions && !settings.blogs_mod_can_add_infractions) return;
 
     let infractions = await N.models.users.Infraction.find()
-                                .where('src').in(_.map(env.data.comments, '_id'))
+                                .where('src').in(env.data.comments.map(x => x._id))
                                 .where('exists').equals(true)
                                 .select('src points ts')
                                 .lean(true);

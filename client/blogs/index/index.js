@@ -97,7 +97,7 @@ N.wire.on('navigate.done:' + module.apiPath, function page_setup(data) {
 
   let scroll_done = false;
 
-  if (!scroll_done && data.state && typeof data.state.hid !== 'undefined' && typeof data.state.offset !== 'undefined') {
+  if (!scroll_done && typeof data.state?.hid !== 'undefined' && typeof data.state?.offset !== 'undefined') {
     let el = $('#entry' + data.state.hid);
 
     if (el.length) {
@@ -106,7 +106,7 @@ N.wire.on('navigate.done:' + module.apiPath, function page_setup(data) {
     }
   }
 
-  if (!scroll_done && data.params.$query && data.params.$query.from) {
+  if (!scroll_done && data.params.$query?.from) {
     let el = $('#entry' + Number(data.params.$query.from));
 
     if (el.length) {

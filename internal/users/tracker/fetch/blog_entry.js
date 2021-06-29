@@ -48,7 +48,7 @@ module.exports = function (N, apiPath) {
 
     if (entry_subs.length !== 0) {
       entries = await N.models.blogs.BlogEntry.find()
-                          .where('_id').in(_.map(entry_subs, 'to'))
+                          .where('_id').in(entry_subs.map(x => x.to))
                           .where(cache + '.last_ts').gt(min_cut)
                           .lean(true);
     }
@@ -57,7 +57,7 @@ module.exports = function (N, apiPath) {
     // Fetch entries by blog subscriptions
     //
     if (blog_subs.length !== 0) {
-      let cuts = await N.models.users.Marker.cuts(locals.params.user_info.user_id, _.map(blog_subs, 'to'));
+      let cuts = await N.models.users.Marker.cuts(locals.params.user_info.user_id, blog_subs.map(x => x.to));
       let queryParts = [];
 
       _.forEach(cuts, (cutTs, id) => {
@@ -167,8 +167,8 @@ module.exports = function (N, apiPath) {
       // Collect user ids
       //
       locals.users = locals.users || [];
-      locals.users = locals.users.concat(_.map(entries, 'user'));
-      locals.users = locals.users.concat(_.map(entries, 'cache.last_user').filter(Boolean));
+      locals.users = locals.users.concat(entries.map(x => x.user));
+      locals.users = locals.users.concat(entries.map(x => x.cache?.last_user).filter(Boolean));
 
       locals.res.read_marks = {};
       for (let id of entry_ids) locals.res.read_marks[id] = read_marks[id];

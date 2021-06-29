@@ -78,7 +78,7 @@ module.exports = function (N, apiPath) {
     let tags = (entry.tags || [])
                  .map((name, idx) => {
                    let name_lc = N.models.blogs.BlogTag.normalize(name);
-                   return [ name, tags_by_name[name_lc] && tags_by_name[name_lc].is_category, idx ];
+                   return [ name, tags_by_name[name_lc]?.is_category, idx ];
                  })
                  /* eslint-disable no-unused-vars */
                  .sort(([ t1, cat1, idx1 ], [ t2, cat2, idx2 ]) => {
@@ -128,7 +128,7 @@ module.exports = function (N, apiPath) {
                                  .where('to_type').equals(N.shared.content_type.BLOG_ENTRY)
                                  .lean(true);
 
-    env.res.subscription = subscription ? subscription.type : null;
+    env.res.subscription = subscription?.type;
   });
 
 
@@ -142,7 +142,7 @@ module.exports = function (N, apiPath) {
 
     if (!bookmarks.length) return;
 
-    env.res.own_bookmarks = _.map(bookmarks, 'src');
+    env.res.own_bookmarks = bookmarks.map(x => x.src);
   });
 
 
@@ -151,7 +151,7 @@ module.exports = function (N, apiPath) {
   N.wire.after(apiPath, async function fetch_votes(env) {
     let votes = await N.models.users.Vote.find()
                           .where('from').equals(env.user_info.user_id)
-                          .where('for').in(_.map(env.data.comments, '_id').concat([ env.data.entry._id ]))
+                          .where('for').in([ env.data.entry._id ])
                           .where('value').in([ 1, -1 ])
                           .lean(true);
 

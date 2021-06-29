@@ -1,9 +1,6 @@
 'use strict';
 
 
-const _ = require('lodash');
-
-
 // Page state
 //
 // - user_hid:  blog owner hid
@@ -142,7 +139,7 @@ N.wire.once('navigate.done:' + module.apiPath, function page_once() {
         comment_ids: [ comment_id ]
       }))
       .then(res => {
-        let $result = $(N.runtime.render('blogs.entry.blocks.comment_list', _.assign(res, { expand: true })));
+        let $result = $(N.runtime.render('blogs.entry.blocks.comment_list', Object.assign(res, { expand: true })));
 
         return N.wire.emit('navigate.content_update', {
           $: $result,

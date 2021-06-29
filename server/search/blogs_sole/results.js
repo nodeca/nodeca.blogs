@@ -62,9 +62,9 @@ module.exports = function (N, apiPath) {
       let search_env = {
         params: {
           user_info:   env.user_info,
-          user_hid:    _.toFinite(env.params.hid),
+          user_hid:    Number(env.params.hid),
           query:       env.params.query,
-          period:      _.toFinite(env.params.period) || _.toFinite(period_types[0]),
+          period:      Number(env.params.period) || Number(period_types[0]),
           sort:        env.params.sort ? env.params.sort : sort_types[0],
           limit:       env.params.limit,
           skip:        env.params.skip
@@ -96,9 +96,9 @@ module.exports = function (N, apiPath) {
         let search_env = {
           params: {
             user_info:   env.user_info,
-            user_hid:    _.toFinite(env.params.hid),
+            user_hid:    Number(env.params.hid),
             query:       env.params.query,
-            period:      _.toFinite(env.params.period) || _.toFinite(period_types[0]),
+            period:      Number(env.params.period) || Number(period_types[0]),
             sort:        env.params.sort ? env.params.sort : sort_types[0],
             limit:       0,
             skip:        0
@@ -116,7 +116,7 @@ module.exports = function (N, apiPath) {
       }));
     }
 
-    env.res.hid  = _.toFinite(env.params.hid);
+    env.res.hid  = Number(env.params.hid);
     env.res.type = env.params.type;
     env.res.skip = env.params.skip;
   });

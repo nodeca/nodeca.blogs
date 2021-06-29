@@ -3,8 +3,6 @@
 'use strict';
 
 
-const _ = require('lodash');
-
 let $dialog;
 let result;
 let bloodhound;
@@ -23,7 +21,7 @@ N.wire.on(module.apiPath, function show_dialog(data) {
   const Bloodhound = require('corejs-typeahead/dist/bloodhound.js');
 
   result = null;
-  $dialog = $(N.runtime.render(module.apiPath, _.assign({ apiPath: module.apiPath }, data)));
+  $dialog = $(N.runtime.render(module.apiPath, Object.assign({ apiPath: module.apiPath }, data)));
   $('body').append($dialog);
 
   return new Promise((resolve, reject) => {

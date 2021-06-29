@@ -221,8 +221,8 @@ async function createEntries() {
 
 
 async function updateUserCounters() {
-  await models.blogs.UserBlogEntryCount.recount(_.map(users, '_id'));
-  await models.blogs.UserBlogCommentCount.recount(_.map(users, '_id'));
+  await models.blogs.UserBlogEntryCount.recount(users.map(u => u._id));
+  await models.blogs.UserBlogCommentCount.recount(users.map(u => u._id));
 }
 
 

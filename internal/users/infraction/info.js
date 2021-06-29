@@ -20,8 +20,8 @@ module.exports = function (N, apiPath) {
   // Fetch infractions issued for blog entries
   //
   N.wire.on(apiPath, async function blog_entries_fetch_infraction_info(info_env) {
-    let entry_ids = _.map(info_env.infractions.filter(i => i.src_type === N.shared.content_type.BLOG_ENTRY), 'src');
-
+    let entry_ids = info_env.infractions.filter(i => i.src_type === N.shared.content_type.BLOG_ENTRY)
+                                        .map(x => x.src);
     if (!entry_ids.length) return;
 
 
@@ -34,7 +34,7 @@ module.exports = function (N, apiPath) {
     // Fetch users
     //
     let users = await N.models.users.User.find()
-                          .where('_id').in(_.map(entries, 'user'))
+                          .where('_id').in(entries.map(x => x.user))
                           .lean(true);
 
     let access_env = { params: {
@@ -67,8 +67,8 @@ module.exports = function (N, apiPath) {
   // Fetch infractions issued for blog comments
   //
   N.wire.on(apiPath, async function blog_comments_fetch_infraction_info(info_env) {
-    let comment_ids = _.map(info_env.infractions.filter(i => i.src_type === N.shared.content_type.BLOG_COMMENT), 'src');
-
+    let comment_ids = info_env.infractions.filter(i => i.src_type === N.shared.content_type.BLOG_COMMENT)
+                                          .map(x => x.src);
     if (!comment_ids.length) return;
 
 
@@ -81,13 +81,13 @@ module.exports = function (N, apiPath) {
     // Fetch entries
     //
     let entries = await N.models.blogs.BlogEntry.find()
-                            .where('_id').in(_.map(comments, 'entry'))
+                            .where('_id').in(comments.map(x => x.entry))
                             .lean(true);
 
     // Fetch users
     //
     let users = await N.models.users.User.find()
-                          .where('_id').in(_.map(entries, 'user'))
+                          .where('_id').in(entries.map(x => x.user))
                           .lean(true);
 
     let access_env = { params: {

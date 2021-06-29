@@ -104,12 +104,12 @@ module.exports = function (N, collectionName) {
   // Remove empty "imports" and "import_users" fields
   //
   BlogEntry.pre('save', function () {
-    if (this.imports && this.imports.length === 0) {
+    if (this.imports?.length === 0) {
       /*eslint-disable no-undefined*/
       this.imports = undefined;
     }
 
-    if (this.import_users && this.import_users.length === 0) {
+    if (this.import_users?.length === 0) {
       /*eslint-disable no-undefined*/
       this.import_users = undefined;
     }
@@ -155,7 +155,7 @@ module.exports = function (N, collectionName) {
                             .sort('-hid')
                             .lean(true);
 
-    if (!comment) comment = {};
+    comment = comment || {};
 
     updateData.$set['cache_hb.last_comment']     = comment._id;
     updateData.$set['cache_hb.last_comment_hid'] = comment.hid;
@@ -176,7 +176,7 @@ module.exports = function (N, collectionName) {
                                   .sort('-hid')
                                   .lean(true);
 
-      if (!comment_visible) comment_visible = {};
+      comment_visible = comment_visible || {};
 
       updateData.$set['cache.last_comment']     = comment_visible._id;
       updateData.$set['cache.last_comment_hid'] = comment_visible.hid;

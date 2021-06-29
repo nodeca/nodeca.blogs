@@ -27,7 +27,7 @@ module.exports = function (N) {
     // Fetch parent comment if it exists
     let parent_comment;
 
-    if (comment.path && comment.path.length) {
+    if (comment.path?.length) {
       let parent_id = comment.path[comment.path.length - 1];
 
       parent_comment = await N.models.blogs.BlogComment.findById(parent_id).lean(true);

@@ -105,7 +105,7 @@ module.exports = function (N, apiPath) {
 
     if (!bookmarks.length) return;
 
-    env.res.own_bookmarks = _.map(bookmarks, 'src');
+    env.res.own_bookmarks = bookmarks.map(x => x.src);
   });
 
 

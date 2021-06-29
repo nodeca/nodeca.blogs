@@ -113,7 +113,7 @@ module.exports = function (N, apiPath) {
     env.res.head = env.res.head || {};
     env.res.head.title = env.t('title');
 
-    if (env.params.$query && env.params.$query.from) {
+    if (env.params.$query?.from) {
       env.res.head.robots = 'noindex,follow';
     }
   });

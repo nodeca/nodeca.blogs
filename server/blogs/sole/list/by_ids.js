@@ -59,7 +59,7 @@ module.exports = function (N, apiPath) {
                    /* eslint-disable no-loop-func */
                    .map((name, idx) => {
                      let name_lc = N.models.blogs.BlogTag.normalize(name);
-                     return [ name, tags_by_name[name_lc] && tags_by_name[name_lc].is_category, idx ];
+                     return [ name, tags_by_name[name_lc]?.is_category, idx ];
                    })
                    /* eslint-disable no-unused-vars */
                    .sort(([ t1, cat1, idx1 ], [ t2, cat2, idx2 ]) => {

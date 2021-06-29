@@ -82,7 +82,7 @@ module.exports = function (N, apiPath) {
 
       let comments = _.keyBy(
         await N.models.blogs.BlogComment.find()
-                  .where('_id').in(_.map(results, 'object_id'))
+                  .where('_id').in(results.map(x => x.object_id))
                   .lean(true),
         '_id'
       );

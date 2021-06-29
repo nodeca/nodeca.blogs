@@ -144,7 +144,7 @@ module.exports = function (N, apiPath) {
                              .lean(true);
 
     await N.models.users.Vote.updateMany(
-      { for: { $in: _.map(comments, '_id') } },
+      { for: { $in: comments.map(x => x._id) } },
       // Just move vote `value` field to `backup` field
       { $rename: { value: 'backup' } }
     );

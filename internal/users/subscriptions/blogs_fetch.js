@@ -17,7 +17,7 @@ module.exports = function (N) {
 
     // Fetch users
     let query = N.models.users.User.find()
-                    .where('_id').in(_.map(subs, 'to'));
+                    .where('_id').in(subs.map(s => s.to));
 
     // Check 'can_see_deleted_users' permission
     if (!can_see_deleted_users) {
@@ -27,7 +27,7 @@ module.exports = function (N) {
     let users = await query.select('_id').lean(true);
     let users_by_id = _.keyBy(users, '_id');
 
-    env.data.users = (env.data.users || []).concat(_.map(users, '_id'));
+    env.data.users = (env.data.users || []).concat(users.map(u => u._id));
 
 
     // Fill missed subscriptions (for deleted users)

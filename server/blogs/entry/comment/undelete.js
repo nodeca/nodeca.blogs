@@ -3,8 +3,6 @@
 
 'use strict';
 
-const _ = require('lodash');
-
 
 module.exports = function (N, apiPath) {
 
@@ -94,7 +92,7 @@ module.exports = function (N, apiPath) {
       $unset: { del_reason: 1, prev_st: 1, del_by: 1 }
     };
 
-    _.assign(update, env.data.comment.prev_st);
+    Object.assign(update, env.data.comment.prev_st);
 
     env.data.new_comment = await N.models.blogs.BlogComment.findOneAndUpdate(
       { _id: env.data.comment._id },

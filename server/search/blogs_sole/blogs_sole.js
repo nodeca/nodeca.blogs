@@ -30,7 +30,7 @@ module.exports = function (N, apiPath) {
   //
   N.wire.before(apiPath, async function fetch_user_by_hid(env) {
     let query = N.models.users.User.findOne()
-                    .where('hid').equals(_.toFinite(env.params.$query.hid));
+                    .where('hid').equals(Number(env.params.$query.hid));
 
     let can_see_deleted_users = await env.extras.settings.fetch('can_see_deleted_users');
 
@@ -62,7 +62,7 @@ module.exports = function (N, apiPath) {
     env.res.query  = env.params.$query.query;
     env.res.sort   = env.params.$query.sort;
     env.res.period = env.params.$query.period;
-    env.res.hid    = _.toFinite(env.params.$query.hid);
+    env.res.hid    = Number(env.params.$query.hid);
 
     env.res.type          = type;
     env.res.sort_types    = sort_types;

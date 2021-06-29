@@ -60,7 +60,7 @@ module.exports = function (N, apiPath) {
       delete comment.ste;
     }
 
-    if (comment.prev_st && comment.prev_st.st === N.models.blogs.BlogComment.statuses.HB) {
+    if (comment.prev_st?.st === N.models.blogs.BlogComment.statuses.HB) {
       comment.prev_st = Object.assign({}, comment.prev_st);
       comment.prev_st.st = comment.prev_st.ste;
       delete comment.prev_st.ste;
@@ -90,16 +90,16 @@ module.exports = function (N, apiPath) {
       ts:   env.data.comment.ts,
       role: N.models.blogs.BlogCommentHistory.roles.USER
     } ].concat(
-      _.map(history, i => ({ user: i.user, ts: i.ts, role: i.role }))
+      history.map(i => ({ user: i.user, ts: i.ts, role: i.role }))
     );
 
-    let history_comments = _.map(history, 'comment_data')
+    let history_comments = history.map(x => x.comment_data)
                             .concat([ env.data.comment ])
                             .map(sanitize_comment);
 
     env.res.history = _.zip(history_meta, history_comments)
                        .map(([ meta, comment ]) => ({ meta, comment }));
 
-    env.data.users = (env.data.users || []).concat(_.map(env.res.history, 'meta.user'));
+    env.data.users = (env.data.users || []).concat(env.res.history.map(x => x.meta?.user));
   });
 };

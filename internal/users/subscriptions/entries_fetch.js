@@ -15,11 +15,11 @@ module.exports = function (N) {
     if (!subs.length) return;
 
     // Fetch entries
-    let entries = await N.models.blogs.BlogEntry.find().where('_id').in(_.map(subs, 'to')).lean(true);
+    let entries = await N.models.blogs.BlogEntry.find().where('_id').in(subs.map(s => s.to)).lean(true);
 
     // Fetch users
     let query = N.models.users.User.find()
-                    .where('_id').in(_.uniq(_.map(entries, 'user').map(String)));
+                    .where('_id').in(_.uniq(entries.map(e => e.user).map(String)));
 
     let can_see_deleted_users = await env.extras.settings.fetch('can_see_deleted_users');
 
@@ -31,7 +31,7 @@ module.exports = function (N) {
     let users = await query.select('_id').lean(true);
     let users_by_id = _.keyBy(users, '_id');
 
-    env.data.users = (env.data.users || []).concat(_.map(users, '_id'));
+    env.data.users = (env.data.users || []).concat(users.map(u => u._id));
 
     // Check permissions subcall
     //

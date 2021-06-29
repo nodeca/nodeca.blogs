@@ -3,8 +3,6 @@
 'use strict';
 
 
-const _ = require('lodash');
-
 let $dialog;
 let categories;
 let result;
@@ -23,7 +21,7 @@ N.wire.before(module.apiPath, function fetch_categories() {
 // Init dialog
 //
 N.wire.on(module.apiPath, function show_dialog() {
-  $dialog = $(N.runtime.render(module.apiPath, _.assign({ apiPath: module.apiPath }, categories)));
+  $dialog = $(N.runtime.render(module.apiPath, Object.assign({ apiPath: module.apiPath }, categories)));
   $('body').append($dialog);
 
   return new Promise((resolve, reject) => {

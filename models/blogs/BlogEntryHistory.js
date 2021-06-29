@@ -119,8 +119,8 @@ module.exports = function (N, collectionName) {
     if (!Array.isArray(changes)) changes = [ changes ];
 
     meta = Object.assign({}, meta);
-    if (!meta.ts) meta.ts = new Date();
-    if (!meta.ip) meta.ip = '127.0.0.1'; // for TASK
+    meta.ts = meta.ts || new Date();
+    meta.ip = meta.ts || '127.0.0.1'; // for TASK
 
     //
     // Select all history ids first, used for:
@@ -130,7 +130,7 @@ module.exports = function (N, collectionName) {
     // (this fetches large numbers of smaller documents, index only)
     //
     let history_ids = await N.models.blogs.BlogEntryHistory.find()
-                                .where('entry').in(_.map(changes, 'new_entry._id'))
+                                .where('entry').in(changes.map(x => x.new_entry?._id))
                                 .select('entry _id')
                                 .sort('_id')
                                 .lean(true);
@@ -156,7 +156,7 @@ module.exports = function (N, collectionName) {
     //
     let last_history_entry = _.keyBy(
       await N.models.blogs.BlogEntryHistory.find()
-                .where('_id').in(_.map(Object.values(history), 'last').filter(Boolean))
+                .where('_id').in(Object.values(history).map(x => x.last).filter(Boolean))
                 .lean(true),
       'entry'
     );

@@ -74,7 +74,7 @@ module.exports = function (N, apiPath) {
 
       let entries = _.keyBy(
         await N.models.blogs.BlogEntry.find()
-                  .where('_id').in(_.map(results, 'object_id'))
+                  .where('_id').in(results.map(x => x.object_id))
                   .lean(true),
         '_id'
       );

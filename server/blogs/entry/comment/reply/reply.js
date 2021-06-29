@@ -144,7 +144,7 @@ module.exports = function (N, apiPath) {
 
     // Replying to a comment, its author is ignoring us (except for moderators)
     //
-    if (env.data.parent_comment && env.data.parent_comment.user) {
+    if (env.data.parent_comment?.user) {
       ignore_data = await N.models.users.Ignore.findOne()
                               .where('from').equals(env.data.parent_comment.user)
                               .where('to').equals(env.user_info.user_id)
@@ -378,7 +378,7 @@ module.exports = function (N, apiPath) {
 
     if (!subscriptions.length) return;
 
-    let subscribed_users = _.map(subscriptions, 'user');
+    let subscribed_users = subscriptions.map(x => x.user);
 
     let ignore = _.keyBy(
       await N.models.users.Ignore.find()
