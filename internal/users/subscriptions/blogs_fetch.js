@@ -9,7 +9,7 @@ const _  = require('lodash');
 module.exports = function (N) {
 
   N.wire.on('internal:users.subscriptions.fetch', async function subscriptions_fetch_blogs(env) {
-    let subs = _.filter(env.data.subscriptions, { to_type: N.shared.content_type.BLOG_SOLE });
+    let subs = env.data.subscriptions.filter(s => s.to_type === N.shared.content_type.BLOG_SOLE);
 
     if (!subs.length) return;
 
@@ -32,7 +32,7 @@ module.exports = function (N) {
 
     // Fill missed subscriptions (for deleted users)
     //
-    let missed = _.filter(subs, s => !users_by_id[s.to]);
+    let missed = subs.filter(s => !users_by_id[s.to]);
 
     env.data.missed_subscriptions = env.data.missed_subscriptions || [];
     env.data.missed_subscriptions = env.data.missed_subscriptions.concat(missed);

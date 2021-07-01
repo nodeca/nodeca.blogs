@@ -61,7 +61,7 @@ module.exports = function (N) {
     if (env.user_info.user_hid !== env.data.user.hid && entries.length === 0) return;
 
     env.res.blocks = env.res.blocks || {};
-    _.set(env.res, 'blocks.blog', { list: entries });
+    env.res.blocks.blog = { list: entries };
   });
 
 
@@ -69,7 +69,7 @@ module.exports = function (N) {
   //
   N.wire.after('server:users.member', async function fetch_blog_entry_count(env) {
 
-    if (!_.get(env.res, 'blocks.blog')) return;
+    if (!env.res.blocks?.blog) return;
 
     env.res.blocks.blog.count = await N.models.blogs.BlogEntry.countDocuments()
                                           .where('user').equals(env.data.user._id)

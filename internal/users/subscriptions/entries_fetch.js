@@ -10,7 +10,7 @@ const sanitize_entry = require('nodeca.blogs/lib/sanitizers/blog_entry');
 module.exports = function (N) {
 
   N.wire.on('internal:users.subscriptions.fetch', async function subscriptions_fetch_blog_entries(env) {
-    let subs = _.filter(env.data.subscriptions, { to_type: N.shared.content_type.BLOG_ENTRY });
+    let subs = env.data.subscriptions.filter(s => s.to_type === N.shared.content_type.BLOG_ENTRY);
 
     if (!subs.length) return;
 
@@ -59,7 +59,7 @@ module.exports = function (N) {
 
     // Fill missed subscriptions (for deleted entries)
     //
-    let missed = _.filter(subs, s => !entries_by_id[s.to] || !users_by_id[entries_by_id[s.to].user]);
+    let missed = subs.filter(s => !entries_by_id[s.to] || !users_by_id[entries_by_id[s.to].user]);
 
     env.data.missed_subscriptions = env.data.missed_subscriptions || [];
     env.data.missed_subscriptions = env.data.missed_subscriptions.concat(missed);

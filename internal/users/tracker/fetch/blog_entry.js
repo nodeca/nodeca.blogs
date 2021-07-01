@@ -29,8 +29,8 @@ module.exports = function (N, apiPath) {
   N.wire.on(apiPath, async function tracker_fetch_entries(locals) {
     locals.res = {};
 
-    let entry_subs = _.filter(locals.params.subscriptions, { to_type: N.shared.content_type.BLOG_ENTRY });
-    let blog_subs = _.filter(locals.params.subscriptions, { to_type: N.shared.content_type.BLOG_SOLE });
+    let entry_subs = locals.params.subscriptions.filter(s => s.to_type === N.shared.content_type.BLOG_ENTRY);
+    let blog_subs  = locals.params.subscriptions.filter(s => s.to_type === N.shared.content_type.BLOG_SOLE);
 
     let content_read_marks_expire = await N.settings.get('content_read_marks_expire');
     let min_cut = new Date(Date.now() - (content_read_marks_expire * 24 * 60 * 60 * 1000));

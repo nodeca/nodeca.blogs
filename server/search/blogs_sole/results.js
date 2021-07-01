@@ -34,9 +34,9 @@ module.exports = function (N, apiPath) {
 
 
   N.wire.on(apiPath, async function search_execute(env) {
-    let menu = _.get(N.config, 'search.blogs_sole.menu', {});
+    let menu = N.config.search?.blogs_sole?.menu || {};
     let content_types = Object.keys(menu)
-                         .sort((a, b) => (menu[a].priority || 100) - (menu[b].priority || 100));
+                         .sort((a, b) => (menu[a].priority ?? 100) - (menu[b].priority ?? 100));
 
     // if type is not specified, select first one
     if (!env.params.type) {
