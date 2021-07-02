@@ -232,7 +232,7 @@ module.exports = function (N, apiPath) {
       })
     );
 
-    let total = _.sum(counters_by_status);
+    let total = counters_by_status.reduce((a, b) => a + b, 0);
 
     //
     // Count an amount of visible blog entries before the first displayed
@@ -255,7 +255,7 @@ module.exports = function (N, apiPath) {
         })
       );
 
-      offset = _.sum(counters_by_status);
+      offset = counters_by_status.reduce((a, b) => a + b, 0);
     }
 
     env.res.pagination = {

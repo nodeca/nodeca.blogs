@@ -170,7 +170,7 @@ module.exports = function (N, apiPath) {
       return false;
     });
 
-    locals.sandbox.entries = _.values(entries_used);
+    locals.sandbox.entries = Object.values(entries_used);
   });
 
 

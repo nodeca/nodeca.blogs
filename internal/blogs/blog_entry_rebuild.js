@@ -3,7 +3,6 @@
 'use strict';
 
 
-const _              = require('lodash');
 const create_preview = require('nodeca.blogs/lib/create_preview');
 
 
@@ -35,12 +34,12 @@ module.exports = function (N, apiPath) {
         }
       };
 
-      let needsUpdate = !_.isEqual(preview, post.html);
+      let needsUpdate = preview !== post.html;
 
       for (let field of [ 'imports', 'import_users' ]) {
-        if (!_.isEmpty(result[field])) {
+        if (result[field] && result[field].length !== 0) {
           updateData.$set[field] = result[field];
-          needsUpdate = needsUpdate || !_.isEqual(result[field].map(String), (post[field] || []).map(String));
+          needsUpdate = needsUpdate || JSON.stringify(result[field]) !== JSON.stringify(post[field]);
         } else {
           updateData.$unset = updateData.$unset || {};
           updateData.$unset[field] = true;

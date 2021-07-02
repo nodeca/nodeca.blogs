@@ -16,7 +16,6 @@
 'use strict';
 
 
-const _        = require('lodash');
 const ObjectId = require('mongoose').Types.ObjectId;
 const userInfo = require('nodeca.users/lib/user_info');
 
@@ -146,7 +145,7 @@ module.exports = function (N, apiPath) {
     locals.data.access_read = locals.data.access_read.map(val => val !== false);
 
     // If `params.entries` is not array - `data.access_read` should be also not an array
-    if (!_.isArray(locals.params.entries)) {
+    if (!Array.isArray(locals.params.entries)) {
       locals.data.access_read = locals.data.access_read[0];
     }
   });

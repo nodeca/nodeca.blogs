@@ -60,9 +60,9 @@ module.exports = function (N, apiPath) {
       let cuts = await N.models.users.Marker.cuts(locals.params.user_info.user_id, blog_subs.map(x => x.to));
       let queryParts = [];
 
-      _.forEach(cuts, (cutTs, id) => {
+      for (let [ id, cutTs ] of Object.entries(cuts)) {
         queryParts.push({ user: id, _id: { $gt: new ObjectId(Math.round(cutTs / 1000)) } });
-      });
+      }
 
       entries = entries.concat(await N.models.blogs.BlogEntry.find({ $or: queryParts }).lean(true) || []);
       entries = _.uniqBy(entries, entry => String(entry._id));
