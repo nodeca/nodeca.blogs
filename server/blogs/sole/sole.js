@@ -38,7 +38,7 @@ module.exports = function (N, apiPath) {
       let tag_not_found = env.data.current_tag_name && !env.data.current_tag;
 
       // get hid by id
-      if (query.from && _.isInteger(+query.from) && !tag_not_found) {
+      if (query.from && Number.isInteger(+query.from) && !tag_not_found) {
         let q = N.models.blogs.BlogEntry.findOne();
 
         if (env.data.current_tag) {
