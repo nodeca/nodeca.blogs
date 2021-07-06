@@ -3,8 +3,6 @@
 
 'use strict';
 
-const _ = require('lodash');
-
 
 module.exports = function (N, apiPath) {
 
@@ -139,14 +137,13 @@ module.exports = function (N, apiPath) {
   N.wire.after(apiPath, async function update_user(env) {
     await N.models.blogs.UserBlogEntryCount.recount(env.data.entry.user);
 
-    let users = _.map(
+    let users = (
       await N.models.blogs.BlogComment.find()
                 .where('entry').equals(env.data.entry._id)
                 .select('user')
-                .lean(true),
-      'user'
-    );
+                .lean(true)
+    ).map(x => x.user);
 
-    await N.models.blogs.UserBlogCommentCount.recount(_.uniq(users.map(String)));
+    await N.models.blogs.UserBlogCommentCount.recount([ ...new Set(users.map(String)) ]);
   });
 };

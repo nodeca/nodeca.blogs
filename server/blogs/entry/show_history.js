@@ -99,8 +99,14 @@ module.exports = function (N, apiPath) {
                            .concat([ env.data.entry ])
                            .map(sanitize_entry);
 
-    env.res.history = _.zip(history_meta, history_entries)
-                       .map(([ meta, entry ]) => ({ meta, entry }));
+    env.res.history = [];
+
+    for (let i = 0; i < history_entries.length; i++) {
+      env.res.history.push({
+        meta: history_meta[i],
+        entry: history_entries[i]
+      });
+    }
 
     env.data.users = (env.data.users || []).concat(env.res.history.map(x => x.meta.user));
   });

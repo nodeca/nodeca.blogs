@@ -219,7 +219,7 @@ module.exports = function (N, apiPath) {
   N.wire.after(apiPath, async function update_user(env) {
     let users = env.data.changes.map(({ old_comment }) => old_comment.user);
 
-    await N.models.blogs.UserBlogCommentCount.recount(_.uniq(users.map(String)));
+    await N.models.blogs.UserBlogCommentCount.recount([ ...new Set(users.map(String)) ]);
   });
 
 

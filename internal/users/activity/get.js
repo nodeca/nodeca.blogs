@@ -11,9 +11,6 @@
 'use strict';
 
 
-const _ = require('lodash');
-
-
 module.exports = function (N, apiPath) {
 
   N.wire.on(apiPath, { parallel: true }, async function activity_get_blogs(data) {
@@ -23,10 +20,9 @@ module.exports = function (N, apiPath) {
     ]);
 
     if (Array.isArray(data.count)) {
-      let zipped = _.zip(...counts);
-      data.count = data.count.map((c, i) => c + _.sum(zipped[i]));
+      data.count = data.count.map((c, i) => c + counts[0][i] + counts[1][i]);
     } else {
-      data.count += _.sum(counts);
+      data.count += counts[0] + counts[1];
     }
   });
 };

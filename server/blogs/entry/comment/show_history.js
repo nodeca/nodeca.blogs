@@ -97,8 +97,14 @@ module.exports = function (N, apiPath) {
                             .concat([ env.data.comment ])
                             .map(sanitize_comment);
 
-    env.res.history = _.zip(history_meta, history_comments)
-                       .map(([ meta, comment ]) => ({ meta, comment }));
+    env.res.history = [];
+
+    for (let i = 0; i < history_comments.length; i++) {
+      env.res.history.push({
+        meta: history_meta[i],
+        comment: history_comments[i]
+      });
+    }
 
     env.data.users = (env.data.users || []).concat(env.res.history.map(x => x.meta?.user));
   });

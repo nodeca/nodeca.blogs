@@ -20,7 +20,6 @@
 'use strict';
 
 
-const _              = require('lodash');
 const sanitize_entry = require('nodeca.blogs/lib/sanitizers/blog_entry');
 
 let setting_names = [
@@ -86,7 +85,7 @@ module.exports = function (N, apiPath) {
     // Sort in `env.data.entry_ids` order.
     // May be slow on large volumes
     env.data.entry_ids.forEach(id => {
-      let entry = _.find(entries, e => e._id.equals(id));
+      let entry = entries.find(e => e._id.equals(id));
 
       if (entry) {
         env.data.entries.push(entry);
