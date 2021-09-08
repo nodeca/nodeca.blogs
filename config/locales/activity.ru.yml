@@ -3,5 +3,5 @@ i18n:
     users:
       activity:
         menu:
-          blog_entries: Блогозаписи
-          blog_comments: Комментарии в блогах
+          blog_entries: 'Блоги: записи'
+          blog_comments: 'Блоги: комментарии'
