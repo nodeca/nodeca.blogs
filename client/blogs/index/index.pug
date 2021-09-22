@@ -35,7 +35,7 @@ article#content.blogs-index(
     != self.partial('@users.blocks.announces')
 
     header.page-head.blogs-index__head
-      h1.blogs-index__title.page-head__title(itemprop='name')= self.t('title')
+      h1.blogs-index__title.page-head__title(itemprop='name')= self.t('new_entries')
 
       != self.partial('@blogs.index.blocks.toolbar_controls')
 

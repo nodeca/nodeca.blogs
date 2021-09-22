@@ -1,5 +1,6 @@
 en-US:
   title: Blogs
+  new_entries: New entries
   no_entries: No blog entries yet.
   next_page: Older
   prev_page: Newer
