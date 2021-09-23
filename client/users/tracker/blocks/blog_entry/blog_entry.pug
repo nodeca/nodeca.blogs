@@ -12,6 +12,8 @@
     h2.user-tracker-item__title
       a.user-tracker-item__title-link(href=href)= entry.title
 
+      .user-tracker-item__new-marker= self.t('new')
+
     .user-tracker-item__microstat
       if blog_owner
         a.user-tracker-item__microstat-category(href=self.link_to('blogs.sole', { user_hid: blog_owner.hid }))=blog_owner.name
