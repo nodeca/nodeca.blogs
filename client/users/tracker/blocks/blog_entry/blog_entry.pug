@@ -1,6 +1,5 @@
 - var entry = self.blog_entries[self.item.id];
 - var blog_owner = self.users[entry.user];
-- var last_user = self.users[entry.cache.last_user || entry.user];
 - var mark = self.read_marks[entry._id];
 - var href = self.link_to('blogs.entry', { user_hid: blog_owner.hid, entry_hid: entry.hid });
 
@@ -16,20 +15,15 @@
     .user-tracker-item__microstat
       if blog_owner
         a.user-tracker-item__microstat-category(href=self.link_to('blogs.sole', { user_hid: blog_owner.hid }))=blog_owner.name
-      a.user-tracker-item__microstat-time.d-sm-none(
+      a.user-tracker-item__microstat-time(
         href=href
       )
         != self.timetag(entry.cache.last_ts || entry.ts, 'relative')
-      if last_user
-        a.user-tracker-item__microstat-author._ucard-popover(
-          href=self.link_to('users.member', { user_hid: last_user.hid })
-          data-user-id=last_user._id
-        )= last_user.name
 
     //- cover all space with link for small screens
     a.user-tracker-item__overlay.d-md-none(href=href)
 
-  .user-tracker-item__stat.d-none.d-sm-block
+  .user-tracker-item__stat-time
     a.user-tracker-item__stat-link(
       href=href
     )!= self.timetag(entry.cache.last_ts || entry.ts, 'relative')
