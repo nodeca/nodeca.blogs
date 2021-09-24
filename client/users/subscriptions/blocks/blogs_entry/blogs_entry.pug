@@ -1,6 +1,6 @@
 - var entry = self.blog_entries[self.item.to];
 - var user = self.users[entry.user];
-- var mark = { next: -1 };// TODO: self.read_marks[topic._id];
+- var mark = self.read_marks[entry._id];
 - var href = self.link_to('blogs.entry', { user_hid: user.hid, entry_hid: entry.hid });
 
 .user-subscriptions-item.user-subscriptions-item__m-blog-entry(

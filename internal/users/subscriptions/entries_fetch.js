@@ -1,5 +1,18 @@
 // Fetch blog entries for subscriptions
 //
+// In:
+//
+//  - env.user_info
+//  - env.subscriptions
+//
+// Out:
+//
+//  - env.data.missed_subscriptions - list of subscriptions for deleted topics
+//                                    (those subscriptions will be deleted later)
+//  - env.res.read_marks
+//  - env.data.users
+//  - env.res.blog_entries - template-specific data
+//
 'use strict';
 
 
@@ -46,6 +59,18 @@ module.exports = function (N) {
 
     // Sanitize entries
     entries = await sanitize_entry(N, entries, env.user_info);
+
+    // Fetch read marks
+    //
+    let data = entries.map(entry => ({
+      categoryId: entry.user,
+      contentId: entry._id,
+      lastPostNumber: entry.cache.last_comment_hid,
+      lastPostTs: entry.cache.last_ts
+    }));
+
+    let read_marks = await N.models.users.Marker.info(env.user_info.user_id, data);
+    env.res.read_marks = Object.assign(env.res.read_marks || {}, read_marks);
 
     // avoid sending large attributes to the client that won't be used
     entries = entries.map(e =>
