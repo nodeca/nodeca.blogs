@@ -7,7 +7,7 @@ each item in self.items
   - var href = self.link_to('blogs.entry', { user_hid: blog_owner.hid, entry_hid: entry.hid });
 
   if (prev_mark && !prev_mark.isNew && mark.isNew)
-    footer.user-tracker__separator= self.t('new_entries')
+    .user-tracker__separator= self.t('new_entries')
   - prev_mark = mark;
 
   .user-tracker-item.user-tracker-item__m-blog-entry(
