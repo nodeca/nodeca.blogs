@@ -9,7 +9,7 @@
         .modal-body
           .mb-3
             textarea.form-control(name='categories')= self.categories.join(', ')
-            small.form-text.text-muted= self.t('help')
+            .form-text= self.t('help')
 
         .modal-footer
           button.btn.btn-secondary(type='button' tabindex='6' data-bs-dismiss='modal')=self.t('cancel')
