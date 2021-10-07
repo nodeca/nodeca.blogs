@@ -1,7 +1,6 @@
 - var menu_rnd_id = 'rnd' + self.get_label_uid()
 - var subscriptionTypes = '$$ JSON.stringify(N.models.users.Subscription.types) $$'
 - var items = []
-- var user = self.users[self.user_id] || {}
 
 if self.settings.blogs_can_create
   - items.push('new_entry')
@@ -72,7 +71,7 @@ if self.user_id === self.runtime.user_id && !self.current_tag
 
             when 'search'
               a.dropdown-item(
-                href=self.link_to('search.blogs_sole', { $query: { hid: user.hid } })
+                href=self.link_to('search.blogs_sole', { $query: { hid: self.user_hid } })
               )= self.t('search')
 
             when 'subscription'

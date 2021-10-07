@@ -1,11 +1,13 @@
+- self.users = self.users || {};
+- var user = self.users[self.user_id] || {};
+- self.user_hid = user.hid;
+
 - self.add_raw_data('settings',     self.settings)
 - self.add_raw_data('user_id',      self.user_id)
+- self.add_raw_data('user_hid',     self.user_hid)
 - self.add_raw_data('current_tag',  self.current_tag)
 - self.add_raw_data('subscription', self.subscription)
 - self.add_raw_data('pagination',   self.pagination)
-
-- self.users = self.users || {};
-- var user = self.users[self.user_id] || {};
 
 article#content.blogs-sole(
   data-keymap= {

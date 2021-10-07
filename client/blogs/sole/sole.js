@@ -261,6 +261,7 @@ N.wire.once('navigate.done:' + module.apiPath, function blogs_sole_init_handlers
         $('.blogs-sole__toolbar-controls')
           .replaceWith(N.runtime.render(module.apiPath + '.blocks.toolbar_controls', {
             user_id:      N.runtime.page_data.user_id,
+            user_hid:     N.runtime.page_data.user_hid,
             current_tag:  N.runtime.page_data.current_tag,
             settings:     N.runtime.page_data.settings,
             subscription: N.runtime.page_data.subscription
