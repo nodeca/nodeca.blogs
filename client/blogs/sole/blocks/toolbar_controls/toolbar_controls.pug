@@ -28,10 +28,7 @@ if self.user_id === self.runtime.user_id && !self.current_tag
   - var subscriptionIcon = 'icon-track-normal'
   - var subscriptionTitle = self.t('subs_normal')
 
-  if (self.subscription === subscriptionTypes.MUTED)
-    - subscriptionIcon = 'icon-track-muted'
-    - subscriptionTitle = self.t('subs_muted')
-  else if (self.subscription === subscriptionTypes.TRACKING)
+  if (self.subscription === subscriptionTypes.TRACKING)
     - subscriptionIcon = 'icon-track-tracking'
     - subscriptionTitle = self.t('subs_tracking')
   else if (self.subscription === subscriptionTypes.WATCHING)
