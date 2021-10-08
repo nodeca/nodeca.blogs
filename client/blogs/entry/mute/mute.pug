@@ -1,7 +1,7 @@
 - var user = self.users[self.user_id] || {};
-- var to_type = '$$ N.models.users.Subscription.types.NORMAL $$'
+- var to_type = '$$ N.models.users.Subscription.types.MUTED $$'
 
-#content.blogs-entry-unsubscribe(data-type=to_type, data-entry-id=self.entry._id)
+#content.blogs-entry-mute(data-type=to_type, data-entry-id=self.entry._id)
   != self.partial('@common.blocks.navbar.logo_apps')
 
   .layout__container.container-fluid

@@ -253,7 +253,7 @@ N.wire.once('navigate.done:' + module.apiPath, function blogs_sole_init_handlers
 
     return Promise.resolve()
       .then(() => N.wire.emit('blogs.sole.subscription', params))
-      .then(() => N.io.rpc('blogs.sole.subscribe', { user_id: id, type: params.subscription }))
+      .then(() => N.io.rpc('blogs.sole.change_subscription', { user_id: id, type: params.subscription }))
       .then(() => {
         N.runtime.page_data.subscription = params.subscription;
       })

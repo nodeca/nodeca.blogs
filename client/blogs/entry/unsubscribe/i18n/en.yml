@@ -1,8 +1,3 @@
 en-US:
-  title: Unsubscribe
-  message: "You will now receive less notifications for blog entry #{link}."
-  button:
-    watching: Urgent
-    tracking: Normal
-    normal: No subscription
-    muted: Muted
+  title: Unsubscribed from new comments
+  message: "You will no longer receive notifications about new comments in entry #{link}."

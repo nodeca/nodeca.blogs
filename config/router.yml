@@ -10,7 +10,7 @@ router:
           type: 'integer'
 
     blogs.sole.unsubscribe:
-      "/unsubscribe/blogs/{user_hid}":
+      "/blogs/{user_hid}/unsubscribe":
         user_hid:
           match: /\d+/
           type: 'integer'
@@ -25,7 +25,16 @@ router:
           type: 'integer'
 
     blogs.entry.unsubscribe:
-      "/unsubscribe/blogs/{user_hid}/{entry_hid}":
+      "/blogs/{user_hid}/{entry_hid}/unsubscribe":
+        user_hid:
+          match: /\d+/
+          type: 'integer'
+        entry_hid:
+          match: /\d+/
+          type: 'integer'
+
+    blogs.entry.mute:
+      "/blogs/{user_hid}/{entry_hid}/mute":
         user_hid:
           match: /\d+/
           type: 'integer'

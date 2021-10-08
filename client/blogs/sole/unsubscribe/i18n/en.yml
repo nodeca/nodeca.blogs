@@ -1,7 +1,3 @@
 en-US:
-  title: Unsubscribe
-  message: "You will now receive less notifications for #{link}'s blog."
-  button:
-    watching: Urgent
-    tracking: Normal
-    normal: No subscription
+  title: Unsubscribed from blog
+  message: "You will no longer receive notifications about new entries in #{link}'s blog."

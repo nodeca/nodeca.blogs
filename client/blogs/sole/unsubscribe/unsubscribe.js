@@ -1,21 +1,12 @@
 'use strict';
 
 
-N.wire.once('navigate.done:' + module.apiPath, function page_once() {
+N.wire.on('navigate.done:' + module.apiPath, function unsubscribe() {
+  let selector = '.blogs-sole-unsubscribe';
+  let type = $(selector).data('type');
+  let user_id = $(selector).data('user-id');
 
-  // Edit subscription button handler
-  //
-  N.wire.on(module.apiPath + ':edit', function edit_subscription(data) {
-    let user_id = data.$this.data('user-id');
-    let params = { subscription: data.$this.data('subscription') };
-
-    return Promise.resolve()
-      .then(() => N.wire.emit('blogs.sole.subscription', params))
-      .then(() => N.io.rpc('blogs.sole.subscribe', { user_id, type: params.subscription }))
-      .then(() => {
-        data.$this.replaceWith(
-          N.runtime.render(module.apiPath + '.button', { user_id, subscription: params.subscription })
-        );
-      });
-  });
+  return Promise.resolve()
+           .then(() => N.io.rpc('blogs.sole.change_subscription', { user_id, type }))
+           .then(() => $(selector).addClass('page-loading__m-done'));
 });

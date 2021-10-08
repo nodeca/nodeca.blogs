@@ -446,7 +446,7 @@ N.wire.once('navigate.done:' + module.apiPath, function page_once() {
 
     return Promise.resolve()
       .then(() => N.wire.emit('blogs.entry.subscription', params))
-      .then(() => N.io.rpc('blogs.entry.subscribe', { entry_id: id, type: params.subscription }))
+      .then(() => N.io.rpc('blogs.entry.change_subscription', { entry_id: id, type: params.subscription }))
       .then(() => {
         N.runtime.page_data.subscription = params.subscription;
       })
