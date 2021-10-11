@@ -3,12 +3,19 @@
 'use strict';
 
 
-const _         = require('lodash');
 const render    = require('nodeca.core/lib/system/render/common');
 const user_info = require('nodeca.users/lib/user_info');
 
 
 module.exports = function (N) {
+
+  // Notification will not be sent if target user:
+  //
+  // 1. creates comment himself
+  // 2. not watching this blog entry
+  // 3. no longer has access to this blog entry
+  // 4. ignores sender of this message
+  //
   N.wire.on('internal:users.notify.deliver', async function notify_deliver_blogs_new_comment(local_env) {
     if (local_env.type !== 'BLOGS_NEW_COMMENT') return;
 
@@ -24,30 +31,14 @@ module.exports = function (N) {
 
     if (!user) return;
 
-    // Fetch parent comment if it exists
-    let parent_comment;
-
-    if (comment.path?.length) {
-      let parent_id = comment.path[comment.path.length - 1];
-
-      parent_comment = await N.models.blogs.BlogComment.findById(parent_id).lean(true);
-    }
-
     // Fetch user info
     let users_info = await user_info(N, local_env.to);
 
-    // Filter post owner (don't send notification to user who create this post)
+    // 1. filter post owner (don't send notification to user who create this post)
     //
-    local_env.to = local_env.to.filter(user_id => String(user_id) !== String(entry.user));
+    local_env.to = local_env.to.filter(user_id => String(user_id) !== String(comment.user));
 
-    // If parent comment is set, don't send user this notification because reply
-    // notification has been already sent
-    //
-    if (parent_comment) {
-      local_env.to = local_env.to.filter(user_id => String(user_id) !== String(parent_comment.user));
-    }
-
-    // Filter users who aren't watching this entry
+    // 2. filter users who aren't watching this entry
     //
     let Subscription = N.models.users.Subscription;
 
@@ -58,12 +49,11 @@ module.exports = function (N) {
                                 .where('to_type').equals(N.shared.content_type.BLOG_ENTRY)
                                 .lean(true);
 
-    let watching = subscriptions.map(subscription => String(subscription.user));
+    let watching = new Set(subscriptions.map(subscription => String(subscription.user)));
 
-    // Only if `user_id` in both arrays
-    local_env.to = _.intersection(local_env.to, watching);
+    local_env.to = local_env.to.filter(user_id => watching.has(String(user_id)));
 
-    // Filter users by access
+    // 3. filter users by access
     //
     await Promise.all(local_env.to.slice().map(user_id => {
       let access_env = { params: {
@@ -79,6 +69,18 @@ module.exports = function (N) {
           }
         });
     }));
+
+    // 4. filter out ignored users
+    //
+    let ignore_data = await N.models.users.Ignore.find()
+                                .where('from').in(local_env.to)
+                                .where('to').equals(comment.user)
+                                .select('from to -_id')
+                                .lean(true);
+
+    let ignored = new Set(ignore_data.map(x => String(x.from)));
+
+    local_env.to = local_env.to.filter(user_id => !ignored.has(String(user_id)));
 
     // Render messages
     //

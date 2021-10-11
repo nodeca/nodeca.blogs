@@ -3,7 +3,6 @@
 'use strict';
 
 
-const _ = require('lodash');
 const $ = require('nodeca.core/lib/parser/cheequery');
 
 
@@ -346,58 +345,40 @@ module.exports = function (N, apiPath) {
   });
 
 
-  // Add reply notification for parent comment owner
+  // Add reply notification for parent comment owner,
+  // add new comment notification for subscribers
   //
-  N.wire.after(apiPath, async function add_reply_notification(env) {
-    if (!env.data.parent_comment) return;
-
-    let ignore_data = await N.models.users.Ignore.findOne()
-                                .where('from').equals(env.data.parent_comment.user)
-                                .where('to').equals(env.user_info.user_id)
-                                .select('from to -_id')
-                                .lean(true);
-
-    if (ignore_data) return;
-
-    await N.wire.emit('internal:users.notify', {
-      src:  env.data.new_comment._id,
-      to:   env.data.parent_comment.user,
-      type: 'BLOGS_REPLY'
-    });
-  });
-
-
-  // Add new comment notification for subscribers
-  //
-  N.wire.after(apiPath, async function add_new_comment_notification(env) {
+  N.wire.after(apiPath, async function add_notifications(env) {
     let subscriptions = await N.models.users.Subscription.find()
                                   .where('to').equals(env.data.entry._id)
                                   .where('type').equals(N.models.users.Subscription.types.WATCHING)
                                   .where('to_type').equals(N.shared.content_type.BLOG_ENTRY)
                                   .lean(true);
 
-    if (!subscriptions.length) return;
-
     let subscribed_users = subscriptions.map(x => x.user);
 
-    let ignore = _.keyBy(
-      await N.models.users.Ignore.find()
-                .where('from').in(subscribed_users)
-                .where('to').equals(env.user_info.user_id)
-                .select('from to -_id')
-                .lean(true),
-      'from'
-    );
+    if (env.data.parent_comment) {
+      let reply_notify = await N.settings.get('reply_notify', { user_id: env.data.parent_comment.user });
 
-    subscribed_users = subscribed_users.filter(user_id => !ignore[user_id]);
+      if (reply_notify) {
+        await N.wire.emit('internal:users.notify', {
+          src:  env.data.new_comment._id,
+          to:   env.data.parent_comment.user,
+          type: 'BLOGS_REPLY'
+        });
 
-    if (!subscribed_users.length) return;
+        // avoid sending both reply and new_comment notification to the same user
+        subscribed_users = subscribed_users.filter(user_id => String(user_id) !== String(env.data.parent_comment.user));
+      }
+    }
 
-    await N.wire.emit('internal:users.notify', {
-      src: env.data.new_comment._id,
-      to: subscribed_users,
-      type: 'BLOGS_NEW_COMMENT'
-    });
+    if (subscribed_users.length) {
+      await N.wire.emit('internal:users.notify', {
+        src: env.data.new_comment._id,
+        to: subscribed_users,
+        type: 'BLOGS_NEW_COMMENT'
+      });
+    }
   });
 
 

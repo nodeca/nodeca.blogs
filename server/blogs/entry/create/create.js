@@ -279,17 +279,6 @@ module.exports = function (N, apiPath) {
 
     let subscribed_users = subscriptions.map(x => x.user);
 
-    let ignore = _.keyBy(
-      await N.models.users.Ignore.find()
-                .where('from').in(subscribed_users)
-                .where('to').equals(env.user_info.user_id)
-                .select('from to -_id')
-                .lean(true),
-      'from'
-    );
-
-    subscribed_users = subscribed_users.filter(user_id => !ignore[user_id]);
-
     if (!subscribed_users.length) return;
 
     await N.wire.emit('internal:users.notify', {
