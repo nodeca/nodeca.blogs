@@ -269,21 +269,8 @@ module.exports = function (N, apiPath) {
   // Add new entry notification for subscribers
   //
   N.wire.after(apiPath, async function add_new_entry_notification(env) {
-    let subscriptions = await N.models.users.Subscription.find()
-                                  .where('to').equals(env.user_info.user_id)
-                                  .where('type').equals(N.models.users.Subscription.types.WATCHING)
-                                  .where('to_type').equals(N.shared.content_type.BLOG_SOLE)
-                                  .lean(true);
-
-    if (!subscriptions.length) return;
-
-    let subscribed_users = subscriptions.map(x => x.user);
-
-    if (!subscribed_users.length) return;
-
     await N.wire.emit('internal:users.notify', {
       src: env.data.new_entry._id,
-      to: subscribed_users,
       type: 'BLOGS_NEW_ENTRY'
     });
   });
