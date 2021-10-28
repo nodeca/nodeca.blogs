@@ -27,12 +27,6 @@ function updateOptions() {
   }));
 }
 
-function updateTagsView() {
-  $footer.html(N.runtime.render('mdedit.content_tags', { tags, apiPath: module.apiPath }));
-
-  N.wire.emit('mdedit.content_footer_update');
-}
-
 
 // Load mdedit
 //
@@ -84,14 +78,11 @@ N.wire.on(module.apiPath + ':begin', function show_editor(data) {
 
   tags = entry.tags || [];
 
-  $footer = $('<div></div>').html(N.runtime.render('mdedit.content_tags', { tags, apiPath: module.apiPath }));
-
   let $editor = N.MDEdit.show({
     text: entry.md,
     // hide attachment button when moderators edit posts created by others
     // (note: editing their own posts as moderators will still show normal toolbar)
-    toolbar: entry.user_id !== N.runtime.user_id ? 'as_moderator' : 'default',
-    contentFooter: $footer[0]
+    toolbar: entry.user_id !== N.runtime.user_id ? 'as_moderator' : 'default'
   });
 
   updateOptions();
@@ -109,6 +100,9 @@ N.wire.on(module.apiPath + ':begin', function show_editor(data) {
       $editor.find('.mdedit-header__caption').html(title);
       $editor.find('.mdedit-header').append(N.runtime.render(module.apiPath + '.title_input', { title: entry.title }));
       $editor.find('.mdedit-footer').append(N.runtime.render(module.apiPath + '.options_btn'));
+
+      $footer = $editor.find('.mdedit__editor-footer');
+      $footer.html(N.runtime.render('blogs.blocks.tags_edit_list', { tags, apiPath: module.apiPath }));
     })
     .on('submit.nd.mdedit', () => {
       $editor.find('.mdedit-btn__submit').addClass('disabled');
@@ -126,6 +120,7 @@ N.wire.on(module.apiPath + ':begin', function show_editor(data) {
       N.io.rpc('blogs.entry.edit.update', params)
         .then(response => {
           if (response.warning) N.wire.emit('notify.info', response.warning);
+          $footer = null;
           N.MDEdit.hide();
           resolve();
         }, err => {
@@ -153,7 +148,7 @@ N.wire.on(module.apiPath + ':tags_edit', function show_tags_input_dlg() {
   return N.wire.emit('blogs.blocks.tags_edit_dlg', data)
              .then(() => {
                tags = data.tags;
-               updateTagsView();
+               $footer.html(N.runtime.render('blogs.blocks.tags_edit_list', { tags, apiPath: module.apiPath }));
              });
 });
 

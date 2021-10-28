@@ -1,0 +1,12 @@
+@import "nodeca.core/client/common/_variables"
+
+.blogs-tag-edit-list
+  background-color $body-bg-secondary
+  color $body-color-secondary
+  cursor pointer
+  padding .5rem .2rem
+  shortable()
+
+.blogs-tag-edit-list__item + .blogs-tag-edit-list__item
+  &:before
+    content ', '

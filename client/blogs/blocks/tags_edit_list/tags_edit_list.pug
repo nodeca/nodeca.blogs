@@ -1,0 +1,11 @@
+.blogs-tag-edit-list(
+  class=self.tags.length === 0 ? '.blogs-tag-edit-list__m-empty' : ''
+  data-on-click=self.apiPath + ':tags_edit'
+)
+  if self.tags.length
+    span.blogs-tag-edit-list__header= self.t('tags')
+
+    each tag in self.tags
+      span.blogs-tag-edit-list__item= tag
+  else
+    .blogs-tag-edit-list__header= self.t('click_to_add_tags')

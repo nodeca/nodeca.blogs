@@ -18,12 +18,6 @@ function updateOptions() {
   }));
 }
 
-function updateTagsView() {
-  $footer.html(N.runtime.render('mdedit.content_tags', { tags, apiPath: module.apiPath }));
-
-  N.wire.emit('mdedit.content_footer_update');
-}
-
 
 // Load mdedit
 //
@@ -53,8 +47,6 @@ N.wire.before(module.apiPath + ':begin', function fetch_options() {
 N.wire.on(module.apiPath + ':begin', function show_editor() {
   tags = [];
 
-  $footer = $('<div></div>').html(N.runtime.render('mdedit.content_tags', { tags, apiPath: module.apiPath }));
-
   let $editor = N.MDEdit.show({
     draftKey: [ 'blog_entry_create', N.runtime.user_hid ].join('_'),
     draftCustomFields: {
@@ -63,10 +55,9 @@ N.wire.on(module.apiPath + ':begin', function show_editor() {
         if (args.length === 0) return tags;
 
         tags = args[0];
-        updateTagsView();
+        $footer.html(N.runtime.render('blogs.blocks.tags_edit_list', { tags, apiPath: module.apiPath }));
       }
-    },
-    contentFooter: $footer[0]
+    }
   });
 
   updateOptions();
@@ -78,6 +69,9 @@ N.wire.on(module.apiPath + ':begin', function show_editor() {
       $editor.find('.mdedit-header__caption').html(title);
       $editor.find('.mdedit-header').append(N.runtime.render(module.apiPath + '.title_input'));
       $editor.find('.mdedit-footer').append(N.runtime.render(module.apiPath + '.options_btn'));
+
+      $footer = $editor.find('.mdedit__editor-footer');
+      $footer.html(N.runtime.render('blogs.blocks.tags_edit_list', { tags, apiPath: module.apiPath }));
     })
     .on('submit.nd.mdedit', () => {
       $editor.find('.mdedit-btn__submit').addClass('disabled');
@@ -120,7 +114,7 @@ N.wire.on(module.apiPath + ':tags_edit', function show_tags_input_dlg() {
   return N.wire.emit('blogs.blocks.tags_edit_dlg', data)
              .then(() => {
                tags = data.tags;
-               updateTagsView();
+               $footer.html(N.runtime.render('blogs.blocks.tags_edit_list', { tags, apiPath: module.apiPath }));
              });
 });
 
