@@ -10,9 +10,10 @@
 each entry in self.entries
   - var user = self.users[entry.user] || { hid: 0 };
   - var visible = [ entryStatuses.DELETED, entryStatuses.DELETED_HARD, entryStatuses.HB ].indexOf(entry.st) === -1;
-  - var collapsed = !self.expand && !visible;
+  - var show_as_deleted_or_hb = !self.expand && !visible;
 
-  if !collapsed
+  if !show_as_deleted_or_hb
+    //- show normal blog posts (not deleted, hb, or ignored)
 
     - var html_parts = entry.html.split('<!--cut-->');
     - var html_before_cut = html_parts.shift();
@@ -145,9 +146,10 @@ each entry in self.entries
 
       != self.partial('@blogs.blocks.tag_list', { tags: self.entry_tags[entry._id] })
 
-  else
+  if show_as_deleted_or_hb
+    //- show deleted or hellbanned posts to moderators (collapsed form)
 
-    .blog-entry.blog-entry__m-collapsed(
+    .blog-entry.blog-entry__m-show-as-deleted(
       id='entry' + entry.hid
       class=(entry.st === entryStatuses.DELETED) ? 'blog-entry__m-deleted' : ''
       class=(entry.st === entryStatuses.DELETED_HARD) ? 'blog-entry__m-deleted-hard' : ''

@@ -18,7 +18,8 @@ ru-RU:
   del_entry_text: Блогозапись удалена.
   del_hard_entry_text: Блогозапись жёстко удалена.
   hb_entry_text: Hellbanned
-  expand: Раскрыть
+  #ignored_post_text: Игнорируется
+  expand: Показать
 
   infraction_added: Нарушение выдано
   infraction_title: "#{points} ((балл|балла|баллов)):points, добавлено #{date}"

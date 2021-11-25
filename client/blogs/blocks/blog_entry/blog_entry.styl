@@ -56,7 +56,14 @@
   margin-right 0px
 
 .blog-entry__content-collapsed
-  margin 0 1rem
+  padding 0 1rem
+  font-size $font-size-sm
+  color $body-color-secondary
+
+.blog-entry__content-ignored
+  display flex
+  justify-content space-between
+  padding 0 1rem .5rem 1rem
   font-size $font-size-sm
   color $body-color-secondary
 
@@ -95,6 +102,10 @@
     display block
     font-size $font-size-sm
     margin-bottom 1rem
+
+.blog-entry__show-ignored
+  color inherit
+  cursor pointer
 
 .blog-entry__controls-blk
   display flex

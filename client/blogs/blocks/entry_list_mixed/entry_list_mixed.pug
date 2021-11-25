@@ -10,12 +10,11 @@
 each entry in self.entries
   - var user = self.users[entry.user] || { hid: 0 };
   - var visible = [ entryStatuses.DELETED, entryStatuses.DELETED_HARD, entryStatuses.HB ].indexOf(entry.st) === -1;
-  - var collapsed = !self.expand && !visible;
+  - var show_as_deleted_or_hb = !self.expand && !visible;
+  - var show_as_ignored = !self.expand && self.ignored_users[entry.user] && !self.settings.blogs_show_ignored;
 
-  if (self.ignored_users[entry.user] && !self.settings.blogs_show_ignored)
-    //- skip entries created by ignored users
-
-  else if !collapsed
+  if !show_as_deleted_or_hb && !show_as_ignored
+    //- show normal blog posts (not deleted, hb, or ignored)
 
     - var html_parts = entry.html.split('<!--cut-->');
     - var html_before_cut = html_parts.shift();
@@ -162,9 +161,10 @@ each entry in self.entries
                     data-entry-hid=entry.hid
                   )= self.t('undelete')
 
-  else
+  if show_as_deleted_or_hb
+    //- show deleted or hellbanned posts to moderators (collapsed form)
 
-    .blog-entry.blog-entry__m-collapsed(
+    .blog-entry.blog-entry__m-show-as-deleted(
       id='entry' + entry.hid
       class=(entry.st === entryStatuses.DELETED) ? 'blog-entry__m-deleted' : ''
       class=(entry.st === entryStatuses.DELETED_HARD) ? 'blog-entry__m-deleted-hard' : ''
@@ -227,3 +227,47 @@ each entry in self.entries
               data-entry-id=entry._id
             )
               span.icon.icon-expand
+
+  if show_as_ignored
+    //- show ignored posts to regular users (collapsed form),
+    //- moderators will see those posts in normal form
+
+    .blog-entry.blog-entry__m-show-as-ignored(
+      id='entry' + entry.hid
+      class=(entry.st === entryStatuses.DELETED) ? 'blog-entry__m-deleted' : ''
+      class=(entry.st === entryStatuses.DELETED_HARD) ? 'blog-entry__m-deleted-hard' : ''
+      class=(entry.st === entryStatuses.HB) ? 'blog-entry__m-hb' : ''
+      class=(self.own_bookmarks.indexOf(entry._id) !== -1) ? 'blog-entry__m-bookmarked' : ''
+      class=(self.ignored_users[entry.user]) ? 'blog-entry__m-ignored' : ''
+      data-user-hid=user.hid
+      data-entry-hid=entry.hid
+      data-entry-id=entry._id
+    )
+      header.blog-entry__head
+        .blog-entry__title
+          a.blog-entry__link(href=self.link_to('blogs.entry', { user_hid: user.hid, entry_hid: entry.hid }))
+            = entry.title
+
+        .blog-entry__meta.blog-entry__author
+          if user.hid
+            span.blog-entry__ignored-mark.icon.icon-ignore
+            a.blog-entry__author-avatar._ucard-popover(
+              href=self.link_to('users.member', { user_hid: user.hid })
+              data-user-id=entry.user
+              data-user-ref='blog_entry:'+user.hid+':'+entry.hid
+            )
+              img.blog-entry__avatar(alt=user.name)&attributes(self.avatar(user, 'sm'))
+            a.blog-entry__author-link(
+              href=self.link_to('blogs.sole', { user_hid: user.hid })
+            )
+              = user.name
+          else
+            .blog-entry__avatar.av-anon
+
+      .blog-entry__content-ignored
+        .blog-entry__ignored.icon.icon-ignore.icon-space-after= self.t('ignored_entry_text')
+
+        a.blog-entry__show-ignored(
+          data-on-click='blogs.blocks.entry_list_mixed:entry_expand'
+          data-entry-id=entry._id
+        )= self.t('expand')
