@@ -9,9 +9,11 @@
 each comment in self.comments
   - var user = self.users[comment.user];
   - var visible = [ commentStatuses.DELETED, commentStatuses.DELETED_HARD, commentStatuses.HB ].indexOf(comment.st) === -1;
-  - var collapsed = !self.expand && !visible;
+  - var show_as_deleted_or_hb = !self.expand && !visible;
+  - var show_as_ignored = !self.expand && self.ignored_users[comment.user] && !self.settings.blogs_show_ignored;
 
-  if !collapsed
+  if !show_as_deleted_or_hb && !show_as_ignored
+    //- show normal blog comments (not deleted, hb, or ignored)
 
     .blog-comment(
       id='comment' + comment.hid
@@ -20,6 +22,7 @@ each comment in self.comments
       class=(self.own_bookmarks.indexOf(comment._id) !== -1) ? 'blog-comment__m-bookmarked' : ''
       class=(self.own_votes[comment._id] === -1) ? 'blog-comment__m-voted-down' : ''
       class=(self.own_votes[comment._id] === +1) ? 'blog-comment__m-voted-up' : ''
+      class=(self.ignored_users[comment.user]) ? 'blog-comment__m-ignored' : ''
       class='blog-comment__level-' + comment.path.length
       data-comment-hid=comment.hid
       data-comment-id=comment._id
@@ -204,15 +207,17 @@ each comment in self.comments
                     data-comment-hid=comment.hid
                   )= self.t('undelete')
 
-  else
+  if show_as_deleted_or_hb && !show_as_ignored
+    //- show deleted or hellbanned posts to moderators (collapsed form)
 
-    .blog-comment.blog-entry__m-collapsed(
+    .blog-comment.blog-comment__m-show-as-deleted(
       id='comment' + comment.hid
       class=(comment.st === commentStatuses.DELETED) ? 'blog-comment__m-deleted' : ''
       class=(comment.st === commentStatuses.DELETED_HARD) ? 'blog-comment__m-deleted-hard' : ''
       class=(self.own_bookmarks.indexOf(comment._id) !== -1) ? 'blog-comment__m-bookmarked' : ''
       class=(self.own_votes[comment._id] === -1) ? 'blog-comment__m-voted-down' : ''
       class=(self.own_votes[comment._id] === +1) ? 'blog-comment__m-voted-up' : ''
+      class=(self.ignored_users[comment.user]) ? 'blog-comment__m-ignored' : ''
       class='blog-comment__level-' + comment.path.length
       data-comment-hid=comment.hid
       data-comment-id=comment._id
@@ -278,3 +283,57 @@ each comment in self.comments
               data-comment-id=comment._id
             )
               span.icon.icon-expand
+
+  if show_as_ignored
+    //- show ignored comments to regular users (collapsed form),
+    //- moderators will see those posts in normal form
+
+    .blog-comment.blog-comment__m-show-as-ignored(
+      id='comment' + comment.hid
+      class=(comment.st === commentStatuses.DELETED) ? 'blog-comment__m-deleted' : ''
+      class=(comment.st === commentStatuses.DELETED_HARD) ? 'blog-comment__m-deleted-hard' : ''
+      class=(self.own_bookmarks.indexOf(comment._id) !== -1) ? 'blog-comment__m-bookmarked' : ''
+      class=(self.own_votes[comment._id] === -1) ? 'blog-comment__m-voted-down' : ''
+      class=(self.own_votes[comment._id] === +1) ? 'blog-comment__m-voted-up' : ''
+      class=(self.ignored_users[comment.user]) ? 'blog-comment__m-ignored' : ''
+      class='blog-comment__level-' + comment.path.length
+      data-comment-hid=comment.hid
+      data-comment-id=comment._id
+    )
+      .blog-comment__aside
+        if user
+          a.blog-comment__author-avatar._ucard-popover(
+            href=self.link_to('users.member', { user_hid: user.hid })
+            data-user-id=entry.user
+            data-user-ref='blog_comment:'+user.hid+':'+entry.hid+':'+comment.hid
+          )
+            img.blog-comment__avatar(alt=user.name)&attributes(self.avatar(user, 'sm'))
+        else
+          .blog-comment__avatar.av-anon
+
+      footer.blog-comment__head
+        if user
+          .blog-comment__author
+            a.blog-comment__author-link(
+              href=self.link_to('blogs.sole', { user_hid: user.hid })
+            )
+              = user.name
+
+        .blog-comment__meta
+          span.blog-comment__meta-item.blog-comment__ts!= self.timetag(comment.ts, 'relative')
+
+          if comment.edit_count
+            a.blog-comment__meta-item.blog-comment__history.icon.icon-history.icon-space-after(
+              href='#'
+              title=self.t('last_edited', { date: self.date(comment.last_edit_ts, 'datetime') })
+              data-on-click='blogs.entry:comment_history'
+              data-comment-id=comment._id
+            )= comment.edit_count
+
+      .blog-comment__content-ignored
+        .blog-comment__ignored.icon.icon-ignore.icon-space-after= self.t('ignored_comment_text')
+
+        a.blog-comment__show-ignored(
+          data-on-click='blogs.entry:comment_expand'
+          data-comment-id=comment._id
+        )= self.t('expand')

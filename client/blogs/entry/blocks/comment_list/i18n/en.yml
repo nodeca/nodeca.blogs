@@ -15,8 +15,9 @@ en-US:
   del_by: "Deleted by:"
   del_comment_text: Blog comment is deleted.
   del_hard_comment_text: Blog comment is hard deleted.
+  ignored_comment_text: Ignored
   hb_comment_text: Hellbanned
-  expand: Expand
+  expand: Show
 
   ip_info: IP info
   add_infraction: Add infraction

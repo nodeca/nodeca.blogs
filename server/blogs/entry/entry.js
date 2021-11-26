@@ -345,6 +345,26 @@ module.exports = function (N, apiPath) {
   });
 
 
+  // Check if any users are ignored
+  //
+  N.wire.after(apiPath, async function check_ignores(env) {
+    let users = env.data.comments.map(comment => comment.user).filter(Boolean);
+
+    // don't fetch `_id` to load all data from composite index
+    let ignored = await N.models.users.Ignore.find()
+                            .where('from').equals(env.user_info.user_id)
+                            .where('to').in(users)
+                            .select('from to -_id')
+                            .lean(true);
+
+    env.res.ignored_users = env.res.ignored_users || {};
+
+    ignored.forEach(row => {
+      env.res.ignored_users[row.to] = true;
+    });
+  });
+
+
   // Fetch settings needed on the client-side
   //
   N.wire.after(apiPath, async function fetch_settings(env) {
@@ -358,7 +378,8 @@ module.exports = function (N, apiPath) {
       'can_vote',
       'can_see_ip',
       'votes_add_max_time',
-      'blogs_edit_comments_max_time'
+      'blogs_edit_comments_max_time',
+      'blogs_show_ignored'
     ]));
   });
 };

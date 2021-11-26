@@ -15,8 +15,9 @@ ru-RU:
   del_by: "Удалил:"
   del_comment_text: Комментарий удалён.
   del_hard_comment_text: Комментарий жёстко удалён.
+  ignored_comment_text: Игнорируется
   hb_comment_text: Hellbanned
-  expand: Раскрыть
+  expand: Показать
 
   ip_info: Информация об IP
   add_infraction: Выдать нарушение

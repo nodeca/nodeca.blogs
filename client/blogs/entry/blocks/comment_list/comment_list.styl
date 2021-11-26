@@ -55,14 +55,21 @@ for $level in (0..$max-indent - 2)
     margin-top -.25rem // Compensate line-height 1.5 rem
 
 .blog-comment__content-collapsed
-  margin-left $aside-size + 16px
-  margin-right 0px
+  padding 0 1rem 0 $aside-size + 16px
+  font-size $font-size-sm
+  color $body-color-secondary
+
+.blog-comment__content-ignored
+  display flex
+  justify-content space-between
+  padding 0 1rem .5rem $aside-size + 16px
   font-size $font-size-sm
   color $body-color-secondary
 
 .blog-comment__m-deleted
 .blog-comment__m-hb
 .blog-comment__m-deleted-hard
+.blog-comment__m-ignored
   background-color $deleted-bg
 
 .blog-comment__del-by-user
@@ -81,6 +88,10 @@ for $level in (0..$max-indent - 2)
   .blog-comment__vote-down
   .blog-comment__bookmark
     display none
+
+.blog-comment__show-ignored
+  color inherit
+  cursor pointer
 
 .blog-comment__controls
   text-align right
