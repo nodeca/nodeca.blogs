@@ -2,12 +2,15 @@ users:
   tracker:
     menu:
       blog_entry:
+        marker_type: blog_entry
         priority: 30
 
   subscriptions:
     blogs_entry:
       to_type: BLOG_ENTRY
+      marker_type: blog_entry
       priority: 30
     blogs_sole:
       to_type: BLOG_SOLE
+      marker_type: blog_entry
       priority: 40

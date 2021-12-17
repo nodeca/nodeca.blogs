@@ -63,7 +63,8 @@ module.exports = function (N, apiPath) {
     // Fetch entries by blog subscriptions
     //
     if (blog_subs.length !== 0) {
-      let cuts = await N.models.users.Marker.cuts(locals.params.user_info.user_id, blog_subs.map(x => x.to));
+      let cuts = await N.models.users.Marker.cuts(
+        locals.params.user_info.user_id, blog_subs.map(x => x.to), 'blog_entry');
       let queryParts = [];
 
       for (let [ id, cutTs ] of Object.entries(cuts)) {
@@ -84,7 +85,7 @@ module.exports = function (N, apiPath) {
       lastPostTs: entry[cache].last_ts
     }));
 
-    let read_marks = await N.models.users.Marker.info(locals.params.user_info.user_id, data);
+    let read_marks = await N.models.users.Marker.info(locals.params.user_info.user_id, data, 'blog_entry');
 
 
     // Filter new and unread entries

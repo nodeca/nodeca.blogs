@@ -69,7 +69,7 @@ module.exports = function (N) {
       lastPostTs: entry.cache.last_ts
     }));
 
-    let read_marks = await N.models.users.Marker.info(env.user_info.user_id, data);
+    let read_marks = await N.models.users.Marker.info(env.user_info.user_id, data, 'blog_entry');
     env.res.read_marks = Object.assign(env.res.read_marks || {}, read_marks);
 
     // avoid sending large attributes to the client that won't be used
