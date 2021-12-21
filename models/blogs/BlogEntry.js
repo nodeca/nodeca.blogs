@@ -23,6 +23,8 @@ module.exports = function (N, collectionName) {
   set_content_type('BLOG_SOLE', 4);
   set_content_type('BLOG_ENTRY', 5);
 
+  N.shared.marker_types = (N.shared.marker_types || []).concat([ 'blog_entry' ]);
+
   let statuses = {
     VISIBLE:      1,
     HB:           2,
