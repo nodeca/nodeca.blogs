@@ -278,10 +278,10 @@ module.exports = function (N, apiPath) {
       N.models.users.Marker.setPos(
         env.user_info.user_id,
         env.data.entry._id,
-        env.data.entry.last_comment_counter,
-        env.data.entry.last_comment_counter,
         env.data.entry.user,
-        'blog_entry'
+        'blog_entry',
+        env.data.entry.last_comment_counter,
+        env.data.entry.last_comment_counter
       )
     ).catch(err => N.logger.error(`Marker cannot mark blog entry as read: ${err}`));
   });

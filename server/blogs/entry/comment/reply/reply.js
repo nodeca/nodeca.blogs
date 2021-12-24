@@ -337,10 +337,10 @@ module.exports = function (N, apiPath) {
     await N.models.users.Marker.setPos(
       env.user_info.user_id,
       env.data.entry._id,
-      env.data.new_comment.hid,
-      env.data.new_comment.hid,
       env.data.entry.user,
-      'blog_entry'
+      'blog_entry',
+      env.data.new_comment.hid,
+      env.data.new_comment.hid
     );
   });
 
