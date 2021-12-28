@@ -15,7 +15,7 @@ module.exports = function (N, apiPath) {
       type: 'object',
       properties: {
         tag:  { type: 'string' },
-        from: { type: 'string' },
+        from: { format: 'pos_int_str' },
         prev: { enum: [ '' ] },
         next: { enum: [ '' ] }
       },
