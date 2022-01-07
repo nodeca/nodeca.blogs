@@ -1,3 +1,6 @@
 ru-RU:
+  topic: Тема
   subject: '#{project_name}: #{user} ответил на ваш комментарий'
   reply: Ответить
+  visit: Перейти
+  unsubscribe: Отписаться

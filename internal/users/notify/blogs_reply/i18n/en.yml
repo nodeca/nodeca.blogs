@@ -1,3 +1,6 @@
 en-US:
+  topic: Topic
   subject: '#{project_name}: #{user} replied to your comment'
   reply: Reply
+  visit: Visit
+  unsubscribe: Unsubscribe

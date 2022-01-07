@@ -1,3 +1,6 @@
 ru-RU:
+  topic: Тема
   subject: '#{project_name}: новая блогозапись от #{user}'
   reply: Ответить
+  visit: Перейти
+  unsubscribe: Отписаться

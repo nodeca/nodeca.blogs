@@ -1,3 +1,6 @@
 en-US:
+  topic: Topic
   subject: '#{project_name}: new comment in blog entry "#{entry_title}"'
   reply: Reply
+  visit: Visit
+  unsubscribe: Unsubscribe
