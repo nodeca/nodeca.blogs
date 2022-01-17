@@ -1,13 +1,14 @@
 en-US:
-  mod_actions: Moderation
-  history: History
-  ip_info: IP info
-  add_infraction: Add infraction
-  delete: Delete
-  undelete: Restore
-  subscription: Subscription
-
   subs_muted: Muted. Prohibit any possible notifications about this entry.
   subs_normal: No subscription. You will be notified only if someone replies to your message.
   subs_tracking: Normal. You will see updated entries in tracker.
   subs_watching: Urgent. You will see updated entries in tracker and receive email notifications.
+
+  dropdown:
+    mod_actions: Moderation
+    history: History
+    ip_info: IP info
+    add_infraction: Add infraction
+    delete: Delete
+    undelete: Restore
+    subscription: Subscription

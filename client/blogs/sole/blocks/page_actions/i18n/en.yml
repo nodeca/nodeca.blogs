@@ -1,9 +1,11 @@
 en-US:
   new_entry: New entry
-  search: Search in blog
-  subscription: Subscription
-  categories: Categories
-
   subs_normal: No subscription. You will not receive notifications about new entries.
   subs_tracking: Normal. You will see new entries in tracker.
   subs_watching: Urgent. You will see new entries in tracker and receive email notifications.
+
+  dropdown:
+    new_entry: New entry
+    search: Search in blog
+    subscription: Subscription
+    categories: Categories

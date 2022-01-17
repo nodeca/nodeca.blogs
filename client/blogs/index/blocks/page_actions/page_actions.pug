@@ -1,0 +1,9 @@
+.page-actions
+  if self.settings.blogs_can_create
+    button.btn.btn-secondary.btn-square.d-none.d-sm-inline-block.icon.icon-plus(
+      type='button'
+      data-on-click='blogs.blocks.blog_entry.create:begin'
+      title=self.t('new_entry')
+    )
+
+  != self.partial('dropdown')

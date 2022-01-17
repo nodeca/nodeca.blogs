@@ -14,7 +14,7 @@ article#content.blogs-index(
   -
     var navbar_args = {
       title: self.t('title'),
-      toolbar: 'blogs.index.blocks.toolbar_controls',
+      toolbar: 'blogs.index.blocks.page_actions.dropdown',
       progress: {
         link_top:    self.link_to('blogs.index'),
         link_bottom: self.link_to('blogs.index', { $query: { from: self.last_entry_hid } }),
@@ -37,7 +37,7 @@ article#content.blogs-index(
     header.page-head.blogs-index__head
       h1.blogs-index__title.page-head__title(itemprop='name')= self.t('new_entries')
 
-      != self.partial('@blogs.index.blocks.toolbar_controls')
+      != self.partial('@blogs.index.blocks.page_actions')
 
     if self.entries && self.entries.length
       .blogs-index__loading-prev.nojs-hide(

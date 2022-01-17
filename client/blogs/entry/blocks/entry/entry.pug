@@ -19,7 +19,7 @@
 )
   header.page-head.blog-entry__head
     .float-end
-      != self.partial('@blogs.entry.blocks.toolbar_controls')
+      != self.partial('@blogs.entry.blocks.page_actions')
 
     h1.blog-entry__title.page-head__title(itemprop='name')
       span.blog-entry__title-text= entry.title

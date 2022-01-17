@@ -22,7 +22,7 @@ article#content.blogs-entry-page(
     var navbar_args = {
       title_html: self.partial('@blogs.entry.blocks.title', { user: user, entry: entry }),
       level_up: self.link_to('blogs.sole', { user_hid: user.hid }),
-      toolbar: 'blogs.entry.blocks.toolbar_controls',
+      toolbar: 'blogs.entry.blocks.page_actions.dropdown',
       search_tab: 'blog_entries',
       search_areas: [
         {

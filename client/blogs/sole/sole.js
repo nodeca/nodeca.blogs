@@ -258,14 +258,22 @@ N.wire.once('navigate.done:' + module.apiPath, function blogs_sole_init_handlers
         N.runtime.page_data.subscription = params.subscription;
       })
       .then(() => {
-        $('.blogs-sole__toolbar-controls')
-          .replaceWith(N.runtime.render(module.apiPath + '.blocks.toolbar_controls', {
-            user_id:      N.runtime.page_data.user_id,
-            user_hid:     N.runtime.page_data.user_hid,
-            current_tag:  N.runtime.page_data.current_tag,
-            settings:     N.runtime.page_data.settings,
-            subscription: N.runtime.page_data.subscription
-          }));
+        // Need to re-render reply button and dropdown here
+        let templateParams = {
+          user_id:      N.runtime.page_data.user_id,
+          user_hid:     N.runtime.page_data.user_hid,
+          current_tag:  N.runtime.page_data.current_tag,
+          settings:     N.runtime.page_data.settings,
+          subscription: N.runtime.page_data.subscription
+        };
+
+        // render dropdown in menu
+        $('.page-actions__dropdown').replaceWith(
+          N.runtime.render(module.apiPath + '.blocks.page_actions.dropdown', templateParams));
+
+        // render buttons+dropdown in page head
+        $('.page-actions').replaceWith(
+          N.runtime.render(module.apiPath + '.blocks.page_actions', templateParams));
       });
   });
 });

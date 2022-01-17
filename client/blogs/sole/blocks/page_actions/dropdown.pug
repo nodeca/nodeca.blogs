@@ -1,0 +1,70 @@
+- var menu_rnd_id = 'rnd' + self.get_label_uid()
+- var subscriptionTypes = '$$ JSON.stringify(N.models.users.Subscription.types) $$'
+- var items = []
+
+if self.settings.blogs_can_create
+  - items.push('new_entry')
+
+- items.push('search')
+
+if self.runtime.is_member && !self.current_tag
+  - items.push('subscription')
+
+if self.user_id === self.runtime.user_id && !self.current_tag
+  - items.push('categories')
+
+- var show_menu = items.filter(function (item) { return item !== 'new_entry'; }).length > 0;
+
+.page-actions__dropdown
+  if show_menu
+    button.btn.btn-secondary.btn-square.icon.icon-dropdown.dropdown-toggle(
+      type='button'
+      id=menu_rnd_id
+      aria-haspopup='true'
+      aria-expanded='false'
+      data-bs-toggle='dropdown'
+    )
+
+    .dropdown-menu.dropdown-menu-end(aria-labelledby=menu_rnd_id)
+
+      each item in items
+        case item
+
+          when 'new_entry'
+            //- this menu element should be shown in navbar OR on small screen
+            button.dropdown-item.hidden-page-head(
+              type='button'
+              data-on-click='blogs.blocks.blog_entry.create:begin'
+            )= self.t('new_entry')
+
+            button.dropdown-item.d-sm-none.hidden-nav-alt(
+              type='button'
+              data-on-click='blogs.blocks.blog_entry.create:begin'
+            )= self.t('new_entry')
+
+          when 'search'
+            a.dropdown-item(
+              href=self.link_to('search.blogs_sole', { $query: { hid: self.user_hid } })
+            )= self.t('search')
+
+          when 'subscription'
+            - var subscriptionIcon = 'icon-track-normal'
+            if (self.subscription === subscriptionTypes.TRACKING)
+              - subscriptionIcon = 'icon-track-tracking'
+            else if (self.subscription === subscriptionTypes.WATCHING)
+              - subscriptionIcon = 'icon-track-watching'
+            button.dropdown-item(
+              type='button'
+              data-on-click='blogs.sole:subscription'
+              data-user-id=self.user_id
+              data-blog-subscription=self.subscription
+            )
+              if self.subscription && self.subscription !== subscriptionTypes.NORMAL
+                span.icon.icon-space-after(class=subscriptionIcon)
+              = self.t('subscription')
+
+          when 'categories'
+            button.dropdown-item(
+              type='button'
+              data-on-click='blogs.sole.categories_edit'
+            )= self.t('categories')
