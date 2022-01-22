@@ -37,33 +37,26 @@ N.wire.before(module.apiPath + ':begin', function load_mdedit() {
 
 // Fetch entry and options
 //
-N.wire.before(module.apiPath + ':begin', function fetch_options(data) {
-  let entryData;
+N.wire.before(module.apiPath + ':begin', async function fetch_options(data) {
+  const entryData = await N.io.rpc('blogs.entry.edit.index', { entry_id: data.entry_id });
 
-  return Promise.resolve()
-    .then(() => N.io.rpc('blogs.entry.edit.index', { entry_id: data.entry_id }))
-    .then(response => {
-      entryData = response;
+  const opt = await N.io.rpc('blogs.entry.options');
 
-      return N.io.rpc('blogs.entry.options');
-    })
-    .then(opt => {
-      options = {
-        parse_options: opt.parse_options,
-        user_settings: {
-          no_mlinks:         !entryData.params.link_to_title && !entryData.params.link_to_snippet,
-          no_emojis:         !entryData.params.emoji,
-          no_quote_collapse: !entryData.params.quote_collapse
-        }
-      };
+  options = {
+    parse_options: opt.parse_options,
+    user_settings: {
+      no_mlinks:         !entryData.params.link_to_title && !entryData.params.link_to_snippet,
+      no_emojis:         !entryData.params.emoji,
+      no_quote_collapse: !entryData.params.quote_collapse
+    }
+  };
 
-      entry = {
-        user_id:     entryData.user_id,
-        md:          entryData.md,
-        title:       entryData.title,
-        tags:        entryData.tags
-      };
-    });
+  entry = {
+    user_id:     entryData.user_id,
+    md:          entryData.md,
+    title:       entryData.title,
+    tags:        entryData.tags
+  };
 });
 
 
@@ -142,19 +135,19 @@ N.wire.on(module.apiPath + ':begin', function show_editor(data) {
 
 // Open tag input dialog
 //
-N.wire.on(module.apiPath + ':tags_edit', function show_tags_input_dlg() {
+N.wire.on(module.apiPath + ':tags_edit', async function show_tags_input_dlg() {
   let data = { tags };
 
-  return N.wire.emit('blogs.blocks.tags_edit_dlg', data)
-             .then(() => {
-               tags = data.tags;
-               $footer.html(N.runtime.render('blogs.blocks.tags_edit_list', { tags, apiPath: module.apiPath }));
-             });
+  await N.wire.emit('blogs.blocks.tags_edit_dlg', data);
+
+  tags = data.tags;
+  $footer.html(N.runtime.render('blogs.blocks.tags_edit_list', { tags, apiPath: module.apiPath }));
 });
 
 
 // Open options dialog
 //
-N.wire.on(module.apiPath + ':options', function show_options_dlg() {
-  return N.wire.emit('common.blocks.editor_options_dlg', options.user_settings).then(updateOptions);
+N.wire.on(module.apiPath + ':options', async function show_options_dlg() {
+  await N.wire.emit('common.blocks.editor_options_dlg', options.user_settings);
+  updateOptions();
 });

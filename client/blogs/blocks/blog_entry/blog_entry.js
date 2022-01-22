@@ -1,4 +1,3 @@
-
 'use strict';
 
 
@@ -6,51 +5,46 @@ N.wire.once(module.apiPath, function blog_entry_setup_handlers() {
 
   // Click report button
   //
-  N.wire.on(module.apiPath + ':report', function entry_report(data) {
+  N.wire.on(module.apiPath + ':report', async function entry_report(data) {
     let params = { messages: t('@blogs.abuse_report.messages') };
     let id = data.$this.data('entry-id');
 
-    return Promise.resolve()
-      .then(() => N.wire.emit('common.blocks.abuse_report_dlg', params))
-      .then(() => N.io.rpc('blogs.entry.abuse_report', { entry_id: id, message: params.message }))
-      .then(() => N.wire.emit('notify.info', t('abuse_reported')));
+    await N.wire.emit('common.blocks.abuse_report_dlg', params);
+    await N.io.rpc('blogs.entry.abuse_report', { entry_id: id, message: params.message });
+    await N.wire.emit('notify.info', t('abuse_reported'));
   });
 
 
   // Show blog entry IP
   //
-  N.wire.on(module.apiPath + ':show_ip', function entry_show_ip(data) {
-    return N.wire.emit('blogs.blocks.ip_info_dlg', { entry_id: data.$this.data('entry-id') });
+  N.wire.on(module.apiPath + ':show_ip', async function entry_show_ip(data) {
+    await N.wire.emit('blogs.blocks.ip_info_dlg', { entry_id: data.$this.data('entry-id') });
   });
 
 
   // Add/remove bookmark
   //
-  N.wire.on(module.apiPath + ':bookmark', function entry_bookmark(data) {
+  N.wire.on(module.apiPath + ':bookmark', async function entry_bookmark(data) {
     let $entry   = $('#entry' + data.$this.data('entry-hid'));
     let entry_id = $entry.data('entry-id');
     let remove   = data.$this.data('remove') || false;
 
-    return N.io.rpc('blogs.entry.bookmark', { entry_id, remove }).then(res => {
-      if (remove) {
-        $entry.removeClass('blog-entry__m-bookmarked');
-      } else {
-        $entry.addClass('blog-entry__m-bookmarked');
-      }
+    const res = await N.io.rpc('blogs.entry.bookmark', { entry_id, remove });
 
-      $entry.find('.blog-entry__bookmarks-count').attr('data-bm-count', res.count);
-    });
+    if (remove) $entry.removeClass('blog-entry__m-bookmarked');
+    else $entry.addClass('blog-entry__m-bookmarked');
+
+    $entry.find('.blog-entry__bookmarks-count').attr('data-bm-count', res.count);
   });
 
 
   // Show history popup
   //
-  N.wire.on(module.apiPath + ':history', function entry_history(data) {
+  N.wire.on(module.apiPath + ':history', async function entry_history(data) {
     let entry_id = data.$this.data('entry-id');
 
-    return Promise.resolve()
-      .then(() => N.io.rpc('blogs.entry.show_history', { entry_id }))
-      .then(res => N.wire.emit('blogs.blocks.blog_entry.entry_history_dlg', res));
+    const res = await N.io.rpc('blogs.entry.show_history', { entry_id });
+    await N.wire.emit('blogs.blocks.blog_entry.entry_history_dlg', res);
   });
 
 

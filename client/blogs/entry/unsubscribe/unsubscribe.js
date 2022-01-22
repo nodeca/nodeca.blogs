@@ -1,12 +1,12 @@
 'use strict';
 
 
-N.wire.on('navigate.done:' + module.apiPath, function unsubscribe() {
+N.wire.on('navigate.done:' + module.apiPath, async function unsubscribe() {
   let selector = '.blogs-entry-unsubscribe';
   let type = $(selector).data('type');
   let entry_id = $(selector).data('entry-id');
 
-  return Promise.resolve()
-           .then(() => N.io.rpc('blogs.entry.change_subscription', { entry_id, type }))
-           .then(() => $(selector).addClass('page-loading__m-done'));
+  await N.io.rpc('blogs.entry.change_subscription', { entry_id, type });
+
+  $(selector).addClass('page-loading__m-done');
 });

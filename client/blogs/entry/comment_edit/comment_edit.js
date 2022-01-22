@@ -36,32 +36,25 @@ N.wire.before(module.apiPath + ':begin', function load_mdedit() {
 
 // Fetch comment and options
 //
-N.wire.before(module.apiPath + ':begin', function fetch_options(data) {
-  let commentData;
+N.wire.before(module.apiPath + ':begin', async function fetch_options(data) {
 
-  return Promise.resolve()
-    .then(() => N.io.rpc('blogs.entry.comment.edit.index', { comment_id: data.comment_id }))
-    .then(response => {
-      commentData = response;
+  const commentData = await N.io.rpc('blogs.entry.comment.edit.index', { comment_id: data.comment_id });
+  const opt = await N.io.rpc('blogs.entry.comment.options');
 
-      return N.io.rpc('blogs.entry.comment.options');
-    })
-    .then(opt => {
-      options = {
-        parse_options: opt.parse_options,
-        user_settings: {
-          no_mlinks:         !commentData.params.link_to_title && !commentData.params.link_to_snippet,
-          no_emojis:         !commentData.params.emoji,
-          no_quote_collapse: !commentData.params.quote_collapse
-        }
-      };
+  options = {
+    parse_options: opt.parse_options,
+    user_settings: {
+      no_mlinks:         !commentData.params.link_to_title && !commentData.params.link_to_snippet,
+      no_emojis:         !commentData.params.emoji,
+      no_quote_collapse: !commentData.params.quote_collapse
+    }
+  };
 
-      comment = {
-        user_id:     commentData.user_id,
-        md:          commentData.md,
-        title:       commentData.title
-      };
-    });
+  comment = {
+    user_id:     commentData.user_id,
+    md:          commentData.md,
+    title:       commentData.title
+  };
 });
 
 

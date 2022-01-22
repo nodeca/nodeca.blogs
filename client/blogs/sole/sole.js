@@ -189,10 +189,9 @@ N.wire.on('navigate.exit:' + module.apiPath, function page_teardown() {
 
 // Set up handlers for buttons in entry-list
 //
-N.wire.on('navigate.done:' + module.apiPath, function setup_blog_entry_handlers() {
-  return Promise.resolve()
-             .then(() => N.wire.emit('blogs.blocks.blog_entry'))
-             .then(() => N.wire.emit('blogs.blocks.entry_list_sole'));
+N.wire.on('navigate.done:' + module.apiPath, async function setup_blog_entry_handlers() {
+  await N.wire.emit('blogs.blocks.blog_entry');
+  await N.wire.emit('blogs.blocks.entry_list_sole');
 });
 
 
@@ -247,33 +246,30 @@ N.wire.once('navigate.done:' + module.apiPath, function blogs_sole_init_handlers
 
   // Subscription handler
   //
-  N.wire.on(module.apiPath + ':subscription', function subscription(data) {
+  N.wire.on(module.apiPath + ':subscription', async function subscription(data) {
     let id = data.$this.data('user-id');
     let params = { subscription: data.$this.data('blog-subscription') };
 
-    return Promise.resolve()
-      .then(() => N.wire.emit('blogs.sole.subscription', params))
-      .then(() => N.io.rpc('blogs.sole.change_subscription', { user_id: id, type: params.subscription }))
-      .then(() => {
-        N.runtime.page_data.subscription = params.subscription;
-      })
-      .then(() => {
-        // Need to re-render reply button and dropdown here
-        let templateParams = {
-          user_id:      N.runtime.page_data.user_id,
-          user_hid:     N.runtime.page_data.user_hid,
-          current_tag:  N.runtime.page_data.current_tag,
-          settings:     N.runtime.page_data.settings,
-          subscription: N.runtime.page_data.subscription
-        };
+    await N.wire.emit('blogs.sole.subscription', params);
+    await N.io.rpc('blogs.sole.change_subscription', { user_id: id, type: params.subscription });
 
-        // render dropdown in menu
-        $('.page-actions__dropdown').replaceWith(
-          N.runtime.render(module.apiPath + '.blocks.page_actions.dropdown', templateParams));
+    N.runtime.page_data.subscription = params.subscription;
 
-        // render buttons+dropdown in page head
-        $('.page-actions').replaceWith(
-          N.runtime.render(module.apiPath + '.blocks.page_actions', templateParams));
-      });
+    // Need to re-render reply button and dropdown here
+    let templateParams = {
+      user_id:      N.runtime.page_data.user_id,
+      user_hid:     N.runtime.page_data.user_hid,
+      current_tag:  N.runtime.page_data.current_tag,
+      settings:     N.runtime.page_data.settings,
+      subscription: N.runtime.page_data.subscription
+    };
+
+    // render dropdown in menu
+    $('.page-actions__dropdown').replaceWith(
+      N.runtime.render(module.apiPath + '.blocks.page_actions.dropdown', templateParams));
+
+    // render buttons+dropdown in page head
+    $('.page-actions').replaceWith(
+      N.runtime.render(module.apiPath + '.blocks.page_actions', templateParams));
   });
 });

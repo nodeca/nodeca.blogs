@@ -91,14 +91,13 @@ N.wire.once('navigate.done:' + module.apiPath, function page_once() {
 
   // Click report button
   //
-  N.wire.on(module.apiPath + ':comment_report', function comment_report(data) {
+  N.wire.on(module.apiPath + ':comment_report', async function comment_report(data) {
     let params = { messages: t('@blogs.abuse_report.messages') };
     let id = data.$this.data('comment-id');
 
-    return Promise.resolve()
-      .then(() => N.wire.emit('common.blocks.abuse_report_dlg', params))
-      .then(() => N.io.rpc('blogs.entry.comment.abuse_report', { comment_id: id, message: params.message }))
-      .then(() => N.wire.emit('notify.info', t('abuse_reported')));
+    await N.wire.emit('common.blocks.abuse_report_dlg', params);
+    await N.io.rpc('blogs.entry.comment.abuse_report', { comment_id: id, message: params.message });
+    await N.wire.emit('notify.info', t('abuse_reported'));
   });
 
 
@@ -111,128 +110,119 @@ N.wire.once('navigate.done:' + module.apiPath, function page_once() {
 
   // Add/remove bookmark
   //
-  N.wire.on(module.apiPath + ':comment_bookmark', function entry_bookmark(data) {
+  N.wire.on(module.apiPath + ':comment_bookmark', async function entry_bookmark(data) {
     let $comment   = $('#comment' + data.$this.data('comment-hid'));
     let comment_id = $comment.data('comment-id');
     let remove     = data.$this.data('remove') || false;
 
-    return N.io.rpc('blogs.entry.comment.bookmark', { comment_id, remove }).then(res => {
-      if (remove) {
-        $comment.removeClass('blog-comment__m-bookmarked');
-      } else {
-        $comment.addClass('blog-comment__m-bookmarked');
-      }
+    const res = await N.io.rpc('blogs.entry.comment.bookmark', { comment_id, remove });
 
-      $comment.find('.blog-comment__bookmarks-count').attr('data-bm-count', res.count);
-    });
+    if (remove) $comment.removeClass('blog-comment__m-bookmarked');
+    else $comment.addClass('blog-comment__m-bookmarked');
+
+    $comment.find('.blog-comment__bookmarks-count').attr('data-bm-count', res.count);
   });
 
 
   // Expand deleted or hellbanned comment
   //
-  N.wire.on(module.apiPath + ':comment_expand', function expand(data) {
+  N.wire.on(module.apiPath + ':comment_expand', async function expand(data) {
     let comment_id = data.$this.data('comment-id');
 
-    return Promise.resolve()
-      .then(() => N.io.rpc('blogs.entry.comment.get', {
-        entry_hid: pageState.entry_hid,
-        comment_ids: [ comment_id ]
-      }))
-      .then(res => {
-        let $result = $(N.runtime.render('blogs.entry.blocks.comment_list', Object.assign(res, { expand: true })));
+    const res = await N.io.rpc('blogs.entry.comment.get', {
+      entry_hid: pageState.entry_hid,
+      comment_ids: [ comment_id ]
+    });
 
-        return N.wire.emit('navigate.content_update', {
-          $: $result,
-          locals: res,
-          $replace: data.$this.closest('.blog-comment')
-        });
-      });
+    let $result = $(N.runtime.render('blogs.entry.blocks.comment_list', Object.assign(res, { expand: true })));
+
+    await N.wire.emit('navigate.content_update', {
+      $: $result,
+      locals: res,
+      $replace: data.$this.closest('.blog-comment')
+    });
   });
 
 
   // Add infraction for blog entry
   //
-  N.wire.on(module.apiPath + ':entry_add_infraction', function add_infraction(data) {
+  N.wire.on(module.apiPath + ':entry_add_infraction', async function add_infraction(data) {
     let $entry = $('#entry' + data.$this.data('entry-hid'));
     let entry_id = $entry.data('entry-id');
     let params = { entry_id };
 
-    return Promise.resolve()
-      .then(() => N.wire.emit('users.blocks.add_infraction_dlg', params))
-      .then(() => N.io.rpc('blogs.entry.add_infraction', params))
-      .then(() => N.io.rpc('blogs.entry.get', { entry_id }))
-      .then(res => {
-        let $result = $(N.runtime.render('blogs.entry.blocks.entry', res));
+    await N.wire.emit('users.blocks.add_infraction_dlg', params);
+    await N.io.rpc('blogs.entry.add_infraction', params);
+    const res = await N.io.rpc('blogs.entry.get', { entry_id });
 
-        return N.wire.emit('navigate.content_update', {
-          $: $result,
-          locals: res,
-          $replace: $entry
-        });
-      })
-      .then(() => N.wire.emit('notify.info', t('infraction_added')));
+    let $result = $(N.runtime.render('blogs.entry.blocks.entry', res));
+
+    await N.wire.emit('navigate.content_update', {
+      $: $result,
+      locals: res,
+      $replace: $entry
+    });
+
+    await N.wire.emit('notify.info', t('infraction_added'));
   });
 
 
   // Add infraction for a comment
   //
-  N.wire.on(module.apiPath + ':comment_add_infraction', function add_infraction(data) {
+  N.wire.on(module.apiPath + ':comment_add_infraction', async function add_infraction(data) {
     let $comment = $('#comment' + data.$this.data('comment-hid'));
     let comment_id = $comment.data('comment-id');
     let params = { comment_id };
 
-    return Promise.resolve()
-      .then(() => N.wire.emit('users.blocks.add_infraction_dlg', params))
-      .then(() => N.io.rpc('blogs.entry.comment.add_infraction', params))
-      .then(() => N.io.rpc('blogs.entry.comment.get', {
-        entry_hid: pageState.entry_hid,
-        comment_ids: [ comment_id ]
-      }))
-      .then(res => {
-        let $result = $(N.runtime.render('blogs.entry.blocks.comment_list', res));
+    await N.wire.emit('users.blocks.add_infraction_dlg', params);
+    await N.io.rpc('blogs.entry.comment.add_infraction', params);
+    const res = await N.io.rpc('blogs.entry.comment.get', {
+      entry_hid: pageState.entry_hid,
+      comment_ids: [ comment_id ]
+    });
 
-        return N.wire.emit('navigate.content_update', {
-          $: $result,
-          locals: res,
-          $replace: $comment
-        });
-      });
+    let $result = $(N.runtime.render('blogs.entry.blocks.comment_list', res));
+
+    await N.wire.emit('navigate.content_update', {
+      $: $result,
+      locals: res,
+      $replace: $comment
+    });
   });
 
 
   // Click on entry edit button
   //
-  N.wire.on(module.apiPath + ':entry_edit', function edit() {
+  N.wire.on(module.apiPath + ':entry_edit', async function edit() {
     let $entry    = $('#entry' + pageState.entry_hid);
     let entry_id  = $entry.data('entry-id');
 
-    return N.wire.emit('blogs.blocks.blog_entry.edit:begin', {
+    await N.wire.emit('blogs.blocks.blog_entry.edit:begin', {
       user_hid:    $entry.data('user-hid'),
       entry_hid:   $entry.data('entry-hid'),
       entry_title: $entry.find('.blog-entry__title').text(),
       entry_id
-    }).then(() => N.io.rpc('blogs.entry.get', { entry_id }))
-      .then(res => {
-        let $result = $(N.runtime.render('blogs.entry.blocks.entry', res));
+    });
+    const res = await N.io.rpc('blogs.entry.get', { entry_id });
 
-        return N.wire.emit('navigate.content_update', {
-          $: $result,
-          locals: res,
-          $replace: $entry
-        });
-      })
-      .catch(err => N.wire.emit('error', err));
+    let $result = $(N.runtime.render('blogs.entry.blocks.entry', res));
+
+    await N.wire.emit('navigate.content_update', {
+      $: $result,
+      locals: res,
+      $replace: $entry
+    });
   });
 
 
   // Click on comment edit button
   //
-  N.wire.on(module.apiPath + ':comment_edit', function edit(data) {
+  N.wire.on(module.apiPath + ':comment_edit', async function edit(data) {
     let comment_hid = data.$this.data('comment-hid');
     let $comment    = $('#comment' + comment_hid);
     let comment_id  = $comment.data('comment-id');
 
-    return N.wire.emit('blogs.entry.comment_edit:begin', {
+    await N.wire.emit('blogs.entry.comment_edit:begin', {
       user_hid:    pageState.user_hid,
       entry_hid:   pageState.entry_hid,
       entry_title: N.runtime.page_data.entry.title,
@@ -244,63 +234,60 @@ N.wire.once('navigate.done:' + module.apiPath, function page_once() {
 
   // Show history popup
   //
-  N.wire.on(module.apiPath + ':comment_history', function comment_history(data) {
+  N.wire.on(module.apiPath + ':comment_history', async function comment_history(data) {
     let comment_id = data.$this.data('comment-id');
 
-    return Promise.resolve()
-      .then(() => N.io.rpc('blogs.entry.comment.show_history', { comment_id }))
-      .then(res => N.wire.emit('blogs.entry.comment_history_dlg', res));
+    const res = await N.io.rpc('blogs.entry.comment.show_history', { comment_id });
+    await N.wire.emit('blogs.entry.comment_history_dlg', res);
   });
 
 
   // Vote on blog entry
   //
-  N.wire.on(module.apiPath + ':entry_vote', function entry_vote(data) {
+  N.wire.on(module.apiPath + ':entry_vote', async function entry_vote(data) {
     let $entry   = $('#entry' + data.$this.data('entry-hid'));
     let entry_id = $entry.data('entry-id');
     let value    = +data.$this.data('value');
 
-    return N.io.rpc('blogs.entry.vote', { entry_id, value })
-      .then(() => N.io.rpc('blogs.entry.get', { entry_id }))
-      .then(res => {
-        let $result = $(N.runtime.render('blogs.entry.blocks.entry', res));
+    await N.io.rpc('blogs.entry.vote', { entry_id, value });
+    const res = await N.io.rpc('blogs.entry.get', { entry_id });
 
-        return N.wire.emit('navigate.content_update', {
-          $: $result,
-          locals: res,
-          $replace: $entry
-        });
-      });
+    let $result = $(N.runtime.render('blogs.entry.blocks.entry', res));
+
+    await N.wire.emit('navigate.content_update', {
+      $: $result,
+      locals: res,
+      $replace: $entry
+    });
   });
 
 
   // Vote on blog comment
   //
-  N.wire.on(module.apiPath + ':comment_vote', function comment_vote(data) {
+  N.wire.on(module.apiPath + ':comment_vote', async function comment_vote(data) {
     let $comment   = $('#comment' + data.$this.data('comment-hid'));
     let comment_id = $comment.data('comment-id');
     let value      = +data.$this.data('value');
 
-    return N.io.rpc('blogs.entry.comment.vote', { comment_id, value })
-      .then(() => N.io.rpc('blogs.entry.comment.get', {
-        entry_hid: pageState.entry_hid,
-        comment_ids: [ comment_id ]
-      }))
-      .then(res => {
-        let $result = $(N.runtime.render('blogs.entry.blocks.comment_list', res));
+    await N.io.rpc('blogs.entry.comment.vote', { comment_id, value });
+    const res = await N.io.rpc('blogs.entry.comment.get', {
+      entry_hid: pageState.entry_hid,
+      comment_ids: [ comment_id ]
+    });
 
-        return N.wire.emit('navigate.content_update', {
-          $: $result,
-          locals: res,
-          $replace: $comment
-        });
-      });
+    let $result = $(N.runtime.render('blogs.entry.blocks.comment_list', res));
+
+    await N.wire.emit('navigate.content_update', {
+      $: $result,
+      locals: res,
+      $replace: $comment
+    });
   });
 
 
   // Delete entry
   //
-  N.wire.on(module.apiPath + ':delete', function entry_delete(data) {
+  N.wire.on(module.apiPath + ':delete', async function entry_delete(data) {
     let $entry = $('#entry' + data.$this.data('entry-hid'));
     let entry_id = $entry.data('entry-id');
 
@@ -313,22 +300,19 @@ N.wire.once('navigate.done:' + module.apiPath, function page_once() {
       asModerator: request.as_moderator
     };
 
-    return Promise.resolve()
-      .then(() => N.wire.emit('blogs.blocks.blog_entry.entry_delete_dlg', params))
-      .then(() => {
-        request.method = params.method;
-        if (params.reason) request.reason = params.reason;
-        return N.io.rpc('blogs.entry.destroy', request);
-      })
-      .then(() =>
-        N.wire.emit('navigate.to', { apiPath: 'blogs.index' })
-      );
+    await N.wire.emit('blogs.blocks.blog_entry.entry_delete_dlg', params);
+
+    request.method = params.method;
+    if (params.reason) request.reason = params.reason;
+    await N.io.rpc('blogs.entry.destroy', request);
+
+    await N.wire.emit('navigate.to', { apiPath: 'blogs.index' });
   });
 
 
   // Delete comment handler
   //
-  N.wire.on(module.apiPath + ':comment_delete', function comment_delete(data) {
+  N.wire.on(module.apiPath + ':comment_delete', async function comment_delete(data) {
     let $comment = $('#comment' + data.$this.data('comment-hid'));
     let comment_id = $comment.data('comment-id');
 
@@ -341,131 +325,121 @@ N.wire.once('navigate.done:' + module.apiPath, function page_once() {
       asModerator: request.as_moderator
     };
 
-    return Promise.resolve()
-      .then(() => N.wire.emit('blogs.entry.comment_delete_dlg', params))
-      .then(() => {
-        request.method = params.method;
-        if (params.reason) request.reason = params.reason;
-        return N.io.rpc('blogs.entry.comment.destroy', request);
-      })
-      .then(res => {
-        let removed_ids = res.removed_comment_ids;
+    await N.wire.emit('blogs.entry.comment_delete_dlg', params);
 
-        return N.io.rpc('blogs.entry.comment.get', {
-          entry_hid: pageState.entry_hid,
-          comment_ids: removed_ids
-        })
-          .then(res => {
-            let comment_counter = $('.blogs-entry-page__comment-count');
-            comment_counter.attr('data-count', comment_counter.attr('data-count') - removed_ids.length);
+    request.method = params.method;
+    if (params.reason) request.reason = params.reason;
+    let res = await N.io.rpc('blogs.entry.comment.destroy', request);
 
-            if (res.comments.length === 0) {
-              // for users who can't see deleted comments we just show hide animation
-              for (let id of removed_ids) {
-                let $comment = $(`.blog-comment[data-comment-id='${id}']`);
-                $comment.fadeOut(() => $comment.remove());
-              }
-              return;
-            }
+    let removed_ids = res.removed_comment_ids;
 
-            let $result = $(N.runtime.render('blogs.entry.blocks.comment_list', res));
+    res = await N.io.rpc('blogs.entry.comment.get', {
+      entry_hid: pageState.entry_hid,
+      comment_ids: removed_ids
+    });
 
-            // remove all child comments then $replace main comment with the entire block
-            removed_ids.forEach(id => {
-              if (id === comment_id) return;
-              let $comment = $(`.blog-comment[data-comment-id='${id}']`);
-              $comment.remove();
-            });
+    let comment_counter = $('.blogs-entry-page__comment-count');
+    comment_counter.attr('data-count', comment_counter.attr('data-count') - removed_ids.length);
 
-            return N.wire.emit('navigate.content_update', {
-              $: $result,
-              locals: res,
-              $replace: $comment
-            });
-          });
-      });
+    if (res.comments.length === 0) {
+      // for users who can't see deleted comments we just show hide animation
+      for (let id of removed_ids) {
+        let $comment = $(`.blog-comment[data-comment-id='${id}']`);
+        $comment.fadeOut(() => $comment.remove());
+      }
+      return;
+    }
+
+    let $result = $(N.runtime.render('blogs.entry.blocks.comment_list', res));
+
+    // remove all child comments then $replace main comment with the entire block
+    removed_ids.forEach(id => {
+      if (id === comment_id) return;
+      let $comment = $(`.blog-comment[data-comment-id='${id}']`);
+      $comment.remove();
+    });
+
+    await N.wire.emit('navigate.content_update', {
+      $: $result,
+      locals: res,
+      $replace: $comment
+    });
   });
 
 
   // Undelete entry
   //
-  N.wire.on(module.apiPath + ':undelete', function entry_undelete(data) {
+  N.wire.on(module.apiPath + ':undelete', async function entry_undelete(data) {
     let $entry = $('#entry' + data.$this.data('entry-hid'));
     let entry_id = $entry.data('entry-id');
 
-    return Promise.resolve()
-      .then(() => N.io.rpc('blogs.entry.undelete', { entry_id }))
-      .then(() => N.io.rpc('blogs.entry.get', { entry_id }))
-      .then(res => {
-        let $result = $(N.runtime.render('blogs.entry.blocks.entry', res));
+    await N.io.rpc('blogs.entry.undelete', { entry_id });
+    const res = await N.io.rpc('blogs.entry.get', { entry_id });
 
-        $('#content').removeClass('blogs-entry-page__m-deleted blogs-entry-page__m-deleted-hard');
+    let $result = $(N.runtime.render('blogs.entry.blocks.entry', res));
 
-        return N.wire.emit('navigate.content_update', {
-          $: $result,
-          locals: res,
-          $replace: $entry
-        });
-      })
-      .then(() => N.wire.emit('notify.info', t('entry_undelete_done')));
+    $('#content').removeClass('blogs-entry-page__m-deleted blogs-entry-page__m-deleted-hard');
+
+    await N.wire.emit('navigate.content_update', {
+      $: $result,
+      locals: res,
+      $replace: $entry
+    });
+
+    await N.wire.emit('notify.info', t('entry_undelete_done'));
   });
 
 
   // Undelete entry handler
   //
-  N.wire.on(module.apiPath + ':comment_undelete', function comment_undelete(data) {
+  N.wire.on(module.apiPath + ':comment_undelete', async function comment_undelete(data) {
     let $comment = $('#comment' + data.$this.data('comment-hid'));
     let comment_id = $comment.data('comment-id');
 
-    return Promise.resolve()
-      .then(() => N.io.rpc('blogs.entry.comment.undelete', { comment_id }))
-      .then(() => N.io.rpc('blogs.entry.comment.get', {
-        entry_hid: pageState.entry_hid,
-        comment_ids: [ comment_id ]
-      }))
-      .then(res => {
-        let comment_counter = $('.blogs-entry-page__comment-count');
-        comment_counter.attr('data-count', +comment_counter.attr('data-count') + 1);
+    await N.io.rpc('blogs.entry.comment.undelete', { comment_id });
+    const res = await N.io.rpc('blogs.entry.comment.get', {
+      entry_hid: pageState.entry_hid,
+      comment_ids: [ comment_id ]
+    });
 
-        let $result = $(N.runtime.render('blogs.entry.blocks.comment_list', res));
+    let comment_counter = $('.blogs-entry-page__comment-count');
+    comment_counter.attr('data-count', +comment_counter.attr('data-count') + 1);
 
-        return N.wire.emit('navigate.content_update', {
-          $: $result,
-          locals: res,
-          $replace: $comment
-        });
-      });
+    let $result = $(N.runtime.render('blogs.entry.blocks.comment_list', res));
+
+    await N.wire.emit('navigate.content_update', {
+      $: $result,
+      locals: res,
+      $replace: $comment
+    });
   });
 
 
   // Subscription handler
   //
-  N.wire.on(module.apiPath + ':subscription', function subscription(data) {
+  N.wire.on(module.apiPath + ':subscription', async function subscription(data) {
     let id = data.$this.data('entry-id');
     let params = { subscription: data.$this.data('entry-subscription') };
 
-    return Promise.resolve()
-      .then(() => N.wire.emit('blogs.entry.subscription', params))
-      .then(() => N.io.rpc('blogs.entry.change_subscription', { entry_id: id, type: params.subscription }))
-      .then(() => {
-        N.runtime.page_data.subscription = params.subscription;
-      })
-      .then(() => {
-        // Need to re-render reply button and dropdown here
-        let templateParams = {
-          entry:        N.runtime.page_data.entry,
-          settings:     N.runtime.page_data.settings,
-          subscription: N.runtime.page_data.subscription
-        };
+    await N.wire.emit('blogs.entry.subscription', params);
+    await N.io.rpc('blogs.entry.change_subscription', { entry_id: id, type: params.subscription });
 
-        // render dropdown in menu
-        $('.page-actions__dropdown').replaceWith(
-          N.runtime.render(module.apiPath + '.blocks.page_actions.dropdown', templateParams));
+    N.runtime.page_data.subscription = params.subscription;
 
-        // render buttons+dropdown in page head
-        $('.page-actions').replaceWith(
-          N.runtime.render(module.apiPath + '.blocks.page_actions', templateParams));
-      });
+    // Need to re-render reply button and dropdown here
+    let templateParams = {
+      entry:        N.runtime.page_data.entry,
+      settings:     N.runtime.page_data.settings,
+      subscription: N.runtime.page_data.subscription
+    };
+
+    // render dropdown in menu
+    $('.page-actions__dropdown').replaceWith(
+      N.runtime.render(module.apiPath + '.blocks.page_actions.dropdown', templateParams));
+
+    // render buttons+dropdown in page head
+    $('.page-actions').replaceWith(
+      N.runtime.render(module.apiPath + '.blocks.page_actions', templateParams));
   });
 
 

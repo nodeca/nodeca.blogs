@@ -9,6 +9,7 @@
 //
 'use strict';
 
+const fromEvent = require('nodeca.core/lib/system/from_event');
 
 let $dialog;
 let params;
@@ -42,28 +43,26 @@ N.wire.once(module.apiPath, function init_handlers() {
 
 // Init dialog
 //
-N.wire.on(module.apiPath, function show_comment_delete_dlg(options) {
+N.wire.on(module.apiPath, async function show_comment_delete_dlg(options) {
+  result = null;
   params = options;
   $dialog = $(N.runtime.render(module.apiPath, params));
 
   $('body').append($dialog);
 
-  return new Promise((resolve, reject) => {
-    $dialog
-      .on('shown.bs.modal', () => {
-        $dialog.find('.btn-secondary').focus();
-      })
-      .on('hidden.bs.modal', () => {
-        // When dialog closes - remove it from body and free resources
-        $dialog.remove();
-        $dialog = null;
-        params = null;
 
-        if (result) resolve(result);
-        else reject('CANCELED');
+  $dialog
+    .on('shown.bs.modal', () => {
+      $dialog.find('.btn-secondary').focus();
+    })
+    .modal('show');
 
-        result = null;
-      })
-      .modal('show');
-  });
+  await fromEvent($dialog, 'hidden.bs.modal');
+
+  // When dialog closes - remove it from body and free resources
+  $dialog.remove();
+  $dialog = null;
+  params = null;
+
+  if (!result) throw 'CANCELED';
 });

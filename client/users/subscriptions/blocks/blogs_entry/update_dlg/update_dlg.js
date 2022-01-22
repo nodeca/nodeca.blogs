@@ -6,6 +6,8 @@
 //
 'use strict';
 
+const fromEvent = require('nodeca.core/lib/system/from_event');
+
 
 let $dialog;
 let params;
@@ -25,36 +27,31 @@ N.wire.once(module.apiPath, function init_handlers() {
   // Close dialog on sudden page exit (if user click back button in browser)
   //
   N.wire.on('navigate.exit', function teardown_page() {
-    if ($dialog) {
-      $dialog.modal('hide');
-    }
+    $dialog?.modal('hide');
   });
 });
 
 
 // Init dialog
 //
-N.wire.on(module.apiPath, function show_subscription_dlg(options) {
+N.wire.on(module.apiPath, async function show_subscription_dlg(options) {
+  result = null;
   params = options;
   $dialog = $(N.runtime.render(module.apiPath, Object.assign({ apiPath: module.apiPath }, params)));
   $('body').append($dialog);
 
-  return new Promise((resolve, reject) => {
-    $dialog
-      .on('shown.bs.modal', function () {
-        $dialog.find('.btn-secondary').focus();
-      })
-      .on('hidden.bs.modal', function () {
-        // When dialog closes - remove it from body and free resources.
-        $dialog.remove();
-        $dialog = null;
-        params = null;
+  $dialog
+    .on('shown.bs.modal', function () {
+      $dialog.find('.btn-secondary').focus();
+    })
+    .modal('show');
 
-        if (result) resolve(result);
-        else reject('CANCELED');
+  await fromEvent($dialog, 'hidden.bs.modal');
 
-        result = null;
-      })
-      .modal('show');
-  });
+  // When dialog closes - remove it from body and free resources.
+  $dialog.remove();
+  $dialog = null;
+  params = null;
+
+  if (!result) throw 'CANCELED';
 });

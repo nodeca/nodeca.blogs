@@ -2,6 +2,7 @@
 //
 'use strict';
 
+const fromEvent = require('nodeca.core/lib/system/from_event');
 
 const commentStatuses  = '$$ JSON.stringify(N.models.blogs.BlogComment.statuses) $$';
 
@@ -155,32 +156,28 @@ function build_diff(history) {
 
 // Init dialog
 //
-N.wire.on(module.apiPath, function show_comment_history_dlg(params) {
+N.wire.on(module.apiPath, async function show_comment_history_dlg(params) {
   params.entries = build_diff(params.history);
 
   $dialog = $(N.runtime.render(module.apiPath, params));
   $('body').append($dialog);
 
-  return new Promise(resolve => {
-    $dialog
-      .on('shown.bs.modal', function () {
-        $dialog.find('.btn-secondary').focus();
-      })
-      .on('hidden.bs.modal', function () {
-        // When dialog closes - remove it from body and free resources.
-        $dialog.remove();
-        $dialog = null;
-        resolve();
-      })
-      .modal('show');
-  });
+  $dialog
+    .on('shown.bs.modal', function () {
+      $dialog.find('.btn-secondary').focus();
+    })
+    .modal('show');
+
+  await fromEvent($dialog, 'hidden.bs.modal');
+
+  // When dialog closes - remove it from body and free resources.
+  $dialog.remove();
+  $dialog = null;
 });
 
 
 // Close dialog on sudden page exit (if user click back button in browser)
 //
 N.wire.on('navigate.exit', function teardown_page() {
-  if ($dialog) {
-    $dialog.modal('hide');
-  }
+  $dialog?.modal('hide');
 });
