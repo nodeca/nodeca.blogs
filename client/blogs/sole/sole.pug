@@ -33,7 +33,7 @@ article#content.blogs-sole(
       level_up: self.current_tag ?
                 self.link_to('blogs.sole', { user_hid: user.hid }) :
                 self.link_to('blogs.index'),
-      toolbar: 'blogs.sole.blocks.page_actions.dropdown',
+      extra_buttons: 'blogs.sole.blocks.page_actions.dropdown',
       progress: {
         link_top:    self.link_to('blogs.sole', {
           user_hid: user.hid,

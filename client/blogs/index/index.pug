@@ -14,7 +14,7 @@ article#content.blogs-index(
   -
     var navbar_args = {
       title: self.t('title'),
-      toolbar: 'blogs.index.blocks.page_actions.dropdown',
+      extra_buttons: 'blogs.index.blocks.page_actions.dropdown',
       progress: {
         link_top:    self.link_to('blogs.index'),
         link_bottom: self.link_to('blogs.index', { $query: { from: self.last_entry_hid } }),
