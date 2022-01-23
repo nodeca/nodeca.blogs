@@ -26,14 +26,10 @@ article#content.blogs-sole(
       $query_bottom.tag = self.current_tag;
     }
 
-    var navbar_args = {
-      title_html: self.current_tag ?
-                  self.partial('@blogs.sole.blocks.title_tag', { user: user, tag: self.current_tag }) :
-                  self.partial('@blogs.sole.blocks.title_user', { user: user }),
+    const navbar_base = {
       level_up: self.current_tag ?
                 self.link_to('blogs.sole', { user_hid: user.hid }) :
                 self.link_to('blogs.index'),
-      extra_buttons: 'blogs.sole.blocks.page_actions.dropdown',
       progress: {
         link_top:    self.link_to('blogs.sole', {
           user_hid: user.hid,
@@ -45,7 +41,10 @@ article#content.blogs-sole(
         }),
         current:     self.pagination.chunk_offset,
         total:       self.pagination.total
-      },
+      }
+    };
+
+    const navbar_primary = {
       search_tab: 'blog_entries',
       search_areas: [
         {
@@ -56,12 +55,19 @@ article#content.blogs-sole(
       ]
     };
 
+    const navbar_alt = {
+      title_html: self.current_tag ?
+                  self.partial('@blogs.sole.blocks.title_tag', { user: user, tag: self.current_tag }) :
+                  self.partial('@blogs.sole.blocks.title_user', { user: user }),
+      extra_buttons: 'blogs.sole.blocks.page_actions.dropdown'
+    };
+
   if self.current_tag
-    != self.partial('@common.blocks.navbar.levelup_apps', navbar_args)
-    != self.partial('@common.blocks.navbar.alt_levelup_title', navbar_args)
+    != self.partial('@common.blocks.navbar.levelup_apps', { ...navbar_base, ...navbar_primary })
+    != self.partial('@common.blocks.navbar.alt_levelup_title', { ...navbar_base, ...navbar_alt })
   else
-    != self.partial('@common.blocks.navbar.levelup_progress_apps', navbar_args)
-    != self.partial('@common.blocks.navbar.alt_levelup_progress_title', navbar_args)
+    != self.partial('@common.blocks.navbar.levelup_progress_apps', { ...navbar_base, ...navbar_primary })
+    != self.partial('@common.blocks.navbar.alt_levelup_progress_title', { ...navbar_base, ...navbar_alt })
 
   nav.breadcrumbs-container
     .layout__container.container-fluid

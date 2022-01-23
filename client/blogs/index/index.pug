@@ -12,20 +12,26 @@ article#content.blogs-index(
 )
 
   -
-    var navbar_args = {
-      title: self.t('title'),
-      extra_buttons: 'blogs.index.blocks.page_actions.dropdown',
+    const navbar_base = {
       progress: {
         link_top:    self.link_to('blogs.index'),
         link_bottom: self.link_to('blogs.index', { $query: { from: self.last_entry_hid } }),
         current:     self.pagination.chunk_offset,
         total:       self.pagination.total
-      },
+      }
+    };
+
+    const navbar_primary = {
       search_tab: 'blog_entries'
     };
 
-  != self.partial('@common.blocks.navbar.logo_apps', navbar_args)
-  != self.partial('@common.blocks.navbar.alt_logo_apps', navbar_args)
+    const navbar_alt = {
+      title: self.t('title'),
+      extra_buttons: 'blogs.index.blocks.page_actions.dropdown'
+    };
+
+  != self.partial('@common.blocks.navbar.logo_apps', { ...navbar_base, ...navbar_primary })
+  != self.partial('@common.blocks.navbar.alt_logo_apps', { ...navbar_base, ...navbar_alt })
 
   nav.breadcrumbs-container
     .layout__container.container-fluid

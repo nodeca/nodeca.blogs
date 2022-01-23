@@ -19,10 +19,11 @@ article#content.blogs-entry-page(
       $query_bottom.tag = self.current_tag;
     }
 
-    var navbar_args = {
-      title_html: self.partial('@blogs.entry.blocks.title', { user: user, entry: entry }),
-      level_up: self.link_to('blogs.sole', { user_hid: user.hid }),
-      extra_buttons: 'blogs.entry.blocks.page_actions.dropdown',
+    const navbar_base = {
+      level_up: self.link_to('blogs.sole', { user_hid: user.hid })
+    };
+
+    const navbar_primary = {
       search_tab: 'blog_entries',
       search_areas: [
         {
@@ -33,8 +34,13 @@ article#content.blogs-entry-page(
       ]
     };
 
-  != self.partial('@common.blocks.navbar.levelup_apps', navbar_args)
-  != self.partial('@common.blocks.navbar.alt_levelup_title', navbar_args)
+    const navbar_alt = {
+      title_html: self.partial('@blogs.entry.blocks.title', { user: user, entry: entry }),
+      extra_buttons: 'blogs.entry.blocks.page_actions.dropdown',
+    };
+
+  != self.partial('@common.blocks.navbar.levelup_apps', { ...navbar_base, ...navbar_primary })
+  != self.partial('@common.blocks.navbar.alt_levelup_title', { ...navbar_base, ...navbar_alt })
 
   nav.breadcrumbs-container
     .layout__container.container-fluid
