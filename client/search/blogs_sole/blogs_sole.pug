@@ -1,7 +1,7 @@
 - self.add_raw_data('items_per_page', self.items_per_page)
 
 article#content.search-blogs-sole
-  != self.partial('@common.blocks.navbar.logo_apps')
+  != self.partial('@common.blocks.navbar.logo_apps', { search_tab: 'blog_entries' })
 
   .layout__container.container-fluid.space-top
     != self.partial('@users.blocks.announces')

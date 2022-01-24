@@ -2,7 +2,7 @@
 - var to_type = '$$ N.models.users.Subscription.types.NORMAL $$'
 
 #content.blogs-entry-unsubscribe(data-type=to_type, data-entry-id=self.entry._id)
-  != self.partial('@common.blocks.navbar.logo_apps')
+  != self.partial('@common.blocks.navbar.logo_apps', { search_tab: 'blog_entries' })
 
   .layout__container.container-fluid
     != self.partial('@users.blocks.announces')
