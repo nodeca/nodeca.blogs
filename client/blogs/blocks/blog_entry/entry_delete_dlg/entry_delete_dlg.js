@@ -9,7 +9,7 @@
 //
 'use strict';
 
-const fromEvent = require('nodeca.core/lib/system/from_event');
+const fromEvent = require('nodeca.core/lib/app/from_event');
 
 let $dialog;
 let params;
