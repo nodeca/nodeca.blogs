@@ -48,7 +48,7 @@ N.wire.on(module.apiPath + ':begin', function show_editor() {
   tags = [];
 
   let $editor = N.MDEdit.show({
-    draftKey: [ 'blog_entry_create', N.runtime.user_hid ].join('_'),
+    draftKey: `blog_entry_create_${N.runtime.user_hid}`,
     draftCustomFields: {
       '.blog-entry-create__title': 'input',
       tags: (...args) => {
