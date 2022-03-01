@@ -4,7 +4,7 @@ article#content.search-blogs-sole
   != self.partial('@common.blocks.navbar.logo_apps', { search_tab: 'blog_entries' })
 
   .layout__container.container-fluid.space-top
-    != self.partial('@users.blocks.announces')
+    != self.partial('@common.blocks.announces')
 
     header.page-head
       h1.page-head__title(itemprop='name')= self.t('title')
