@@ -151,7 +151,7 @@ N.wire.once('navigate.done:' + module.apiPath, function page_once() {
     let entry_id = $entry.data('entry-id');
     let params = { entry_id };
 
-    await N.wire.emit('users.blocks.add_infraction_dlg', params);
+    await N.wire.emit('common.blocks.add_infraction_dlg', params);
     await N.io.rpc('blogs.entry.add_infraction', params);
     const res = await N.io.rpc('blogs.entry.get', { entry_id });
 
@@ -174,7 +174,7 @@ N.wire.once('navigate.done:' + module.apiPath, function page_once() {
     let comment_id = $comment.data('comment-id');
     let params = { comment_id };
 
-    await N.wire.emit('users.blocks.add_infraction_dlg', params);
+    await N.wire.emit('common.blocks.add_infraction_dlg', params);
     await N.io.rpc('blogs.entry.comment.add_infraction', params);
     const res = await N.io.rpc('blogs.entry.comment.get', {
       entry_hid: pageState.entry_hid,

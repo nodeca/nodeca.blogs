@@ -63,7 +63,7 @@ N.wire.once(module.apiPath, function entry_list_sole_setup_handlers() {
     let entry_id = $entry.data('entry-id');
     let params = { entry_id };
 
-    await N.wire.emit('users.blocks.add_infraction_dlg', params);
+    await N.wire.emit('common.blocks.add_infraction_dlg', params);
     await N.io.rpc('blogs.entry.add_infraction', params);
     const res = await N.io.rpc('blogs.sole.list.by_ids', { entry_ids: [ entry_id ] });
 
