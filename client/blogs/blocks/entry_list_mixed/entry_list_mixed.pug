@@ -243,27 +243,6 @@ each entry in self.entries
       data-entry-hid=entry.hid
       data-entry-id=entry._id
     )
-      header.blog-entry__head
-        .blog-entry__title
-          a.blog-entry__link(href=self.link_to('blogs.entry', { user_hid: user.hid, entry_hid: entry.hid }))
-            = entry.title
-
-        .blog-entry__meta.blog-entry__author
-          if user.hid
-            span.blog-entry__ignored-mark.icon.icon-ignore
-            a.blog-entry__author-avatar._ucard-popover(
-              href=self.link_to('users.member', { user_hid: user.hid })
-              data-user-id=entry.user
-              data-user-ref='blog_entry:'+user.hid+':'+entry.hid
-            )
-              img.blog-entry__avatar(alt=user.name)&attributes(self.avatar(user, 'sm'))
-            a.blog-entry__author-link(
-              href=self.link_to('blogs.sole', { user_hid: user.hid })
-            )
-              = user.name
-          else
-            .blog-entry__avatar.av-anon
-
       .blog-entry__content-ignored
         .blog-entry__ignored.icon.icon-ignore.icon-space-after= self.t('ignored_entry_text')
 
