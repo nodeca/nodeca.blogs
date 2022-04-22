@@ -62,7 +62,7 @@ module.exports = function (N, apiPath) {
           .select('hid user')
           .sort('hid')
           .lean(true)
-          .stream(),
+          .cursor(),
 
       entry_stream,
       () => {}
