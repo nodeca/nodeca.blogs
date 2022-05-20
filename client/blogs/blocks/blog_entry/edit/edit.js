@@ -150,7 +150,8 @@ N.wire.on(module.apiPath + ':tags_edit', async function show_tags_input_dlg() {
 
 // Open options dialog
 //
-N.wire.on(module.apiPath + ':options', async function show_options_dlg() {
-  await N.wire.emit('common.blocks.editor_options_dlg', options.user_settings);
-  updateOptions();
+N.wire.on(module.apiPath + ':options', function show_options_dlg() {
+  return N.wire.emit('common.blocks.editor_options_dlg', options.user_settings)
+    .then(updateOptions)
+    .then(() => N.io.rpc('users.set_md_options', options.user_settings));
 });
