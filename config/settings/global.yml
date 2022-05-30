@@ -18,6 +18,12 @@ setting_schemas:
       category_key: entry
       default: 2
 
+    blog_entry_title_max_length:
+      type: number
+      group_key: blogs_editor
+      category_key: entry
+      default: 100
+
     blog_entry_min_length:
       type: number
       group_key: blogs_editor

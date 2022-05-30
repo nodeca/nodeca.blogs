@@ -16,6 +16,7 @@ i18n:
         setting_names:
           blog_entries_per_page: Blog entries per page
           blog_entry_title_min_length: Min title length
+          blog_entry_title_max_length: Max title length
           blog_entry_min_length: Min text length
           blog_entry_max_images: Max number of images
           blog_entry_max_emojis: Max number of emoticons
