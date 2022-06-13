@@ -195,7 +195,7 @@ module.exports = function (N, collectionName) {
           // Remove last history entry when user reverts changes
           //
           history[new_entry._id].count--;
-          bulk_history.find({ _id: prev._id }).remove();
+          bulk_history.find({ _id: prev._id }).delete();
           continue;
         }
 
