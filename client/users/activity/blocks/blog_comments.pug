@@ -1,9 +1,12 @@
+- var commentStatuses = '$$ JSON.stringify(N.models.blogs.BlogComment.statuses) $$'
+
 each result in self.results
   - var blog_user = self.users[result.entry.user];
-
+  - var show_as_deleted = result.comment.st === commentStatuses.DELETED || result.comment.st === commentStatuses.DELETED_HARD;
   article.users-activity-item.users-activity-item__m-with-content(
     id='item' + result.comment._id
     data-item-id=result.comment._id
+    class= show_as_deleted ? 'users-activity-item__m-deleted' : ''
   )
     header.users-activity-item__header
       a.users-activity-item__title(
