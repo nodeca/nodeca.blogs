@@ -6,10 +6,10 @@ const create_preview = require('nodeca.blogs/lib/create_preview');
 
 
 function add_test(str) {
-  let orig_str = str.replace(/<!--cut-->\n?/, '');
+  let orig_str = str.replace(/<!--cut(?:((?:<[/a-z]+>)*))?-->/i, '');
   let p = create_preview(orig_str);
 
-  assert.strictEqual(p.html, str);
+  assert.strictEqual(p.html.replace(/\n/g, ''), str.replace(/\n/g, ''));
   assert.strictEqual(p.top_too_heavy, false);
   assert.strictEqual(p.user_cut_too_large, false);
 }
@@ -109,12 +109,10 @@ ${'q\n'.repeat(10)}
     `);
   });
 
-  it('should count text inside nested tags', function () {
-    // paragraph is 4 lines each
+  it('should put cut inside long paragraph after inline tag', function () {
     add_test(`
-<p>test <div>test <em>${text(120 * 15)}</em><br> test</div> </p>
-<!--cut-->
-<p>${text(400)}</p>
+<p>test <div>test <em>${text(120 * 6)}</em><br><!--cut</div></p>-->
+${text(120 * 12)}</div> </p>
     `);
   });
 
@@ -149,6 +147,20 @@ ${'q\n'.repeat(10)}
     );
   });
 
+  it('should keep user preview in the middle', function () {
+    assert.strictEqual(
+      create_preview(`
+<p>${text(10)}</p>
+<!--cut-->
+<p>${text(10)}</p>
+`).html, `
+<p>${text(10)}</p>
+<!--cut-->
+<p>${text(10)}</p>
+`
+    );
+  });
+
   it('should replace user cut with auto cut + warning', function () {
     let p = create_preview(`<p>${text(400)}</p>
 <p>${text(400)}</p>
@@ -167,11 +179,11 @@ ${'q\n'.repeat(10)}
     assert.strictEqual(p.user_cut_too_large, true);
   });
 
-  it('should warn about multiple images at the top', function () {
+  /*it('should warn about multiple images at the top', function () {
     let p;
     p = create_preview('<p><img class="image"><img class="image"></p>');
     assert.strictEqual(p.top_too_heavy, false);
     p = create_preview('<p><img class="image"><img class="image"><img class="image"></p>');
     assert.strictEqual(p.top_too_heavy, true);
-  });
+  });*/
 });

@@ -15,20 +15,22 @@ N.wire.once(module.apiPath, function entry_list_mixed_setup_handlers() {
 
     data.$this.closest('.blog-entry').removeClass('blog-entry__m-can-read-more');
 
-    let html_parts = res.entry.html.split('<!--cut-->');
-    let $html_before_cut = $(html_parts.shift());
-    let $html_after_cut = $(html_parts.join(''));
-
+    let $html = $(res.entry.html.replace('<!--cut', '<span class="tmp-cut-marker"></span><!--cut'));
     let new_content = $('<div class="blog-entry__message markup"></div>');
 
-    // replace old content with expanded blog post (that's assembled
-    // from 2 parts: before and after cut), part after cut has 0 opacity
+    // top_level_tag is last visible paragraph on screen before expansion
+    let top_level_tag = $html.find('.tmp-cut-marker');
+    while (top_level_tag.parent().length) top_level_tag = top_level_tag.parent();
+
+    // add a class to everything below the cut
+    top_level_tag.nextAll().addClass('blog-entry__under-cut');
+
+    $html.remove('.blog-entry__tmp-cut-marker');
+
+    new_content.append($html);
+
+    // replace old content with expanded blog post, part after cut has 0 opacity
     // initially and animates to 1 later
-    new_content.append($html_before_cut);
-    new_content.append($html_after_cut);
-
-    $html_after_cut.each((idx, el) => $(el).addClass('blog-entry__under-cut'));
-
     await N.wire.emit('navigate.content_update', {
       $: new_content,
       locals: res,

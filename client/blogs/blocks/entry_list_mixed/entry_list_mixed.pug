@@ -16,9 +16,8 @@ each entry in self.entries
   if !show_as_deleted_or_hb && !show_as_ignored
     //- show normal blog posts (not deleted, hb, or ignored)
 
-    - var html_parts = entry.html.split('<!--cut-->');
+    - var html_parts = entry.html.split('<!--cut');
     - var html_before_cut = html_parts.shift();
-    - var html_after_cut = html_parts.join('');
 
     .blog-entry(
       id='entry' + entry.hid
@@ -27,7 +26,7 @@ each entry in self.entries
       class=(entry.st === entryStatuses.HB) ? 'blog-entry__m-hb' : ''
       class=(self.own_bookmarks.indexOf(entry._id) !== -1) ? 'blog-entry__m-bookmarked' : ''
       class=(self.ignored_users[entry.user]) ? 'blog-entry__m-ignored' : ''
-      class=html_after_cut.length ? 'blog-entry__m-can-read-more' : ''
+      class=html_parts.length ? 'blog-entry__m-can-read-more' : ''
       data-user-hid=user.hid
       data-entry-hid=entry.hid
       data-entry-id=entry._id
