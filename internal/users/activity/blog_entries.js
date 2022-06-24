@@ -185,4 +185,43 @@ module.exports = function (N, apiPath) {
 
     locals.users = Object.keys(users);
   });
+
+
+  // Fetch pagination and last topic id
+  //
+  N.wire.after(apiPath, async function fetch_pagination(locals) {
+    //
+    // Count total amount of visible topics
+    //
+    let entry_count = await N.models.blogs.BlogEntry.countDocuments()
+                                .where('user').equals(locals.params.user_id)
+                                .where('st').in(locals.sandbox.countable_statuses);
+
+    //
+    // Count an amount of visible topics before the first one
+    //
+    let entry_offset = 0;
+
+    if (locals.results.length) {
+      entry_offset = await N.models.blogs.BlogEntry.countDocuments()
+                               .where('user').equals(locals.params.user_id)
+                               .where('st').in(locals.sandbox.countable_statuses)
+                               .where('_id').gt(locals.results[0].entry._id);
+    }
+
+    let last_entry = await N.models.blogs.BlogEntry.findOne()
+                               .where('user').equals(locals.params.user_id)
+                               .where('st').in(locals.sandbox.countable_statuses)
+                               .sort('_id')
+                               .select('_id')
+                               .lean(true);
+
+    locals.pagination = {
+      total:        entry_count,
+      per_page:     20, // unused
+      chunk_offset: entry_offset
+    };
+
+    locals.last_item_id = last_entry?._id;
+  });
 };
